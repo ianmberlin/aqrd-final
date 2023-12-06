@@ -10,12 +10,10 @@ library(fuzzyjoin)
 library(usethis)
 
 forbes <- read_dta("data/brookings_forbes_2022.dta")
-states <- read.csv("data/Popular vote backend - Sheet1.csv") |>
-  pop(1:4)
-analysis <- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
-analysis2 <- read_dta("ReplicationPackage/data/stata_data/StateyearAgeAnalysisDataset.dta")
+state_year<- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
+state_year_age <- read_dta("ReplicationPackage/data/stata_data/StateyearAgeAnalysisDataset.dta")
 person_year <- read_dta("ReplicationPackage/data/stata_data/IndivAnalysisDataset.dta") |>
-  rename(name = Name)
+  rename(name = Name) 
 
 dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members.xlsx")
 
@@ -40,32 +38,34 @@ dynasty_long |>
     distance_col = "distance"
   )
 
+#test for git 
+
 
 ## Replication attempt ----
 
-analysis <- analysis |>
+state_year <- state_year |>
   mutate(post_year = if_else(year > 2001, 1, 0)) |>
   mutate(PIT = avg*100) 
 
-analysis <- analysis |>
+state_year <- state_year |>
   group_by(year) |>
   mutate(pop_90to97_natl = sum(pop_90to97)) |>
   mutate(topshr_90to97 = (pop_90to97/pop_90to97_natl)*100) |>
   mutate(total_wealth = sum(wealth)) |>
   mutate(wealth_share = (wealth/total_wealth)*100)
 
-mod1 <- feols(stock ~ EI*post_year + EI  | State + year, analysis)
-mod2 <- feols(stock ~ EI*post_year + EI + PIT*post_year + PIT | State + year, analysis)
-mod3 <- feols(stock ~ EI*post_year + EI + topshr_90to97  | State + year, analysis)
-mod6 <- feols(wealth_share ~ EI*post_year + EI  | State + year, analysis)
+mod1 <- feols(stock ~ EI*post_year + EI  | State + year, state_year)
+mod2 <- feols(stock ~ EI*post_year + EI + PIT*post_year + PIT | State + year, state_year)
+mod3 <- feols(stock ~ EI*post_year + EI + topshr_90to97  | State + year, state_year)
+mod6 <- feols(wealth_share ~ EI*post_year + EI  | State + year, state_year)
 
 #create dataset without 2002-2004
-analysis_drop <- analysis|>
+state_year_drop <- state_year|>
   filter(year != "2002",
          year != "2003",
          year != "2004")
 
-mod8 <- feols(stock ~ EI*post_year + EI  | State + year, analysis_drop)
+mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
 
 
 modelsummary(list(mod1, mod2, mod3, mod6, mod8), gof_map = c("nobs", "FE: State", "FE: year"))
