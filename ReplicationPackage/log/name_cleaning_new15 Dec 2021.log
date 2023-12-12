@@ -1,0 +1,4753 @@
+----------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  s:\dan\Paper - Forbes\ReplicationPackage\data\../log/name_cleaning_new15 Dec 2021.log
+  log type:  text
+ opened on:  15 Dec 2021, 12:49:45
+
+. 
+. 
+. gen family = 0
+
+. replace Name = strtrim(strproper(Name))
+(0 real changes made)
+
+. replace Name = subinstr(Name, "  ", " ", .)
+(0 real changes made)
+
+. replace family = 1 if regexm(Name, "Family")==1
+(1,192 real changes made)
+
+. replace Name = subinstr(Name, "& Family", "", .) if family==1
+(217 real changes made)
+
+. foreach y in "Fam Ily" "Fami Ly" "& Family" "And Family" "Family" "family"{
+  2. replace family = 1 if regexm(Name, "`y'")==1
+  3. replace Name = subinstr(Name, "`y'", "", .)
+  4. }
+(0 real changes made)
+(0 real changes made)
+(1 real change made)
+(1 real change made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(208 real changes made)
+(0 real changes made)
+(767 real changes made)
+(3 real changes made)
+(3 real changes made)
+
+. 
+. drop if mi(Name)
+(7 observations deleted)
+
+. 
+. replace Name = strtrim(Name)
+(1,114 real changes made)
+
+. replace Name = stritrim(Name)
+(71 real changes made)
+
+. 
+. gen NameReverse = strreverse(Name)
+
+. 
+. replace lastname = strreverse(substr(NameReverse, 1, strpos(NameReverse, " ")))
+(14,744 real changes made)
+
+. replace lastname = strtrim(lastname)
+(14,740 real changes made)
+
+. replace firstname = substr(Name, 1, strpos(Name, " "))
+(15,433 real changes made)
+
+. replace firstname = strtrim(firstname)
+(14,740 real changes made)
+
+. 
+. drop if strlen(Name) == 1
+(7 observations deleted)
+
+. 
+. gen midname = substr(Name, strpos(Name, " "), strlen(Name) - strpos(NameReverse, " ") - strpos(Name, " ") + 1)
+(7,194 missing values generated)
+
+. order lastname firstname midname
+
+. gen firstlast = firstname + " " + lastname
+
+. 
+. *NICOLE START
+. 
+. replace Name= "John E Abele" if regexm(firstname, "John") & regexm(lastname, "Abele")
+(3 real changes made)
+
+. replace midname = "E" if regexm(firstname, "John") & regexm(lastname, "Abele")
+(16 real changes made)
+
+. replace Name= "Kenneth Stanley Adams" if regexm(firstname, "Kenneth") & regexm(lastname, "Adams")
+(6 real changes made)
+
+. replace midname= "Stanley" if regexm(firstname, "Kenneth") & regexm(lastname, "Adams")
+(8 real changes made)
+
+. replace Name= "Richard L Adams" if regexm(firstname, "Richard") & regexm(lastname, "Adams")
+(1 real change made)
+
+. replace midname= "L" if regexm(firstname, "Richard") & regexm(lastname, "Adams")
+(4 real changes made)
+
+. replace Name= "Kathryn Mccurry Albertson" if regexm(firstname, "Kathryn") & regexm(lastname, "Albertson")
+(1 real change made)
+
+. replace midname= "Mccury" if regexm(firstname, "Kathryn") & regexm(lastname, "Albertson")
+(4 real changes made)
+
+. replace Name= "Joseph Albert Albertson" if regexm(firstname, "Joseph") & regexm(lastname, "Albertson")
+(5 real changes made)
+
+. replace midname= "Albert" if regexm(firstname, "Joseph") & regexm(lastname, "Albertson")
+(12 real changes made)
+
+. replace Name= "Joe Lewis Allbritton" if regexm(firstname, "Jo6") | regexm(lastname, "Allbritton")
+(3 real changes made)
+
+. replace firstname= "Joe" if regexm(firstname, "Jo6") & regexm(lastname, "Allbritton")
+(1 real change made)
+
+. replace midname= "Lewis" if regexm(firstname, "Joe") & regexm(lastname, "Allbritton")
+(12 real changes made)
+
+. replace Name= "Herbert Anthony Allen" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(midname, "A")
+(6 real changes made)
+
+. replace midname= "Anthony" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(midname, "A")
+(26 real changes made)
+
+. replace Name= "Herbert Anthony Allen" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(SUFFIX, "Jr")
+(4 real changes made)
+
+. replace midname= "Anthony" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(SUFFIX, "Jr")
+(4 real changes made)
+
+. replace Name= "Herbert Anthony Allen" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(year, "2011")
+(1 real change made)
+
+. replace midname= "Anthony" if regexm(firstname, "Herbert") & regexm(lastname, "Allen") & regexm(year, "2011")
+(1 real change made)
+
+. replace Name= "Paul Gardner Allen" if regexm(lastname, "Allen") & regexm(firstname, "Paul") 
+(15 real changes made)
+
+. replace midname= "Gardner" if regexm(lastname, "Allen") & regexm(firstname, "Paul") 
+(31 real changes made)
+
+. replace Name= "Charles Robert Allen" if regexm(lastname, "Allen") & regexm(firstname, "Charles")
+(11 real changes made)
+
+. replace midname= "Robert" if regexm(lastname, "Allen") & regexm(firstname, "Charles")
+(13 real changes made)
+
+. replace Name= "Robert Orville Anderson" if regexm(lastname, "Anderson") & regexm(firstname,  "Robert") 
+(3 real changes made)
+
+. replace midname= "Orville" if regexm(lastname, "Anderson") & regexm(firstname,  "Robert") 
+(8 real changes made)
+
+. replace Name= "Robert Orville Anderson" if regexm(firstname, "Robertson") & regexm(lastname, "Anderson")
+(0 real changes made)
+
+. replace firstname= "Robert" if regexm(firstname, "Robertson") & regexm(lastname, "Anderson")
+(1 real change made)
+
+. replace Name= "John Edward Anderson" if regexm(firstname, "John") & regexm(lastname, "Anderson")
+(2 real changes made)
+
+. replace midname= "Edward" if regexm(firstname, "John") & regexm(lastname, "Anderson")
+(22 real changes made)
+
+. replace Name= "Dwayne Orville Andreas" if regexm(firstname, "Dwayne") & regexm(lastname, "Andreas")
+(1 real change made)
+
+. replace midname= "Orville" if regexm(firstname, "Dwayne") & regexm(lastname, "Andreas")
+(5 real changes made)
+
+. replace Name= "Walter Hubert Annenberg" if regexm(firstname, "Walter") & regexm(lastname, "Annenberg")
+(2 real changes made)
+
+. replace midname= "Hubert" if regexm(firstname, "Walter") & regexm(lastname, "Annenberg")
+(20 real changes made)
+
+. replace Name= "Walter Hubert Annenberg" if regexm(firstname, "W") & regexm(lastname, "Annenberg")
+(1 real change made)
+
+. replace midname= "Hubert" if regexm(firstname, "W") & regexm(lastname, "Annenberg")
+(1 real change made)
+
+. replace firstname= "Walter" if regexm(firstname, "W") & regexm(lastname, "Annenberg")
+(1 real change made)
+
+. replace Name= "Phillip Frederick Anschutz" if regexm(firstname, "Phillip") & regexm(lastname, "Anschutz")
+(0 real changes made)
+
+. replace Name= "Phillip Frederick Anschutz" if regexm(firstname, "P") & regexm(lastname, "Anschutz")
+(36 real changes made)
+
+. replace firstname= "Phillip" if regexm(firstname, "P") & regexm(lastname, "Anschutz")
+(36 real changes made)
+
+. replace midname= "Frederick" if regexm(firstname, "Phillip") & regexm(lastname, "Anschutz")
+(36 real changes made)
+
+. replace Name= "Mary Anselmo" if regexm(firstname, "Mary") & regexm(lastname, "Anselmo")
+(1 real change made)
+
+. replace midname= "" if regexm(firstname, "Mary") & regexm(lastname, "Anselmo")
+(1 real change made)
+
+. replace Name= "Edmund Newton Ansin" if regexm(lastname, "Ansin") & regexm(firstname, "Edmund")
+(7 real changes made)
+
+. replace midname= "Newton" if regexm(lastname, "Ansin") & regexm(firstname, "Edmund")
+(25 real changes made)
+
+. replace Name= "Barbara Cox Anthony" if regexm(firstname, "Barbara") & regexm(lastname, "Anthony") 
+(1 real change made)
+
+. replace midname= "Cox" if regexm(firstname, "Barbara") & regexm(lastname, "Anthony")
+(25 real changes made)
+
+. replace Name= "George Leon Argyros" if regexm(lastname, "Argyros") & regexm(firstname, "George")
+(12 real changes made)
+
+. replace midname= "Leon" if regexm(lastname, "Argyros") & regexm(firstname, "George")
+(22 real changes made)
+
+. replace Name= "Alan C Ashton" if regexm(firstname, "Alan") & regexm(lastname, "Ashton")
+(1 real change made)
+
+. replace midname= "C" if regexm(firstname, "Alan") & regexm(lastname, "Ashton")
+(6 real changes made)
+
+. replace Name= "Dannine Avara" if regexm(firstname, "Dannine") & regexm(lastname, "Avara")
+(1 real change made)
+
+. replace midname= "" if regexm(firstname, "Dannine") & regexm(lastname, "Avara")
+(1 real change made)
+
+. replace Name= "Alice O'Niell Avery" if regexm(firstname, "Alice") & regexm(lastname, "Avery")
+(12 real changes made)
+
+. replace midname= "O'Niell" if regexm(firstname, "Alice") & regexm(lastname, "Avery")
+(12 real changes made)
+
+. replace Name= "Lours Moore Bacon" if regexm(firstname, "Louis") & regexm(lastname, "Bacon")
+(13 real changes made)
+
+. replace midname= "Moore" if regexm(firstname, "Louis") & regexm(lastname, "Bacon")
+(13 real changes made)
+
+. replace Name= "Jay H Baker" if regexm(lastname, "Baker") & regexm(firstname, "Jay")
+(1 real change made)
+
+. replace midname= "H" if regexm(lastname, "Baker") & regexm(firstname, "Jay")
+(2 real changes made)
+
+. replace Name= "Steven Anthony Ballmer" if regexm(firstname, "Steven") & regexm(lastname, "Ballmer")
+(4 real changes made)
+
+. replace midname= "Anthony" if regexm(firstname, "Steven") & regexm(lastname, "Ballmer")
+(20 real changes made)
+
+. replace Name= "Millicent V Boudjakdji" if regexm(lastname, "Baoudjakdji")
+(5 real changes made)
+
+. replace firstname= "Millicient" if regexm(lastname, "Baoudjakdji")
+(5 real changes made)
+
+. replace midname= "V" if regexm(lastname, "Baoudjakdji")
+(5 real changes made)
+
+. replace lastname= "Boudjakdji" if regexm(lastname, "Baoudjakdji")
+(5 real changes made)
+
+. replace Name= "Ron Baron" if regexm(lastname, "Baron")
+(1 real change made)
+
+. replace firstname= "Ron" if regexm(lastname, "Baron")
+(1 real change made)
+
+. replace Name= "Thomas J Barrack" if regexm(lastname, "Barrack")
+(5 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Barrack")
+(6 real changes made)
+
+. replace Name= "Robert Muse Bass" if regexm(lastname, "Bass") & regexm(firstname, "Robert")
+(11 real changes made)
+
+. replace midname= "Muse" if regexm(lastname, "Bass") & regexm(firstname, "Robert")
+(35 real changes made)
+
+. replace Name= "Perry Richardson Bass" if regexm(firstname, "Perry") & regexm(lastname, "Bass")
+(1 real change made)
+
+. replace midname= "Richardson" if regexm(firstname, "Perry") & regexm(lastname, "Bass")
+(16 real changes made)
+
+. replace Name= "Edward Perry Bass" if regexm(firstname, "Edward") & regexm(lastname, "Bass")
+(12 real changes made)
+
+. replace midname= "Perry" if regexm(firstname, "Edward") & regexm(lastname, "Bass")
+(35 real changes made)
+
+. replace Name= "Sid Richardson Bass" if regexm(firstname, "Sid") & regexm(lastname, "Bass")
+(12 real changes made)
+
+. replace midname= "Richardson" if regexm(firstname, "Sid") & regexm(lastname, "Bass")
+(36 real changes made)
+
+. replace Name= "Lee Marshall Bass" if regexm(firstname, "Lee") & regexm(lastname, "Bass")
+(12 real changes made)
+
+. replace midname= "Marshall" if regexm(firstname, "Lee") & regexm(lastname, "Bass")
+(35 real changes made)
+
+. replace Name= "Anne Hendricks Bass" if regexm(firstname, "Anne") & regexm(lastname, "Bass")
+(2 real changes made)
+
+. replace midname= "Hendricks" if regexm(firstname, "Anne") & regexm(lastname, "Bass")
+(10 real changes made)
+
+. replace Name= "Bruce W Bastian" if regexm(lastname, "Bastian")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Bastian")
+(5 real changes made)
+
+. replace Name= "Stephen Davidson Betchel" if regexm(firstname, "Stephen") & regexm(lastname, "Bechtel")
+(44 real changes made)
+
+. replace midname= "Davidson"  if regexm(firstname, "Stephen") & regexm(lastname, "Bechtel")
+(44 real changes made)
+
+. replace Name= "Riley P Bechtel" if regexm(lastname, "Bechtel") & regexm(firstname, "Riley")
+(11 real changes made)
+
+. replace midname= "P" if regexm(lastname, "Bechtel") & regexm(firstname, "Riley")
+(25 real changes made)
+
+. replace Name= "Kenneth Eugene Behring" if regexm(lastname, "Behring")
+(1 real change made)
+
+. replace midname= "Eugene" if regexm(lastname, "Behring")
+(8 real changes made)
+
+. replace Name= "Arthur Bejer Belfer" if regexm(lastname, "Belfer")
+(2 real changes made)
+
+. replace midname= "Bejer" if regexm(lastname, "Belfer")
+(12 real changes made)
+
+. replace Name= "Charles B Benenson" if regexm(lastname, "Benenson")
+(1 real change made)
+
+. replace midname= "B" if regexm(lastname, "Benenson")
+(5 real changes made)
+
+. replace Name= "William Gordon Bennett" if regexm(lastname, "Bennett")
+(1 real change made)
+
+. replace midname= "Gordon" if regexm(lastname, "Bennett")
+(17 real changes made)
+
+. replace Name= "Craig Robert Benson" if regexm(lastname, "Benson") & regexm(firstname, "Craig")
+(2 real changes made)
+
+. replace midname="Robert" if regexm(lastname, "Benson") & regexm(firstname, "Craig")
+(9 real changes made)
+
+. replace Name= "Thomas Benson" if regexm(lastname, "Benson") & regexm(firstname, "Tom")
+(7 real changes made)
+
+. replace firstname= "Thomas" if regexm(lastname, "Benson") & regexm(firstname, "Tom")
+(7 real changes made)
+
+. replace Name= "Carl Edwin Berg" if regexm(Name, "Carl Berg")
+(4 real changes made)
+
+. replace midname= "Edwin" if regexm(lastname, "Berg")
+(19 real changes made)
+
+. replace Name= "Jack Monteith Berry" if regexm(lastname, "Berry") & regexm(firstname, "Jack")
+(4 real changes made)
+
+. replace midname= "Monteith" if regexm(lastname, "Berry") & regexm(firstname, "Jack")
+(12 real changes made)
+
+. replace Name= "Jeffrey P Bezos" if regexm(lastname, "Bezos")
+(12 real changes made)
+
+. replace firstname= "Jeff" if regexm(lastname, "Bezos")
+(12 real changes made)
+
+. replace midname= "P" if regexm(lastname, "Bezos")
+(20 real changes made)
+
+. replace Name= "Virginia Mcknight Binger" if regexm(lastname, "Binger")
+(3 real changes made)
+
+. replace midname= "Mcknight" if regexm(lastname, "Binger")
+(18 real changes made)
+
+. replace firstname= "Virginia" if regexm(lastname, "Binger")
+(2 real changes made)
+
+. replace Name= "Michael Birck" if regexm(lastname, "Birck")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Birck")
+(1 real change made)
+
+. replace Name= "Stephen J Bisciotti" if regexm(lastname, "Bisciotti")
+(11 real changes made)
+
+. replace firstname= "Stephen" if regexm(lastname, "Bisciotti")
+(1 real change made)
+
+. replace midname= "J" if regexm(lastname, "Bisciotti")
+(16 real changes made)
+
+. replace Name= "Arthur M Blank" if regexm(lastname, "Blank")
+(19 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Blank")
+(26 real changes made)
+
+. replace Name= "Morton K Blaustein" if regexm(lastname, "Blaustein")
+(1 real change made)
+
+. replace midname= "K" if regexm(lastname, "Blaustein")
+(10 real changes made)
+
+. replace Name= "Len Blavatnik" if regexm(lastname, "Blavatnik")
+(5 real changes made)
+
+. replace firstname= "Len" if regexm(lastname, "Blavatnik")
+(5 real changes made)
+
+. replace Name= "William Block" if regexm(lastname, "Block") & regexm(firstname, "Willam")
+(1 real change made)
+
+. replace firstname= "William" if regexm(lastname, "Block") & regexm(firstname, "Willam")
+(1 real change made)
+
+. replace Name= "Michael Rubens Bloomberg" if regexm(lastname, "Bloomberg")
+(12 real changes made)
+
+. replace midname= "Rubens" if regexm(lastname, "Bloomberg")
+(24 real changes made)
+
+. replace Name= "Neil Gary Bluhm" if regexm(lastname, "Bluhm")
+(10 real changes made)
+
+. replace midname= "Gary" if regexm(lastname, "Bluhm")
+(24 real changes made)
+
+. replace Name= "Ivan Frederick Boesky" if regexm(lastname, "Boesky")
+(3 real changes made)
+
+. replace midname= "Frederick" if regexm(lastname, "Boesky")
+(5 real changes made)
+
+. replace firstname= "Ivan" if regexm(lastname, "Boesky")
+(3 real changes made)
+
+. replace Name= "Amar Gopal Bose" if regexm(lastname, "Bose")
+(5 real changes made)
+
+. replace midname= "Gopal" if regexm(lastname, "Bose")
+(15 real changes made)
+
+. replace Name= "Millicent V Boudjakdji" if regexm(lastname, "Boudjakdji")
+(1 real change made)
+
+. replace firstname= "Millicent" if regexm(lastname, "Boudjakdji")
+(6 real changes made)
+
+. replace Name= "Charles H Brandes" if regexm(lastname, "Brandes") 
+(4 real changes made)
+
+. replace midname= "H" if regexm(lastname, "Brandes") 
+(6 real changes made)
+
+. replace Name= "Octavia Mary Du Pont Bredin" if regexm(lastname, "Bredin")
+(1 real change made)
+
+. replace midname= "Mary Du Pont" if regexm(lastname, "Bredin")
+(15 real changes made)
+
+. replace Name= "Donald Leroy Bren" if regexm(lastname, "Bren")
+(29 real changes made)
+
+. replace midname= "Leory" if regexm(lastname, "Bren")
+(42 real changes made)
+
+. replace Name= "Harvey Roberts Bright" if regexm(lastname, "Bright")
+(4 real changes made)
+
+. replace midname= "Roberts" if regexm(lastname, "Bright")
+(7 real changes made)
+
+. replace Name = "Edgar Miles Bronfman" if regexm(lastname, "Bronfman") & regexm(firstname, "Edgar")
+(14 real changes made)
+
+. replace midname= "Miles" if regexm(lastname, "Bronfman") & regexm(firstname, "Edgar")
+(28 real changes made)
+
+. replace Name= "Jack Eugene Brown" if regexm(lastname, "Brown") & regexm(firstname, "Jack")
+(11 real changes made)
+
+. replace midname= "Eugene" if regexm(lastname, "Brown") & regexm(firstname, "Jack")
+(14 real changes made)
+
+. replace Name= "John W Brown" if regexm(lastname, "Brown") & regexm(firstname, "John")
+(10 real changes made)
+
+. replace midname= "W" if regexm(lastname, "Brown") & regexm(firstname, "John")
+(16 real changes made)
+
+. replace Name= "Susan Thompson Buffett" if regexm(lastname, "Buffett") & regexm(firstname, "Susan")
+(1 real change made)
+
+. replace midname= "Thompson" if regexm(lastname, "Buffett") & regexm(firstname, "Susan")
+(13 real changes made)
+
+. replace Name= "Warren Edward Buffett" if regexm(lastname, "Buffett") & regexm(firstname, "Warren")
+(13 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Buffett") & regexm(firstname, "Warren")
+(36 real changes made)
+
+. replace Name= "Ronald Burkle" if regexm(lastname, "Burkle")
+(5 real changes made)
+
+. replace firstname= "Ronald" if regexm(lastname, "Burkle")
+(5 real changes made)
+
+. replace Name= "Gary L Burrell" if regexm(lastname, "Burrell")
+(6 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Burrell")
+(9 real changes made)
+
+. replace Name= "August Anheuser Busch" if regexm(lastname, "Busch")
+(2 real changes made)
+
+. replace midname= "Anheuser" if regexm(lastname, "Busch")
+(9 real changes made)
+
+. replace Name= "Charles Clarence Butt" if regexm(Name, "Charles C Butt")
+(17 real changes made)
+
+. replace midname= "Clarence" if regexm(lastname, "Butt")
+(30 real changes made)
+
+. replace Name= "William Michael Cafaro" if regexm(lastname, "Cafaro")
+(1 real change made)
+
+. replace midname= "Michael" if regexm(lastname, "Cafaro")
+(9 real changes made)
+
+. replace Name= "John P Calamos" if regexm(lastname, "Calamos")
+(2 real changes made)
+
+. replace midname= "P" if regexm(lastname, "Calamos")
+(5 real changes made)
+
+. replace Name= "Bernard Gerald Cantor" if regexm(lastname, "Cantor")
+(1 real change made)
+
+. replace firstname= "Bernard" if regexm(lastname, "Cantor")
+(1 real change made)
+
+. replace Name= "James R Cargill" if regexm(firstname, "James") & regexm(lastname, "Cargill") 
+(10 real changes made)
+
+. replace midname= "R" if regexm(firstname, "James") & regexm(lastname, "Cargill") 
+(34 real changes made)
+
+. replace SUFFIX= "Ii" if regexm(NetWorth, "1.9") & regexm(lastname, "Cargill") & regexm(firstname, "James")
+(1 real change made)
+
+. replace SUFFIX= "Ii" if regexm(NetWorth, "1.3") & regexm(lastname, "Cargill") & regexm(firstname, "James")
+(1 real change made)
+
+. replace Name= "James R Cargill II" if regexm(firstname, "James") & regexm(lastname, "Cargill") & regexm(SUFFIX, "Ii")
+(10 real changes made)
+
+. replace Name= "Margaret Anne Cargill" if regexm(firstname, "Margaret") & regexm(lastname, "Cargill")
+(14 real changes made)
+
+. replace midname= "Anne" if regexm(firstname, "Margaret") & regexm(lastname, "Cargill")
+(24 real changes made)
+
+. replace Name= "Austen S Cargill" if regexm(lastname, "Cargill") & regexm(firstname, "Austen")
+(9 real changes made)
+
+. replace midname= "S" if regexm(lastname, "Cargill") & regexm(firstname, "Austen")
+(10 real changes made)
+
+. replace Name= "Mary Janet Cargill" if regexm(lastname, "Cargill") & regexm(firstname, "Mary")
+(1 real change made)
+
+. replace midname= "Janet" if regexm(lastname, "Cargill") & regexm(firstname, "Mary")
+(2 real changes made)
+
+. replace Name= "Curtis Leroy Carlson" if regexm(lastname, "Carlson")
+(1 real change made)
+
+. replace midname= "Leroy" if regexm(lastname, "Carlson")
+(17 real changes made)
+
+. replace Name= "Robert Ruliph Carpenter" if regexm(lastname, "Carpenter") & regexm(firstname, "Robert")
+(2 real changes made)
+
+. replace midname= "Ruliph" if regexm(lastname, "Carpenter") & regexm(firstname, "Robert")
+(8 real changes made)
+
+. replace Name= "Alan I Casden" if regexm(lastname, "Casden") & regexm(firstname, "Alan")
+(5 real changes made)
+
+. replace midname= "I" if regexm(lastname, "Casden") & regexm(firstname, "Alan")
+(9 real changes made)
+
+. replace Name= "Stephen M Case" if regexm(lastname, "Case")
+(5 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Case")
+(9 real changes made)
+
+. replace Name= "John Andreas Catsimatidis" if regexm(lastname, "Catsimatidis")
+(10 real changes made)
+
+. replace midname= "Andreas" if regexm(lastname, "Catsimatidis")
+(13 real changes made)
+
+. replace Name= "Malcolm Green Chace" if regexm(lastname, "Chace")
+(3 real changes made)
+
+. replace Name= "Malcolm Green Chace" if regexm(lastname, "Chase") & regexm(firstname, "Malcom")
+(1 real change made)
+
+. replace midname= "Green" if regexm(Name, "Malcolm Green Chace")
+(8 real changes made)
+
+. replace firstname= "Malcolm" if regexm(Name, "Malcolm Green Chace")
+(1 real change made)
+
+. replace lastname= "Chace" if regexm(Name, "Malcolm Green Chace")
+(1 real change made)
+
+. replace Name= "Jin Sook & Do Won Chang" if regexm(lastname, "Chang") & regexm(firstname, "Do")
+(3 real changes made)
+
+. replace Name= "Jin Sook & Do Won Chang" if regexm(lastname, "Chang") & regexm(firstname, "Jin")
+(0 real changes made)
+
+. replace midname= "" if regexm(Name, "Jin Sook & Do Won Chang")
+(7 real changes made)
+
+. replace firstname= "Jin Sook & Do Won" if regexm(Name,"Jin Sook & Do Won Chang") 
+(7 real changes made)
+
+. replace Name= "James H Clark" if regexm(lastname, "Clark") & regexm(firstname, "James")
+(7 real changes made)
+
+. replace midname= "H" if regexm(lastname, "Clark") & regexm(firstname, "James")
+(15 real changes made)
+
+. replace Name= "Emory T Clark" if regexm(firstname, "Emory") & regexm(lastname, "Clark")
+(1 real change made)
+
+. replace midname= "T" if regexm(firstname, "Emory") & regexm(lastname, "Clark")
+(1 real change made)
+
+. replace Name= "Edward Baron Cohen" if regexm(firstname, "Edward") & regexm(lastname, "Cohen")
+(1 real change made)
+
+. replace midname= "Baron" if regexm(firstname, "Edward") & regexm(lastname, "Cohen")
+(3 real changes made)
+
+. replace Name= "Steven A Cohen" if regexm(firstname, "Steven") & regexm(lastname, "Cohen")
+(3 real changes made)
+
+. replace Name= "Steven A Cohen" if regexm(firstname, "Steve") & regexm(lastname, "Cohen")
+(8 real changes made)
+
+. replace midname= "A" if regexm(Name, "Steven A Cohen")
+(15 real changes made)
+
+. replace firstname= "Steven" if regexm(Name, "Steven A Cohen")
+(8 real changes made)
+
+. replace Name= "Tristram C Colket" if regexm(lastname, "Colket")
+(3 real changes made)
+
+. replace firstname= "Tristram" if regexm(lastname, "Colket")
+(3 real changes made)
+
+. replace Name= "Miles Carnes Collier" if regexm(lastname, "Collier")
+(6 real changes made)
+
+. replace midname= "Carnes" if regexm(lastname, "Collier")
+(8 real changes made)
+
+. replace Name= "Gary Campbell Comer" if regexm(lastname, "Comer")
+(1 real change made)
+
+. replace midname= "Campbell" if regexm(lastname, "Comer")
+(19 real changes made)
+
+. replace Name= "William E Connor" if regexm(lastname, "Connor") & regexm(firstname, "William")
+(5 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Connor") & regexm(firstname, "William")
+(12 real changes made)
+
+. replace Name= "Jane Bancroft Cook" if regexm(lastname, "Cook") & regexm(firstname, "Jane")
+(1 real change made)
+
+. replace midname= "Bancroft" if regexm(lastname, "Cook") & regexm(firstname, "Jane")
+(15 real changes made)
+
+. replace Name= "William Alfred Cook" if regexm(firstname, "William") & regexm(lastname, "Cook")
+(6 real changes made)
+
+. replace midname= "Alfred" if regexm(firstname, "William") & regexm(lastname, "Cook")
+(23 real changes made)
+
+. replace Name= "Scott D Cook" if regexm(firstname, "Scott") & regexm(lastname, "Cook")
+(11 real changes made)
+
+. replace midname= "D" if regexm(firstname, "Scott") & regexm(lastname, "Cook")
+(18 real changes made)
+
+. replace Name= "Phoebe Hearst Cooke" if regexm(firstname, "Phoebe Hearst")
+(0 real changes made)
+
+. replace firstname= "Phoebe" if regexm(firstname, "Phoebe Hearst")
+(0 real changes made)
+
+. replace midname= "Hearst" if regexm(lastname, "Cooke")
+(44 real changes made)
+
+. replace Name= "Leon G Cooperman" if regexm(lastname, "Cooperman")
+(2 real changes made)
+
+. replace midname="G" if regexm(lastname, "Cooperman")
+(9 real changes made)
+
+. replace Name= "Lammot Du Pont Copeland" if regexm(lastname, "Copeland") & regexm(firstname, "Lammot")
+(1 real change made)
+
+. replace midname= "Du Pont" if regexm(lastname, "Copeland") & regexm(firstname, "Lammot")
+(2 real changes made)
+
+. replace Name= "Helen Kinney Copley" if regexm(lastname, "Copley") & regexm(firstname, "Helen")
+(2 real changes made)
+
+. replace midname= "Kinney" if regexm(lastname, "Copley") & regexm(firstname, "Helen")
+(21 real changes made)
+
+. replace Name= "Joseph R Coulter" if regexm(firstname, "Joseph") & regexm(lastname, "Coulter")
+(2 real changes made)
+
+. replace midname= "R" if regexm(firstname, "Joseph") & regexm(lastname, "Coulter")
+(4 real changes made)
+
+. replace Name= "William Coburn Cox" if regexm(firstname, "William") & regexm(lastname, "Cox")
+(4 real changes made)
+
+. replace midname= "Coburn" if regexm(firstname, "William") & regexm(lastname, "Cox")
+(9 real changes made)
+
+. replace Name= "Edwin Lochridge Cox" if regexm(firstname, "Edwin") & regexm(lastname, "Cox")
+(3 real changes made)
+
+. replace midname= "Lockridge" if regexm(firstname, "Edwin") & regexm(lastname, "Cox")
+(9 real changes made)
+
+. replace Name= "Joseph W Craft" if regexm(lastname, "Craft")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Craft")
+(2 real changes made)
+
+. replace Name= "Gertrude Ramsay Crain" if regexm(lastname, "Crain")
+(1 real change made)
+
+. replace midname= "Gertrude" if regexm(lastname, "Crain")
+(7 real changes made)
+
+. replace Name= "Lester Crown" if regexm(lastname, "Crown") & regexm(firstname, "Lester")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Crown") & regexm(firstname, "Lester")
+(2 real changes made)
+
+. replace Name= "Ian M Cumming" if regexm(lastname, "Cumming")
+(4 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Cumming")
+(5 real changes made)
+
+. replace Name= "Andrea B Currier" if regexm(lastname, "Currier") & regexm(firstname, "Andrea")
+(3 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Currier") & regexm(firstname, "Andrea")
+(4 real changes made)
+
+. replace Name= "Jack Dangermond" if regexm(lastname, "Dangermond")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Dangermond")
+(2 real changes made)
+
+. replace Name= "Raymond L Danner" if regexm(lastname, "Danner")
+(1 real change made)
+
+. replace midname= "L" if regexm(lastname, "Danner")
+(4 real changes made)
+
+. replace Name= "Constance Simons Du Pont Darden" if regexm(firstname, "Constance") & regexm(lastname, "Arden")
+(1 real change made)
+
+. replace midname= "Simons Du Pont" if regexm(firstname, "Constance") & regexm(lastname, "Arden")
+(1 real change made)
+
+. replace lastname= "Darden" if regexm(firstname, "Constance") & regexm(lastname, "Arden")
+(1 real change made)
+
+. replace midname= "Simons Du Pont" if regexm(firstname, "Constance") & regexm(lastname, "Darden")
+(14 real changes made)
+
+. replace Name= "Constance Simons Du Pont Darden" if regexm(firstname, "Constance") & regexm(lastname, "Darden")
+(4 real changes made)
+
+. replace Name= "Joseph Morton Davidwitz" if regexm(lastname, "Davidwitz")
+(0 real changes made)
+
+. replace midname= "Morton" if regexm(lastname, "Davidwitz")
+(0 real changes made)
+
+. replace Name= "William Morse Davidson" if regexm(lastname, "Davidson") & regexm(firstname, "William")
+(4 real changes made)
+
+. replace midname= "Morse" if regexm(lastname, "Davidson") & regexm(firstname, "William")
+(25 real changes made)
+
+. replace Name= "Marvin Harold Davis" if regexm(lastname, "Davis") & regexm(firstname, "Marvin")
+(13 real changes made)
+
+. replace midname= "Harold" if regexm(lastname, "Davis") & regexm(firstname, "Marvin")
+(22 real changes made)
+
+. replace Name= "James Elsworth Davis" if regexm(lastname, "Davis") & regexm(firstname, "James")
+(1 real change made)
+
+. replace midname= "Elsworth" if regexm(lastname, "Davis") & regexm(firstname, "James")
+(5 real changes made)
+
+. replace Name= "Kenneth W Davis" if regexm(lastname, "Davis") & regexm(firstname, "Kenneth")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Davis") & regexm(firstname, "Kenneth")
+(3 real changes made)
+
+. replace Name= "Ray Davis" if regexm(lastname, "Davis") & regexm(firstname, "Ray")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Davis") & regexm(firstname, "Ray")
+(1 real change made)
+
+. replace Name= "Thomas Cullen Davis" if regexm(lastname, "Davis") & regexm(midname, "Cullen") 
+(2 real changes made)
+
+. replace firstname= "Thomas" if regexm(lastname, "Davis") & regexm(midname, "Cullen") 
+(2 real changes made)
+
+. replace Name= "Robert Addison Day" if regexm(lastname, "Day") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "Addison" if regexm(lastname, "Day") & regexm(firstname, "Robert")
+(10 real changes made)
+
+. replace Name= "Willametta Keck Day" if regexm(lastname, "Day") & regexm(midname, "Keck")
+(1 real change made)
+
+. replace firstname= "Willametta" if regexm(lastname, "Day") & regexm(midname, "Keck")
+(1 real change made)
+
+. replace Name= "Nicholas Louis Deak" if regexm(lastname, "Deak")
+(1 real change made)
+
+. replace midname= "Louis" if regexm(lastname, "Deak")
+(2 real changes made)
+
+. replace firstname= "Edward" if regexm(lastname, "Debartolo")
+(1 real change made)
+
+. replace midname= "John" if regexm(lastname, "Debartolo") 
+(35 real changes made)
+
+. replace SUFFIX= "Jr" if regexm(Residence, "Fl") & regexm(lastname, "Debartolo") & regexm(firstname, "Edward")
+(3 real changes made)
+
+. replace SUFFIX= "Jr" if Age=="" & regexm(lastname, "Debartolo") & regexm(firstname, "Edward")
+(0 real changes made)
+
+. replace Name= "Edward John Debartolo Jr" if regexm(lastname, "Debartolo") & regexm(firstname, "Edward") & regexm(SUFFIX, "Jr")
+(23 real changes made)
+
+. replace Name= "Edward John Debartolo" if regexm(lastname, "Debartolo") & regexm(firstname, "Edward") & SUFFIX==""
+(2 real changes made)
+
+. replace Name= "Robert Henry Dedman" if regexm(lastname, "Dedman") & regexm(firstname, "Robert")
+(6 real changes made)
+
+. replace midname= "Henry" if regexm(lastname, "Dedman") & regexm(firstname, "Robert")
+(16 real changes made)
+
+. replace Name= "Michael Dell" if regexm(firstname, "Michael") & regexm(lastname, "Dell")
+(1 real change made)
+
+. replace midname= "" if regexm(firstname, "Michael") & regexm(lastname, "Dell")
+(1 real change made)
+
+. replace Name= "John Cornelius Dempsey" if regexm(firstname, "John") & regexm(lastname, "Dempsey")
+(2 real changes made)
+
+. replace midname= "Cornelius" if regexm(firstname, "John") & regexm(lastname, "Dempsey")
+(5 real changes made)
+
+. replace Name= "Bharat Desai" if regexm(lastname, "Desai")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Desai")
+(2 real changes made)
+
+. replace Name= "Richard M Devos" if regexm(lastname, "Devos")
+(22 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Devos")
+(31 real changes made)
+
+. replace Name= "James Dinan" if regexm(lastname, "Dinan")
+(1 real change made)
+
+. replace firstname= "James" if regexm(lastname, "Dinan")
+(1 real change made)
+
+. replace Name= "Roy Edward Disney" if regexm(lastname, "Disney") & regexm(firstname, "Roy")
+(2 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Disney") & regexm(firstname, "Roy")
+(26 real changes made)
+
+. 
+. replace lastname= "Disney" if regexm(firstname, "Disney") & regexm(midname, "")
+(1 real change made)
+
+. replace Name= "Thomas Henry Dittmer" if regexm(lastname, "Dittmer")
+(1 real change made)
+
+. replace midname= "Henry" if regexm(lastname, "Dittmer")
+(5 real changes made)
+
+. replace Name= "L John Doerr" if regexm(lastname, "Doerr")
+(8 real changes made)
+
+. replace firstname= "L" if regexm(lastname, "Doerr")
+(8 real changes made)
+
+. replace midname= "John" if regexm(lastname, "Doerr")
+(17 real changes made)
+
+. replace Name= "Charles Francis Dolan" if regexm(lastname, "Dolan") & regexm(firstname, "Charles")
+(14 real changes made)
+
+. replace midname= "Francis" if regexm(lastname, "Dolan") & regexm(firstname, "Charles")
+(31 real changes made)
+
+. replace Name= "Ray Milton Dolby" if regexm(lastname, "Dolby") & regexm(firstname, "Ray")
+(5 real changes made)
+
+. replace midname= "Milton" if regexm(lastname, "Dolby") & regexm(firstname, "Ray")
+(7 real changes made)
+
+. replace Name = "John Thompson Dorrance Jr" if regexm(firstname, "John") & regexm(lastname, "Dorrance") & regexm(Residence, "Glad")
+(8 real changes made)
+
+. replace midname= "Thompson" if regexm(firstname, "John") & regexm(lastname, "Dorrance") 
+(15 real changes made)
+
+. replace Name= "John Thompson Dorrance III" if regexm(firstname, "John") & regexm(lastname, "Dorrance") & regexm(Residence, "Wyo")
+(7 real changes made)
+
+. replace firstname= "John" if regexm(firstname, "John") & regexm(lastname, "Dorrance")
+(1 real change made)
+
+. replace Name= "Irene Carpenter Draper" if regexm(firstname, "Irene") & regexm(lastname, "Draper")
+(1 real change made)
+
+. replace midname= "Irene" if regexm(firstname, "Irene") & regexm(lastname, "Draper")
+(10 real changes made)
+
+. replace Name= "David A Duffield" if regexm(lastname, "Duffield")
+(10 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Duffield")
+(21 real changes made)
+
+. replace Name= "Dan L Duncan" if regexm(lastname, "Duncan") & regexm(firstname, "Dan")
+(3 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Duncan") & regexm(firstname, "Dan")
+(6 real changes made)
+
+. replace Name= "David Durst" if regexm(firstname, "David") & regexm(lastname, "Durst")
+(6 real changes made)
+
+. replace midname= "" if regexm(firstname, "David") & regexm(lastname, "Durst")
+(6 real changes made)
+
+. replace Name= "Seymour B Durst" if regexm(lastname, "Durst") & regexm(firstname, "Seymour")
+(4 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Durst") & regexm(firstname, "Seymour")
+(11 real changes made)
+
+. replace Name= "Roy Durst" if regexm(lastname, "Durst") & regexm(firstname, "Roy")
+(6 real changes made)
+
+. replace midname= "" if regexm(lastname, "Durst") & regexm(firstname, "Roy")
+(6 real changes made)
+
+. replace firstname= "Roy" if regexm(lastname, "Durst") & regexm(firstname, "Roy")
+(6 real changes made)
+
+. replace Name= "Charles Henry Dyson" if regexm(lastname, "Dyson")
+(2 real changes made)
+
+. replace midname= "Henry" if regexm(lastname, "Dyson")
+(13 real changes made)
+
+. replace Name= "Anne Catherine Getty Earhart" if regexm(lastname, "Earhart") & regexm(firstname, "Anne")
+(1 real change made)
+
+. replace midname= "Catherine Getty" if regexm(lastname, "Earhart") & regexm(firstname, "Anne")
+(16 real changes made)
+
+. replace Name= "Farhad Fred Ebrahimi" if regexm(lastname, "Ebrahimi")
+(2 real changes made)
+
+. replace firstname= "Farhad" if regexm(lastname, "Ebrahimi")
+(1 real change made)
+
+. replace midname= "Fred" if regexm(lastname, "Ebrahimi")
+(4 real changes made)
+
+. replace Name= "John Orin Edson" if regexm(lastname, "Edson") & regexm(firstname, "John")
+(1 real change made)
+
+. replace midname= "Orin" if regexm(lastname, "Edson") & regexm(firstname, "John")
+(22 real changes made)
+
+. replace Name= "Richard J Egan" if regexm(firstname, "Richard") & regexm(lastname, "Egan")
+(5 real changes made)
+
+. replace midname= "J" if regexm(firstname, "Richard") & regexm(lastname, "Egan")
+(15 real changes made)
+
+. replace Name= "Michael D Eisner" if regexm(lastname, "Eisner") & regexm(firstname, "Michael")
+(1 real change made)
+
+. replace midname= "D" if regexm(lastname, "Eisner") & regexm(firstname, "Michael")
+(10 real changes made)
+
+. replace Name= "Alpheus Lee Ellis" if regexm(lastname, "Ellis") & regexm(firstname, "Al")
+(1 real change made)
+
+. replace midname= "Lee" if regexm(lastname, "Ellis") & regexm(firstname, "Al")
+(13 real changes made)
+
+. replace firstname= "Alpheus" if regexm(lastname, "Ellis") & regexm(firstname, "Al")
+(1 real change made)
+
+. replace Name= "Lawrence Joseph Ellison" if regexm(lastname, "Ellison")
+(18 real changes made)
+
+. replace firstname= "Lawrence" if regexm(lastname, "Ellison")
+(9 real changes made)
+
+. replace midname= "Joseph" if regexm(lastname, "Ellison")
+(31 real changes made)
+
+. replace Name= "Archie Aldis Emmerson" if regexm(lastname, "Emmerson")
+(11 real changes made)
+
+. replace midname= "Aldis" if regexm(lastname, "Emmerson")
+(19 real changes made)
+
+. replace Name= "Jane B Engelhard" if regexm(lastname, "Engelhard")
+(3 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Engelhard")
+(15 real changes made)
+
+. replace Name= "Ralph L Engelstad" if regexm(lastname, "Engelstad")
+(1 real change made)
+
+. replace midname= "L" if regexm(lastname, "Engelstad")
+(3 real changes made)
+
+. replace Name= "Charles Ergen" if regexm(lastname, "Ergen")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Ergen")
+(1 real change made)
+
+. replace Name= "Richard T Farmer" if regexm(lastname, "Farmer")
+(1 real change made)
+
+. replace midname= "T" if regexm(lastname, "Farmer")
+(16 real changes made)
+
+. replace Name= "Charles F Feeney" if regexm(lastname, "Feeney")
+(2 real changes made)
+
+. replace midname= "F" if regexm(lastname, "Feeney")
+(9 real changes made)
+
+. replace Name= "William Arthur Fickling" if regexm(lastname, "Fickling") & regexm(firstname, "William")
+(2 real changes made)
+
+. replace midname= "Arthur" if regexm(lastname, "Fickling") & regexm(firstname, "William")
+(8 real changes made)
+
+. replace Name= "Marshall V Field" if regexm(firstname, "Marshall") & lastname== "V"
+(1 real change made)
+
+. replace midname= "V" if regexm(firstname, "Marshall") & lastname== "V"
+(1 real change made)
+
+. replace lastname= "Field" if regexm(firstname, "Marshall") & lastname== "V"
+(1 real change made)
+
+. replace firstname= "Frederick" if regexm(firstname, "Fredrick") & regexm(lastname, "Field")
+(1 real change made)
+
+. replace Name= "Frederick Woodruff Field" if regexm(firstname, "Frederick") & regexm(lastname, "Field")
+(9 real changes made)
+
+. replace midname= "Woodruff" if regexm(firstname, "Frederick") & regexm(lastname, "Field")
+(22 real changes made)
+
+. replace Name= "Paul Barry Fireman" if regexm(lastname, "Fireman")
+(11 real changes made)
+
+. replace midname= "Barry" if regexm(lastname, "Fireman")
+(16 real changes made)
+
+. replace Name= "Ken Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "Kenneth")
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "Fisher") & regexm(firstname, "Kenneth")
+(2 real changes made)
+
+. replace firstname= "Ken" if regexm(lastname, "Fisher") & regexm(firstname, "Kenneth")
+(4 real changes made)
+
+. replace Name= "Doris Feigenbaum Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "Doris")
+(17 real changes made)
+
+. replace midname= "Feigenbaum" if regexm(lastname, "Fisher") & regexm(firstname, "Doris")
+(25 real changes made)
+
+. replace Name= "John J Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "John")
+(9 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Fisher") & regexm(firstname, "John")
+(21 real changes made)
+
+. replace Name= "Donald George Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "Donald")
+(3 real changes made)
+
+. replace midname= "George" if regexm(lastname, "Fisher") & regexm(firstname, "Donald")
+(21 real changes made)
+
+. replace Name= "William Sydney Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "William")
+(13 real changes made)
+
+. replace midname= "Sydney" if regexm(lastname, "Fisher") & regexm(firstname, "William")
+(16 real changes made)
+
+. replace Name= "Max Martin Fisher" if regexm(lastname, "Fisher") & regexm(firstname, "Max")
+(2 real changes made)
+
+. replace midname= "Martin" if regexm(lastname, "Fisher") & regexm(firstname, "Max")
+(23 real changes made)
+
+. replace Name= "Thomas John Flatley" if regexm(lastname, "Flatley")
+(1 real change made)
+
+. replace midname= "John" if regexm(lastname, "Flatley")
+(16 real changes made)
+
+. replace Name= "Lucile Evelena Du Pont Flint" if regexm(lastname, "Flint") & regexm(firstname, "Lucile")
+(11 real changes made)
+
+. replace midname= "Evelena Du Pont" if regexm(lastname, "Flint") & regexm(firstname, "Lucile")
+(13 real changes made)
+
+. replace Name= "Malcolm Stevenson Forbes" if regexm(lastname, "Forbes") & regexm(firstname, "Malcolm")
+(2 real changes made)
+
+. replace midname= "Stevenson" if regexm(lastname, "Forbes") & regexm(firstname, "Malcolm")
+(9 real changes made)
+
+. replace Name= "Josephine Clay Ford" if regexm(lastname, "Ford") & regexm(firstname, "Josephine")
+(7 real changes made)
+
+. replace midname= "Clay" if regexm(lastname, "Ford") & regexm(firstname, "Josephine")
+(16 real changes made)
+
+. replace Name= "Kenneth William Ford" if regexm(lastname, "Ford") & regexm(firstname, "Kenneth")
+(3 real changes made)
+
+. replace midname= "William" if regexm(lastname, "Ford") & regexm(firstname, "Kenneth")
+(5 real changes made)
+
+. replace Name= "William Clay Ford" if regexm(lastname, "Ford") & regexm(firstname, "William")
+(4 real changes made)
+
+. replace midname= "Clay" if regexm(lastname, "Ford") & regexm(firstname, "William")
+(27 real changes made)
+
+. replace Name= "Henry Ford II" if regexm(lastname, "Ford") & regexm(firstname, "Henry") 
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "Ford") & regexm(firstname, "Henry") 
+(2 real changes made)
+
+. replace Name= "Gerald J Ford" if regexm(lastname, "Ford") & regexm(firstname, "Gerald")
+(4 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Ford") & regexm(firstname, "Gerald")
+(17 real changes made)
+
+. replace Name= "Theodore J Forstmann" if regexm(lastname, "Forstmann")
+(11 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Forstmann")
+(11 real changes made)
+
+. replace firstname= "Theodore" if regexm(lastname, "Forstmann")
+(1 real change made)
+
+. replace Name= "James C France" if regexm(lastname, "France") & regexm(firstname, "James")
+(6 real changes made)
+
+. replace midname= "C" if regexm(lastname, "France") & regexm(firstname, "James")
+(14 real changes made)
+
+. replace Name= "Milane Duncan Frantz" if regexm(lastname, "Frantz") & regexm(firstname, "Milane")
+(7 real changes made)
+
+. replace midname= "Duncan" if regexm(lastname, "Frantz") & regexm(firstname, "Milane")
+(8 real changes made)
+
+. replace Name= "Mansfield Freeman" if regexm(lastname, "Freeman") & regexm(firstname, "Mansfield")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Freeman") & regexm(firstname, "Mansfield")
+(1 real change made)
+
+. replace Name= "Michel Fribourg" if regexm(lastname, "Fribourg")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Fribourg")
+(1 real change made)
+
+. replace Name= "Thomas H Friedkin" if regexm(lastname, "Friedkin") & regexm(firstname, "Thomas")
+(9 real changes made)
+
+. replace midname= "H" if regexm(lastname, "Friedkin") & regexm(firstname, "Thomas")
+(10 real changes made)
+
+. replace Name= "Robert M Friedland" if regexm(lastname, "Friedland") 
+(6 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Friedland") 
+(9 real changes made)
+
+. replace Name= "Thomas F Frist" if regexm(lastname, "Frist") & regexm(firstname, "Thomas")
+(10 real changes made)
+
+. replace midname= "F" if regexm(lastname, "Frist") & regexm(firstname, "Thomas")
+(26 real changes made)
+
+. replace firstname= "Phillip" if regexm(lastname, "Frost") & regexm(firstname, "Dr")
+(3 real changes made)
+
+. replace Name= "Phillip Frost" if regexm(lastname, "Frost") & regexm(firstname, "Phillip")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Frost") & regexm(firstname, "Phillip")
+(3 real changes made)
+
+. replace Name= "John Brooks Fuqua" if regexm(lastname, "Fuqua")
+(1 real change made)
+
+. replace midname= "Brooks" if regexm(lastname, "Fuqua")
+(7 real changes made)
+
+. replace Name= "Ernest Gallo" if regexm(lastname, "Gall") & regexm(firstname, "Ernest")
+(1 real change made)
+
+. replace firstname= "Ernest" if regexm(lastname, "Gall") & regexm(firstname, "Ernest")
+(1 real change made)
+
+. replace lastname= "Gallo" if regexm(lastname, "Gall") & regexm(firstname, "Ernest")
+(1 real change made)
+
+. replace Name= "Julio Gallo" if regexm(lastname, "Gallo") & regexm(firstname, "Ju")
+(3 real changes made)
+
+. replace firstname= "Julio" if regexm(lastname, "Gallo") & regexm(firstname, "Ju")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Gallo") & regexm(firstname, "Ju")
+(3 real changes made)
+
+. replace Name= "Robert William Galvin" if regexm(lastname, "Galvin") & regexm(firstname, "Robert")
+(3 real changes made)
+
+. replace midname= "William" if regexm(lastname, "Galvin") & regexm(firstname, "Robert")
+(24 real changes made)
+
+. replace Name= "Stephen A Garofalo" if regexm(lastname, "Garofalo") 
+(1 real change made)
+
+. replace midname= "A" if regexm(lastname, "Garofalo") 
+(2 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Gates") & regexm(firstname, "Bill")
+(8 real changes made)
+
+. replace Name= "William Henry Gates" if regexm(lastname, "Gates") & regexm(firstname, "William")
+(17 real changes made)
+
+. replace midname= "Henry" if regexm(lastname, "Gates") & regexm(firstname, "William")
+(32 real changes made)
+
+. replace Name= "Charles Cassius Gates" if regexm(lastname, "Gates") & regexm(firstname, "Charles")
+(1 real change made)
+
+. replace midname= "Cassius" if regexm(lastname, "Gates") & regexm(firstname, "Charles")
+(23 real changes made)
+
+. replace Name= "Edward Lewis Gaylord" if regexm(lastname, "Gaylord")
+(2 real changes made)
+
+. replace midname= "Lewis" if regexm(lastname, "Gaylord")
+(21 real changes made)
+
+. replace Name= "Frances Koshland Geballe" if regexm(firstname, "Frances") & regexm(lastname, "Geballe")
+(2 real changes made)
+
+. replace midname= "Koshland" if regexm(firstname, "Frances") & regexm(lastname, "Geballe")
+(6 real changes made)
+
+. replace Name= "Mari Hulman George" if regexm(lastname, "George") & regexm(firstname, "Mar")
+(1 real change made)
+
+. replace firstname= "Mari" if regexm(lastname, "George") & regexm(firstname, "Mar")
+(1 real change made)
+
+. replace Name= "Louis V Gerstner Jr" if regexm(lastname, "Gerstner")
+(4 real changes made)
+
+. replace midname= "V" if regexm(lastname, "Gerstner")
+(4 real changes made)
+
+. replace firstname= "Eugene" if regexm(lastname, "Getty") & regexm(firstname, "Eugen")
+(1 real change made)
+
+. replace lastname= "Getty" if lastname== "Paul)"
+(3 real changes made)
+
+. replace firstname= "Eugene" if lastname== "Paul)"
+(0 real changes made)
+
+. replace Name= "Eugene (John Paul) Getty" if regexm(lastname, "Getty") & regexm(firstname, "Eugene")
+(9 real changes made)
+
+. replace midname= "(John Paul)" if regexm(lastname, "Getty") & regexm(firstname, "Eugene")
+(9 real changes made)
+
+. replace Name= "Gordon Peter Getty" if regexm(lastname, "Getty") & regexm(firstname, "Gordon")
+(12 real changes made)
+
+. replace midname= "Peter" if regexm(lastname, "Getty") & regexm(firstname, "Gordon")
+(36 real changes made)
+
+. replace Name= "Tim Gill" if regexm(lastname, "Gill") & regexm(firstname, "Tim")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Gill") & regexm(firstname, "Tim")
+(2 real changes made)
+
+. replace firstname= "Tim" if regexm(lastname, "Gill") & regexm(firstname, "Tim")
+(3 real changes made)
+
+. replace Name= "James Stanley Gilmore" if regexm(lastname, "Gilmore") & regexm(firstname, "ames")
+(2 real changes made)
+
+. replace firstname= "James" if regexm(lastname, "Gilmore") & regexm(firstname, "ames")
+(1 real change made)
+
+. replace midname= "Stanley" if regexm(lastname, "Gilmore") & regexm(firstname, "ames")
+(3 real changes made)
+
+. replace Name= "Robert D Glaser" if regexm(lastname, "Glaser") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "D" if regexm(lastname, "Glaser") & regexm(firstname, "Robert")
+(2 real changes made)
+
+. replace firstname= "Malcolm" if regexm(lastname, "Glazer") & regexm(firstname, "Malcom")
+(1 real change made)
+
+. replace Name= "Malcolm Glazer" if regexm(lastname, "Glazer") & regexm(firstname, "Malcolm")
+(1 real change made)
+
+. replace Name= "Richard N Goldman" if regexm(lastname, "Goldman") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "N" if regexm(lastname, "Goldman") & regexm(firstname, "Richard")
+(6 real changes made)
+
+. replace Name= "Rhoda Haas Goldman" if regexm(lastname, "Goldman") & regexm(firstname, "Rhoda")
+(2 real changes made)
+
+. replace midname= "Haas" if regexm(lastname, "Goldman") & regexm(firstname, "Rhoda")
+(5 real changes made)
+
+. replace Name= "Christopher Kit Goldsbury" if regexm(lastname, "Goldsbury")
+(18 real changes made)
+
+. replace midname= "Kit" if regexm(lastname, "Goldsbury")
+(18 real changes made)
+
+. replace firstname= "Christopher" if regexm(lastname, "Goldsbury")
+(1 real change made)
+
+. replace Name= "Blase Thomas Golisano" if regexm(lastname, "Golisano")
+(12 real changes made)
+
+. replace firstname= "Blase" if regexm(lastname, "Golisano")
+(12 real changes made)
+
+. replace midname= "Thomas" if regexm(lastname, "Golisano")
+(21 real changes made)
+
+. replace Name= "Louis L Gonda" if regexm(lastname, "Gonda") & regexm(firstname, "Louis")
+(2 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Gonda") & regexm(firstname, "Louis")
+(15 real changes made)
+
+. replace Name= "Leslie Gonda" if regexm(lastname, "Gonda") & regexm(firstname, "Leslie")
+(13 real changes made)
+
+. replace midname= "" if regexm(lastname, "Gonda") & regexm(firstname, "Leslie")
+(13 real changes made)
+
+. replace Name= "Mark Goodson" if regexm(lastname, "Goodson")
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "Goodson")
+(4 real changes made)
+
+. replace Name= "Tom Gores" if regexm(lastname, "Gores") & regexm(firstname, "Tom")
+(6 real changes made)
+
+. replace midname= "" if regexm(lastname, "Gores") & regexm(firstname, "Tom")
+(6 real changes made)
+
+. replace firstname= "Dorothy" if regexm(lastname, "Green") & regexm(firstname, "Dolly")
+(2 real changes made)
+
+. replace Name= "Dorothy Green" if regexm(lastname, "Green") & regexm(firstname, "Dorothy")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Green") & regexm(firstname, "Dorothy")
+(1 real change made)
+
+. replace Name= "Maurice Raymond Greenberg" if regexm(lastname, "Greenberg") & regexm(firstname, "Maurice")
+(6 real changes made)
+
+. replace midname= "Raymond" if regexm(lastname, "Greenberg") & regexm(firstname, "Maurice")
+(22 real changes made)
+
+. replace Name= "Jeff Greene" if regexm(lastname, "Greene") & regexm(firstname, "Jeff")
+(3 real changes made)
+
+. replace firstname= "Jeff" if regexm(lastname, "Greene") & regexm(firstname, "Jeff")
+(3 real changes made)
+
+. replace firstname= "Margaretta" if regexm(lastname, "Greenewalt") & regexm(firstname, "M")
+(1 real change made)
+
+. replace Name= "Margaretta Lammot Du Pont Greenewalt" if regexm(lastname, "Greenewalt") & regexm(firstname, "Margaretta")
+(2 real changes made)
+
+. replace midname= "Lammot Du Pont" if regexm(lastname, "Greenewalt") & regexm(firstname, "Margaretta")
+(9 real changes made)
+
+. replace Name= "Ben Hill Griffin" if regexm(lastname, "Griffin") & regexm(firstname, "Ben")
+(1 real change made)
+
+. replace midname= "Hill" if regexm(lastname, "Griffin") & regexm(firstname, "Ben")
+(9 real changes made)
+
+. replace Name= "Kenneth C Griffin" if regexm(lastname, "Griffin") & regexm(firstname, "Ken")
+(12 real changes made)
+
+. replace firstname= "Kenneth" if regexm(lastname, "Griffin") & regexm(firstname, "Ken")
+(8 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Griffin") & regexm(firstname, "Ken")
+(15 real changes made)
+
+. replace Name= "William H Gross" if regexm(lastname, "Gross") & regexm(firstname, "ill")
+(10 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Gross") & regexm(firstname, "ill")
+(7 real changes made)
+
+. replace midname= "H" if regexm(lastname, "Gross") & regexm(firstname, "ill")
+(13 real changes made)
+
+. replace firstname= "Joseph" if regexm(lastname, "Gruss") & regexm(firstname, "seph")
+(1 real change made)
+
+. replace Name= "Joseph S Gruss" if regexm(lastname, "Gruss") & regexm(firstname, "seph")
+(1 real change made)
+
+. replace Name= "Robert Charles Joseph Edward Sabatini Guccione" if regexm(lastname, "Guccione") & regexm(firstname, "Robert")
+(9 real changes made)
+
+. replace midname= " Charles Joseph Edward Sabatini" if regexm(lastname, "Guccione") & regexm(firstname, "Robert")
+(9 real changes made)
+
+. replace Name= "Tamara Hughes Gustavson" if regexm(lastname, "Gustavson") & regexm(firstname, "Tamara")
+(7 real changes made)
+
+. replace midname= "Hughes" if regexm(lastname, "Gustavson") & regexm(firstname, "Tamara")
+(8 real changes made)
+
+. replace Name= "John Charles Haas" if regexm(lastname, "Haas") & regexm(firstname, "John")
+(2 real changes made)
+
+. replace midname= "Charles" if regexm(lastname, "Haas") & regexm(firstname, "John")
+(14 real changes made)
+
+. replace suffix= "Sr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & Age=="63"
+(1 real change made)
+
+. replace suffix= "Sr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & Age=="73"
+(2 real changes made)
+
+. replace suffix= "Jr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & Age=="44"
+(1 real change made)
+
+. replace suffix= "Jr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & Age=="45"
+(2 real changes made)
+
+. replace Name= "Peter E Haas" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & regexm(suffix, "Sr")
+(1 real change made)
+
+. replace Name= "Peter E Haas Jr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & regexm(suffix, "Jr")
+(8 real changes made)
+
+. replace Name= "Peter E Haas" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & regexm(Suffix, "Sr")
+(1 real change made)
+
+. replace Name= "Peter E Haas Jr" if regexm(lastname, "Haas") & regexm(firstname, "Peter") & regexm(Suffix, "Jr")
+(1 real change made)
+
+. replace midname= "E" if regexm(lastname, "Haas") & regexm(firstname, "Peter") 
+(19 real changes made)
+
+. replace Name= "Josephine B Haas" if regexm(lastname, "Haas") & regexm(firstname, "Josephine")
+(2 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Haas") & regexm(firstname, "Josephine")
+(9 real changes made)
+
+. replace Name= "Robert D Haas" if regexm(lastname, "Haas") & regexm(firstname, "Robert")
+(4 real changes made)
+
+. replace midname= "D" if regexm(lastname, "Haas") & regexm(firstname, "Robert")
+(9 real changes made)
+
+. replace Name= "Ernest Walter Hahn" if regexm(lastname, "Hahn") & regexm(firstname, "Ernest")
+(2 real changes made)
+
+. replace midname= "Walter" if regexm(lastname, "Hahn") & regexm(firstname, "Ernest")
+(5 real changes made)
+
+. replace Name= "Donald Joyce Hall" if regexm(lastname, "Hall") & regexm(firstname, "Donald")
+(7 real changes made)
+
+. replace midname= "Joyce" if regexm(lastname, "Hall") & regexm(firstname, "Donald")
+(29 real changes made)
+
+. replace firstname= "Dorrance" if regexm(lastname, "Hamilton") & regexm(firstname, "Marie")
+(2 real changes made)
+
+. replace midname= "Hill" if regexm(lastname, "Hamilton") & regexm(firstname, "Dorrance")
+(24 real changes made)
+
+. replace Name= "Dorrance Hill Hamilton" if regexm(lastname, "Hamilton") & regexm(firstname, "Dorrance")
+(3 real changes made)
+
+. replace Name= "John Kendrick Hanson" if regexm(lastname, "Hanson") & regexm(midname, "K")
+(1 real change made)
+
+. replace midname= "Kendrick" if regexm(lastname, "Hanson") & regexm(midname, "K")
+(2 real changes made)
+
+. replace Name= "Mary Jane Hoiles Hardie" if regexm(lastname, "Hardie") & regexm(firstname, "Mary")
+(1 real change made)
+
+. replace midname= "Jane Hoiles" if regexm(lastname, "Hardie") & regexm(firstname, "Mary")
+(9 real changes made)
+
+. replace Name= "William Averell Harriman" if regexm(lastname, "Harriman") & regexm(firstname, "W")
+(2 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Harriman") & regexm(firstname, "W")
+(2 real changes made)
+
+. replace Name= "Norman Hascoe" if regexm(lastname, "Hascoe") 
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Hascoe") 
+(1 real change made)
+
+. replace Name= "Richard Haworth" if regexm(lastname, "Haworth")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Haworth")
+(1 real change made)
+
+. replace Name= "Richard Hayne" if regexm(lastname, "Hayne") 
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Hayne")
+(1 real change made)
+
+. replace Residence= "San Francisco" if regexm(lastname, "Hearst") & regexm(firstname, "William") & Rank=="209"
+(1 real change made)
+
+. replace Name= "William Randolph Hearst Jr" if regexm(lastname, "Hearst") & regexm(firstname, "William") & regexm(Residence, "N")
+(13 real changes made)
+
+. replace midname= "Randolph" if regexm(lastname, "Hearst") & regexm(firstname, "William") 
+(32 real changes made)
+
+. replace Name= "William Randolph Hearst III" if regexm(lastname, "Hearst") & regexm(firstname, "William") & regexm(Residence, "S")
+(19 real changes made)
+
+. replace Name= "Randolph Apperson Hearst" if regexm(lastname, "Hearst") & regexm(firstname, "Randolph")
+(2 real changes made)
+
+. replace midname= "Apperson" if regexm(lastname, "Hearst") & regexm(firstname, "Randolph")
+(19 real changes made)
+
+. replace Name= "George Randolph Hearst" if regexm(lastname, "Hearst") & regexm(firstname, "George") 
+(4 real changes made)
+
+. replace midname= "Randolph" if regexm(lastname, "Hearst") & regexm(firstname, "George") 
+(29 real changes made)
+
+. replace Name= "David Whitmire Hearst" if regexm(lastname, "Hearst") & regexm(firstname, "David") & regexm(Residence, "Beverly")
+(0 real changes made)
+
+. replace midname= "Whitmire" if regexm(lastname, "Hearst") & regexm(firstname, "David")
+(29 real changes made)
+
+. replace Residence= "Los Angeles" if regexm(lastname, "Hearst") & regexm(firstname, "David") & year=="2002"
+(1 real change made)
+
+. replace Name= "David Whitmire Hearst Jr" if regexm(lastname, "Hearst") & regexm(firstname, "David") & regexm(Residence, "Los")
+(25 real changes made)
+
+. replace Name= "Henry John Heinz II" if regexm(lastname, "Heinz") & regexm(firstname, "Henry") & regexm(Residence, "Pittsburgh")
+(4 real changes made)
+
+. replace midname= "John" if regexm(lastname, "Heinz") & regexm(firstname, "Henry")
+(11 real changes made)
+
+. replace Suffix= "Iii" if regexm(lastname, "Heinz") & regexm(firstname, "Henry") & regexm(Residence, "Fox")
+(2 real changes made)
+
+. replace Name= "Henry John Heinz III" if regexm(lastname, "Heinz") & regexm(firstname, "Henry") & regexm(Suffix, "Iii")
+(7 real changes made)
+
+. replace Name= "Michael E Heisley" if regexm(lastname, "Heisley") 
+(4 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Heisley") 
+(9 real changes made)
+
+. replace Name= "Leona Helmsley" if regexm(lastname, "Helmsley") & regexm(firstname, "Leona")
+(3 real changes made)
+
+. replace midname= ""  if regexm(lastname, "Helmsley") & regexm(firstname, "Leona")
+(3 real changes made)
+
+. replace Name= "Helen Hunt Henrix" if regexm(lastname, "Hendrix") & regexm(firstname, "Helen")
+(4 real changes made)
+
+. replace midname= "Hunt" if regexm(lastname, "Hendrix") & regexm(firstname, "Helen")
+(4 real changes made)
+
+. replace Name= "Robert Henry Dedman" if regexm(lastname, "Henry") & regexm(firstname, "Sr")
+(1 real change made)
+
+. replace midname= "Henry" if regexm(lastname, "Henry") & regexm(firstname, "Sr")
+(1 real change made)
+
+. replace firstname= "Robert" if regexm(lastname, "Henry") & regexm(firstname, "Sr")
+(1 real change made)
+
+. replace lastname= "Dedman" if regexm(lastname, "Henry") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace Name= "Marvin J Herb" if regexm(lastname, "Herb") & regexm(firstname, "Marvin")
+(6 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Herb") & regexm(firstname, "Marvin")
+(16 real changes made)
+
+. replace Name= "Leon Hess" if regexm(lastname, "Hess") & regexm(firstname, "Leon")
+(1 real change made)
+
+. replace firstname= "Leon" if regexm(lastname, "Hess") & regexm(firstname, "Leon")
+(1 real change made)
+
+. replace Name= "William Redington Hewlett" if regexm(lastname, "Hewlett") 
+(2 real changes made)
+
+. replace midname= "Redington" if regexm(lastname, "Hewlett") 
+(9 real changes made)
+
+. replace Name= "Thomas Ollis Hicks" if regexm(lastname, "Hicks") & regexm(firstname, "Thomas")
+(9 real changes made)
+
+. replace midname= "Ollis" if regexm(lastname, "Hicks") & regexm(firstname, "Thomas")
+(9 real changes made)
+
+. replace Name= "Jeffery Hildebrand" if regexm(lastname, "Hildebrand") 
+(7 real changes made)
+
+. replace firstname= "Jeffery" if regexm(lastname, "Hildebrand") 
+(7 real changes made)
+
+. replace Name= "Henry Lea Hillman" if regexm(lastname, "Hillman") & regexm(firstname, "Henry")
+(10 real changes made)
+
+. replace midname= "Lea" if regexm(lastname, "Hillman") & regexm(firstname, "Henry")
+(34 real changes made)
+
+. replace Name= "William Barron Hilton" if regexm(lastname, "Hilton") & regexm(firstname, "William")
+(2 real changes made)
+
+. replace midname=  "Barron" if regexm(lastname, "Hilton") & regexm(firstname, "William")
+(19 real changes made)
+
+. replace Name= "Robert Earl Holding" if regexm(lastname, "Holding") & regexm(firstname, "Robert")
+(5 real changes made)
+
+. replace midname= "Earl" if regexm(lastname, "Holding") & regexm(firstname, "Robert")
+(19 real changes made)
+
+. replace Name= "Harry R Horvitz" if regexm(lastname, "Horvitz") & regexm(firstname, "Harry")
+(1 real change made)
+
+. replace midname= "R" if regexm(lastname, "Horvitz") & regexm(firstname, "Harry")
+(2 real changes made)
+
+. replace Name= "Amos Barr Hostetter" if regexm(lastname, "Hostetter") & regexm(firstname, "Amos")
+(12 real changes made)
+
+. replace midname= "Barr" if regexm(lastname, "Hostetter") & regexm(firstname, "Amos")
+(31 real changes made)
+
+. replace Name= "Stanley E Hubbard" if regexm(lastname, "Hubbard") & regexm(midname, "E")
+(0 real changes made)
+
+. replace Name= "Stanley Stub Hubbard" if regexm(lastname, "Hubbard") & regexm(midname, "Stub")
+(0 real changes made)
+
+. replace Name= "Roy Michael Huffington" if regexm(lastname, "Huffington") 
+(1 real change made)
+
+. replace midname= "Michael" if regexm(lastname, "Huffington") 
+(12 real changes made)
+
+. replace firstname= "Bradley" if regexm(lastname, "Hughes") & regexm(firstname, "B")
+(7 real changes made)
+
+. replace Name= "Bradley Wayne Hughes" if regexm(lastname, "Hughes") & regexm(firstname, "B")
+(10 real changes made)
+
+. replace midname= "Wayne" if regexm(lastname, "Hughes") & regexm(firstname, "B")
+(22 real changes made)
+
+. replace Name= "Harry Wayne Huizenga" if regexm(lastname, "Huizenga")
+(19 real changes made)
+
+. replace firstname= "Harry" if regexm(lastname, "Huizenga")
+(19 real changes made)
+
+. replace midname= "Wayne" if regexm(lastname, "Huizenga")
+(25 real changes made)
+
+. replace Name= "Ray Lee Hunt" if regexm(lastname, "Hunt") & regexm(firstname, "Ray")
+(4 real changes made)
+
+. replace midname= "Lee" if regexm(lastname, "Hunt") & regexm(firstname, "Ray")
+(36 real changes made)
+
+. replace Name= "William Herbert Hunt" if regexm(lastname, "Hunt") & regexm(firstname, "W")
+(5 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Hunt") & regexm(firstname, "W")
+(5 real changes made)
+
+. replace Name= "Swanee Hunt" if regexm(lastname, "Meeks") & regexm(firstname, "Swanee")
+(2 real changes made)
+
+. replace lastname= "Hunt" if regexm(lastname, "Meeks") & regexm(firstname, "Swanee")
+(2 real changes made)
+
+. replace firstname= "Swanee" if regexm(lastname, "Hunt") & regexm(firstname, "Swanee")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Hunt") & regexm(firstname, "Swanee")
+(1 real change made)
+
+. replace firstname= "Jon" if regexm(lastname, "Huntsman") & regexm(firstname, "Jo")
+(1 real change made)
+
+. replace Name= "Jon Meade Huntsman" if regexm(lastname, "Huntsman") & regexm(firstname, "Jo")
+(5 real changes made)
+
+. replace midname= "Meade" if regexm(lastname, "Huntsman") & regexm(firstname, "Jo")
+(19 real changes made)
+
+. replace Name= "Kyupin Philip Hwang" if regexm(lastname, "Hwang") 
+(1 real change made)
+
+. replace midname= "Philip" if regexm(lastname, "Hwang") 
+(2 real changes made)
+
+. replace firstname= "Joseph" if regexm(lastname, "Hyde") & regexm(firstname, "Jos")
+(1 real change made)
+
+. replace Name= "Joseph Reeves Hyde" if regexm(lastname, "Hyde") & regexm(firstname, "Jos")
+(1 real change made)
+
+. replace Name= "Carl Celian Icahn" if regexm(lastname, "Icahn") & regexm(firstname, "Carl")
+(18 real changes made)
+
+. replace midname= "Celian" if regexm(lastname, "Icahn") & regexm(firstname, "Carl")
+(31 real changes made)
+
+. replace Name= "Michael Ilitch" if regexm(lastname, "Ilitch") & regexm(firstname, "Michael")
+(5 real changes made)
+
+. replace midname= "" if regexm(lastname, "Ilitch") & regexm(firstname, "Michael")
+(5 real changes made)
+
+. replace Name= "Arthur Edward Imperatore" if regexm(lastname, "Imperatore")
+(1 real change made)
+
+. replace midname= "Edward" if regexm(lastname, "Imperatore")
+(2 real changes made)
+
+. replace firstname= "Arthur" if regexm(lastname, "Imperatore")
+(1 real change made)
+
+. replace Name= "Ralph Mcallister Ingersoll" if regexm(lastname, "Ingersoll")
+(1 real change made)
+
+. replace midname= "Mcallister" if regexm(lastname, "Ingersoll")
+(2 real changes made)
+
+. replace Name= "Martha Robinson Rivers Ingram" if regexm(lastname, "Ingram") & regexm(firstname, "Martha")
+(18 real changes made)
+
+. replace midname= "Robinson Rivers" if regexm(lastname, "Ingram") & regexm(firstname, "Martha")
+(23 real changes made)
+
+. replace Name= "Jess Stonestreet Jackson" if regexm(lastname, "Jackson") & regexm(firstname, "Jess")
+(3 real changes made)
+
+. replace midname= "Stonestreet" if regexm(lastname, "Jackson") & regexm(firstname, "Jess")
+(10 real changes made)
+
+. replace Name= "Irwin Mark Jacobs" if regexm(lastname, "Jacobs") & regexm(firstname, "Irwin") & midname==""
+(9 real changes made)
+
+. replace midname= "Mark" if regexm(lastname, "Jacobs") & regexm(firstname, "Irwin") & midname==""
+(9 real changes made)
+
+. replace Name= "Jeremy Maurice Jacobs" if regexm(lastname, "Jacobs") & regexm(firstname, "Jeremy")
+(11 real changes made)
+
+. replace midname= "Maurice" if regexm(lastname, "Jacobs") & regexm(firstname, "Jeremy")
+(25 real changes made)
+
+. replace Name= "Joseph Dahr Jamail" if regexm(lastname, "Jamail")
+(9 real changes made)
+
+. replace midname= "Dahr" if regexm(lastname, "Jamail")
+(26 real changes made)
+
+. replace firstname= "Joseph" if regexm(lastname, "Jamail")
+(4 real changes made)
+
+. replace Name= "Hamilton James" if regexm(lastname, "James") & regexm(firstname, "Hamilton")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "James") & regexm(firstname, "Hamilton")
+(1 real change made)
+
+. replace Name= "James Jannard" if regexm(lastname, "Jannard")
+(8 real changes made)
+
+. replace firstname= "James" if regexm(lastname, "Jannard")
+(8 real changes made)
+
+. replace Name= "Steven Paul Jobs" if regexm(lastname, "Jobs") & regexm(firstname, "Steve")
+(8 real changes made)
+
+. replace midname= "Paul" if regexm(lastname, "Jobs") & regexm(firstname, "Steve")
+(24 real changes made)
+
+. replace firstname= "Steven" if regexm(lastname, "Jobs") & regexm(firstname, "Steve")
+(3 real changes made)
+
+. replace lastname= "Johnson" if regexm(lastname, "Iv") & regexm(firstname, "Edward")
+(1 real change made)
+
+. replace Name= "Edward Crosby Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Edward")
+(13 real changes made)
+
+. replace midname= "Crosby" if regexm(lastname, "Johnson") & regexm(firstname, "Edward")
+(34 real changes made)
+
+. replace Name= "Barbara Piasecka Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Barbara")
+(1 real change made)
+
+. replace midname= "Piasecka" if regexm(lastname, "Johnson") & regexm(firstname, "Barbara")
+(27 real changes made)
+
+. replace Name= "Charles Bartlett Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Charles")
+(16 real changes made)
+
+. replace midname= "Barlett" if regexm(lastname, "Johnson") & regexm(firstname, "Charles")
+(26 real changes made)
+
+. replace Name= "Robert L Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "L" if regexm(lastname, "Johnson") & regexm(firstname, "Robert")
+(4 real changes made)
+
+. replace Name= "Samuel Curtis Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Samuel")
+(1 real change made)
+
+. replace midname= "Curtis" if regexm(lastname, "Johnson") & regexm(firstname, "Samuel")
+(22 real changes made)
+
+. replace Name= "Rupert Harris Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Rupert")
+(22 real changes made)
+
+. replace midname= "Harris" if regexm(lastname, "Johnson") & regexm(firstname, "Rupert")
+(26 real changes made)
+
+. replace Name= "Abigail Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "Abigail")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Johnson") & regexm(firstname, "Abigail")
+(1 real change made)
+
+. replace Name= "John Harold Johnson" if regexm(lastname, "Johnson") & regexm(firstname, "John") & regexm(midname, "H")
+(3 real changes made)
+
+. replace midname= "Harold" if regexm(lastname, "Johnson") & regexm(firstname, "John") & regexm(midname, "H")
+(5 real changes made)
+
+. replace Name= "Winnie Johnson-Marquart" if regexm(lastname, "Johnson") & regexm(firstname, "Winifred")
+(1 real change made)
+
+. replace firstname= "Winnie" if regexm(lastname, "Johnson") & regexm(firstname, "Winifred")
+(1 real change made)
+
+. replace Name= "Jerral Wayne Jones" if regexm(lastname, "Jones") & regexm(firstname, "J")
+(21 real changes made)
+
+. replace firstname= "Jerral" if regexm(lastname, "Jones") & regexm(firstname, "J")
+(9 real changes made)
+
+. replace midname= "Wayne" if regexm(lastname, "Jones") & regexm(firstname, "J")
+(24 real changes made)
+
+. replace Name= "Thomas Jordan" if regexm(lastname, "Jordan") & regexm(firstname, "Thomas")
+(1 real change made)
+
+. replace firstname= "Thomas" if regexm(lastname, "Jordan") & regexm(firstname, "Thomas")
+(1 real change made)
+
+. replace Name= "George B Kaiser" if regexm(lastname, "Kaiser") & regexm(firstname, "G")
+(12 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Kaiser") & regexm(firstname, "G")
+(26 real changes made)
+
+. replace firstname= "George" if regexm(lastname, "Kaiser") & regexm(firstname, "G")
+(1 real change made)
+
+. replace Name= "Peter Stephen Kalikow" if regexm(lastname, "Kalikow") & regexm(firstname, "Peter")
+(2 real changes made)
+
+. replace midname= "Stephen" if regexm(lastname, "Kalikow") & regexm(firstname, "Peter")
+(10 real changes made)
+
+. replace Name= "Philip Evan Kamins" if regexm(lastname, "Kamins")
+(2 real changes made)
+
+. replace midname= "Evan" if regexm(lastname, "Kamins")
+(4 real changes made)
+
+. replace Name= "Min H Kao" if regexm(lastname, "Kao") & regexm(firstname, "Min")
+(10 real changes made)
+
+. replace midname= "H" if regexm(lastname, "Kao") & regexm(firstname, "Min")
+(14 real changes made)
+
+. replace Name= "William Keck Jr" if regexm(lastname, "Keck") & regexm(firstname, "William") & midname==""
+(1 real change made)
+
+. replace Name= "William Myron Keck II" if regexm(lastname, "Keck") & regexm(firstname, "William") & midname != ""
+(10 real changes made)
+
+. replace midname= "Myron" if regexm(lastname, "Keck") & regexm(firstname, "William") & midname != ""
+(10 real changes made)
+
+. replace Name= "Howard Brighton Keck" if regexm(lastname, "Keck") & regexm(firstname, "Howard")
+(3 real changes made)
+
+. replace midname= "Brighton" if regexm(lastname, "Keck") & regexm(firstname, "Howard")
+(14 real changes made)
+
+. replace firstname= "Howard" if regexm(lastname, "Keck") & regexm(firstname, "Howard")
+(1 real change made)
+
+. replace Name= "Pauline Macmillan Keinath" if regexm(lastname, "Keinath")
+(1 real change made)
+
+. replace midname= "Macmillan" if regexm(lastname, "Keinath")
+(30 real changes made)
+
+. replace Name= "Brad Kelley" if regexm(lastname, "Kelley") & regexm(firstname, "Brad")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Kelley") & regexm(firstname, "Brad")
+(2 real changes made)
+
+. replace Name= "Peter R Kellogg" if regexm(lastname, "Kellog") & regexm(firstname, "Peter")
+(11 real changes made)
+
+. replace lastname= "Kellogg" if regexm(lastname, "Kellog") & regexm(firstname, "Peter")
+(1 real change made)
+
+. replace midname= "R" if regexm(lastname, "Kellog") & regexm(firstname, "Peter")
+(19 real changes made)
+
+. replace Name= "William S Kellog" if regexm(lastname, "Kellog") & regexm(firstname, "William")
+(11 real changes made)
+
+. replace midname= "S" if regexm(lastname, "Kellog") & regexm(firstname, "William")
+(11 real changes made)
+
+. replace Name= "Jim Kennedy" if regexm(lastname, "Kennedy") & regexm(firstname, "J")
+(3 real changes made)
+
+. replace firstname= "Jim" if regexm(lastname, "Kennedy") & regexm(firstname, "J")
+(3 real changes made)
+
+. replace Name= "Robert H Kieckhefer" if regexm(lastname, "Kieckhefer") 
+(1 real change made)
+
+. replace midname= "H" if regexm(lastname, "Kieckhefer") 
+(3 real changes made)
+
+. replace Name= "Richard Kinder" if regexm(lastname, "Kinder") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Kinder") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace Name= "Randal J Kirk" if regexm(lastname, "Kirk") & regexm(firstname, "Randal")
+(8 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Kirk") & regexm(firstname, "Randal")
+(10 real changes made)
+
+. replace Name= "John Werner Kluge" if regexm(lastname, "Kluge") & regexm(firstname, "John")
+(4 real changes made)
+
+. replace midname= "Werner" if regexm(lastname, "Kluge") & regexm(firstname, "John")
+(28 real changes made)
+
+. replace Name= "James Landon Knight" if regexm(lastname, "Knight") & regexm(firstname, "James")
+(3 real changes made)
+
+. replace midname= "Landon" if regexm(lastname, "Knight") & regexm(firstname, "James")
+(9 real changes made)
+
+. replace Name= "Philip Hampson Knight" if regexm(lastname, "Knight") & regexm(firstname, "Phil") 
+(23 real changes made)
+
+. replace firstname= "Philip" if regexm(lastname, "Knight") & regexm(firstname, "Phil") 
+(8 real changes made)
+
+. replace midname= "Hampson" if regexm(lastname, "Knight") & regexm(firstname, "Phil") 
+(36 real changes made)
+
+. replace Name= "David Hamilton Koch" if regexm(lastname, "Koch") & regexm(firstname, "David")
+(14 real changes made)
+
+. replace midname= "Hamilton" if regexm(lastname, "Koch") & regexm(firstname, "David")
+(36 real changes made)
+
+. replace Name= "Frederick Robinson Koch" if regexm(lastname, "Koch") & regexm(firstname, "Frederick")
+(1 real change made)
+
+. replace midname= "Robinson" if regexm(lastname, "Koch") & regexm(firstname, "Frederick")
+(20 real changes made)
+
+. replace Name= "Charles de Ganahl Koch" if regexm(lastname, "Koch") & regexm(firstname, "Charles")
+(36 real changes made)
+
+. replace midname= "de Ganahl" if regexm(lastname, "Koch") & regexm(firstname, "Charles")
+(36 real changes made)
+
+. replace Name= "William Ingrahm Koch" if regexm(lastname, "Koch") & regexm(firstname, "William")
+(32 real changes made)
+
+. replace midname= "Ingrahm" if regexm(lastname, "Koch") & regexm(firstname, "William")
+(32 real changes made)
+
+. replace Name= "Jerome Spiegel Kohlberg" if regexm(lastname, "Kohlberg")
+(4 real changes made)
+
+. replace midname= "Spiegel" if regexm(lastname, "Kohlberg")
+(22 real changes made)
+
+. replace Name= "Herbert Kohler" if regexm(lastname, "Kohler") & regexm(firstname, "Herbert")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Kohler") & regexm(firstname, "Herbert")
+(3 real changes made)
+
+. replace Name= "Henry R Kravis" if regexm(lastname, "Kravis") & regexm(firstname, "Henry")
+(12 real changes made)
+
+. replace midname= "R" if regexm(lastname, "Kravis") & regexm(firstname, "Henry")
+(32 real changes made)
+
+. replace Name= "John Hammond Krehbiel Jr" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") & regexm(Suffix, "Sr")
+(7 real changes made)
+
+. replace midname= "Hammond" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") 
+(23 real changes made)
+
+. replace Name= "John Hammond Krehbiel III" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") & regexm(Residence, "Lake")
+(9 real changes made)
+
+. replace Name= "John Hammond Krehbiel Jr" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") & regexm(Residence, "Downer")
+(2 real changes made)
+
+. replace Name= "John Hammond Krehbiel Jr" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") & regexm(Residence, "Lisle")
+(4 real changes made)
+
+. replace Name= "John Hammond Krehbiel III" if regexm(lastname, "Krehbiel") & regexm(firstname, "John") & regexm(SUFFIX, "Jr")
+(3 real changes made)
+
+. replace Name= "Joan Beverly Kroc" if regexm(lastname, "Kroc") & regexm(firstname, "Joan")
+(1 real change made)
+
+. replace midname= "Beverly" if regexm(lastname, "Kroc") & regexm(firstname, "Joan")
+(20 real changes made)
+
+. replace firstname= "Enos" if regexm(lastname, "Kroenke") & regexm(firstname, "E")
+(11 real changes made)
+
+. replace firstname= "Enos" if regexm(lastname, "Kroenke") & regexm(firstname, "Stanley")
+(7 real changes made)
+
+. replace midname= "Stanley" if regexm(lastname, "Kroenke") & regexm(firstname, "E")
+(18 real changes made)
+
+. replace Name= "Enos Stanley Kroenke" if regexm(lastname, "Kroenke") & regexm(firstname, "E")
+(18 real changes made)
+
+. replace Name= "Tracy W Krohn" if regexm(lastname, "Krohn") & regexm(firstname, "Tracy")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Krohn") & regexm(firstname, "Tracy")
+(3 real changes made)
+
+. replace Name= "Edward Lampert" if regexm(lastname, "Lampert") & regexm(firstname, "Edward")
+(5 real changes made)
+
+. replace midname= "" if regexm(lastname, "Lampert") & regexm(firstname, "Edward")
+(5 real changes made)
+
+. replace Name= "Carl Clement Landegger" if regexm(lastname, "Landegger") & regexm(firstname, "Carl") 
+(2 real changes made)
+
+. replace midname= "Clemont" if regexm(lastname, "Landegger") & regexm(firstname, "Carl") 
+(8 real changes made)
+
+. replace Name= "George Francis Landegger" if regexm(lastname, "Landegger") & regexm(firstname, "George")
+(2 real changes made)
+
+. replace midname= "Francis" if regexm(lastname, "Landegger") & regexm(firstname, "George")
+(8 real changes made)
+
+. replace Name= "Kenneth G Langone" if regexm(lastname, "Langone")
+(9 real changes made)
+
+. replace midname= "G" if regexm(lastname, "Langone")
+(16 real changes made)
+
+. replace Name= "M Larry Lawrence" if regexm(lastname, "Lawrence") 
+(2 real changes made)
+
+. replace midname= "Larry" if regexm(lastname, "Lawrence") 
+(11 real changes made)
+
+. replace firstname= "M" if regexm(lastname, "Lawrence") 
+(1 real change made)
+
+. replace Name= "Norman Milton Lear" if regexm(lastname, "Lear") & regexm(firstname, "Norman")
+(1 real change made)
+
+. replace midname= "Milton" if regexm(lastname, "Lear") & regexm(firstname, "Norman")
+(2 real changes made)
+
+. replace Name= "Thomas Haskell Lee" if regexm(lastname, "Lee") & regexm(firstname, "Thomas")
+(13 real changes made)
+
+. replace midname= "Haskell" if regexm(lastname, "Lee") & regexm(firstname, "Thomas")
+(25 real changes made)
+
+. replace Name= "Leonard Alan Lauder" if regexm(lastname, "Lauder") & regexm(firstname, "Leonard")
+(14 real changes made)
+
+. replace midname = "Alan" if regexm(lastname, "Lauder") & regexm(firstname, "Leonard")
+(36 real changes made)
+
+. replace Name= "Ronald Steven Lauder" if regexm(lastname, "Lauder") & regexm(firstname, "Ronald")
+(14 real changes made)
+
+. replace midname= "Steven" if regexm(lastname, "Lauder") & regexm(firstname, "Ronald")
+(36 real changes made)
+
+. replace Name= "Samuel Jayson LeFrak" if regexm(lastname, "Lefrak") & regexm(firstname, "Samuel")
+(21 real changes made)
+
+. replace midname= "Jayson" if regexm(lastname, "Lefrak") & regexm(firstname, "Samuel")
+(21 real changes made)
+
+. replace lastname= "LeFrak" if regexm(lastname, "Lefrak") & regexm(firstname, "Samuel")
+(21 real changes made)
+
+. replace Name= "James Richard Leininger" if regexm(lastname, "Leininger")
+(1 real change made)
+
+. replace midname= "Richard" if regexm(lastname, "Leininger")
+(3 real changes made)
+
+. replace Name= "Harold Fitzgerald Lenfest" if regexm(lastname, "Lenfest") & regexm(firstname, "H")
+(1 real change made)
+
+. replace firstname= "Harold" if regexm(lastname, "Lenfest") & regexm(firstname, "H")
+(1 real change made)
+
+. replace Name= "Theodore Nathan Lerner" if regexm(lastname, "Lerner") & regexm(firstname, "T")
+(12 real changes made)
+
+. replace firstname= "Theodore" if regexm(lastname, "Lerner") & regexm(firstname, "T")
+(7 real changes made)
+
+. replace midname= "Nathan" if regexm(lastname, "Lerner") & regexm(firstname, "T")
+(16 real changes made)
+
+. replace Name= "Randolph D Lerner" if regexm(lastname, "Lerner") & regexm(firstname, "Randolph")
+(3 real changes made)
+
+. replace midname= "D" if regexm(lastname, "Lerner") & regexm(firstname, "Randolph")
+(7 real changes made)
+
+. replace Name= "Stuart Robert Levine" if regexm(lastname, "Levine") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "Robert" if regexm(lastname, "Levine") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace firstname= "Stuart" if regexm(lastname, "Levine") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace firstname= "Stuart" if regexm(lastname, "Levine") & regexm(firstname, "St")
+(0 real changes made)
+
+. replace Name= "William S Levine" if regexm(lastname, "Levine") & regexm(firstname, "William")
+(1 real change made)
+
+. replace midname= "S" if regexm(lastname, "Levine") & regexm(firstname, "William")
+(6 real changes made)
+
+. replace Name= "Peter Benjamin Lewis" if regexm(lastname, "Lewis") & regexm(firstname, "Peter")
+(4 real changes made)
+
+. replace midname= "Benjamin" if regexm(lastname, "Lewis") & regexm(firstname, "Peter")
+(17 real changes made)
+
+. replace Name= "Marianne Liebmann" if regexm(lastname, "Liebmann") & regexm(firstname, "Marianne") 
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Liebmann") & regexm(firstname, "Marianne") 
+(1 real change made)
+
+. replace Name= "Carl Henry Lindner" if regexm(lastname, "Lindner") & regexm(firstname, "Carl") 
+(5 real changes made)
+
+. replace midname= "Henry" if regexm(lastname, "Lindner") & regexm(firstname, "Carl")
+(27 real changes made)
+
+. replace Name= "Edmund Wattis Littlefield" if regexm(lastname, "Littlefield") & regexm(firstname, "Edmund")
+(1 real change made)
+
+. replace midname= "Wattis" if regexm(lastname, "Littlefield") & regexm(firstname, "Edmund")
+(12 real changes made)
+
+. replace Name= "Joseph A Liemandt" if regexm(lastname, "Liemandt")
+(1 real change made)
+
+. replace midname= "A" if regexm(lastname, "Liemandt")
+(5 real changes made)
+
+. replace Name= "George L Lindemann" if regexm(lastname, "Lindemann") & regexm(firstname, "George")
+(14 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Lindemann") & regexm(firstname, "George")
+(28 real changes made)
+
+. replace Name= "John E Little" if regexm(lastname, "Little") & regexm(firstname, "John")
+(1 real change made)
+
+. replace midname= "E" if regexm(lastname, "Little") & regexm(firstname, "John")
+(2 real changes made)
+
+. replace Name= "John Jeffry Louis" if regexm(lastname, "Louis") & regexm(firstname, "John")
+(4 real changes made)
+
+. replace midname= "Jeffry" if regexm(lastname, "Louis") & regexm(firstname, "John")
+(13 real changes made)
+
+. replace Name= "John Thomas Lupton" if regexm(lastname, "Lupton") & regexm(firstname, "John")
+(3 real changes made)
+
+. replace midname= "Thomas" if regexm(lastname, "Lupton") & regexm(firstname, "John")
+(23 real changes made)
+
+. replace Name= "Robert Harris Lurie" if regexm(lastname, "Lurie") & regexm(firstname, "Robert") & regexm(Residence, "Chicago")
+(1 real change made)
+
+. replace midname= "Harris" if regexm(lastname, "Lurie") & regexm(firstname, "Robert") & regexm(Residence, "Chicago")
+(5 real changes made)
+
+. replace Name= "John Hugh Macmillan" if regexm(lastname, "Macmillan") & regexm(firstname, "John")
+(1 real change made)
+
+. replace midname= "Hugh" if regexm(lastname, "Macmillan") & regexm(firstname, "John")
+(22 real changes made)
+
+. replace Name= "Frank Lyon" if regexm(lastname, "Lyon") & regexm(firstname, "Frank")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Lyon") & regexm(firstname, "Frank")
+(1 real change made)
+
+. replace Name= "Jane Cox MacElree" if regexm(midname, "Cox") & regexm(firstname, "Jane")
+(11 real changes made)
+
+. replace lastname= "MacElree" if regexm(Name, "Jane Cox MacElree")
+(11 real changes made)
+
+. replace midname= "Cox" if regexm(Name, "Jane Cox MacElree")
+(11 real changes made)
+
+. replace Name= "Maggie Hardy Magerko" if regexm(lastname, "Magerko") & regexm(firstname, "Ma")
+(6 real changes made)
+
+. replace midname= "Hardy" if regexm(lastname, "Magerko") & regexm(firstname, "Ma")
+(12 real changes made)
+
+. replace firstname= "Maggie" if regexm(lastname, "Magerko") & regexm(firstname, "Ma")
+(6 real changes made)
+
+. replace Name= "Bob John Magness" if regexm(lastname, "Magness") & regexm(firstname, "Bo")
+(1 real change made)
+
+. replace firstname= "Bob" if regexm(lastname, "Magness") & regexm(firstname, "Bo")
+(1 real change made)
+
+. replace Name= "John C Malone" if regexm(lastname, "Malone") & regexm(firstname, "John")
+(12 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Malone") & regexm(firstname, "John")
+(25 real changes made)
+
+. replace Name= "Mary Alice Dorrance Malone" if regexm(lastname, "Malone") & regexm(firstname, "Mary")
+(2 real changes made)
+
+. replace midname= "Alice Dorrance" if regexm(lastname, "Malone") & regexm(firstname, "Mary")
+(28 real changes made)
+
+. replace Name= "Morton Leon Mandel" if regexm(lastname, "Mandel") & regexm(firstname, "Morton")
+(6 real changes made)
+
+. replace midname= "Leon" if regexm(lastname, "Mandel") & regexm(firstname, "Morton")
+(12 real changes made)
+
+. replace Name= "Joseph C Mandel" if regexm(lastname, "Mandel") & regexm(firstname, "Joseph")
+(1 real change made)
+
+. replace midname= "C" if regexm(lastname, "Mandel") & regexm(firstname, "Joseph")
+(12 real changes made)
+
+. replace Name= "Richard Alexander Manoogian" if regexm(lastname, "Manoogian") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "Alexander" if regexm(lastname, "Manoogian") & regexm(firstname, "Richard")
+(19 real changes made)
+
+. replace Name= "Joseph D Mansueto" if regexm(lastname, "Mansueto") & regexm(firstname, "Jo")
+(11 real changes made)
+
+. replace midname= "D" if regexm(lastname, "Mansueto") & regexm(firstname, "Jo")
+(13 real changes made)
+
+. replace firstname= "Joseph" if regexm(lastname, "Mansueto") & regexm(firstname, "Jo")
+(6 real changes made)
+
+. replace Name= "Anne Windfohr Marion" if regexm(lastname, "Marion") & regexm(firstname, "Anne")
+(4 real changes made)
+
+. replace midname= "Windfohr" if regexm(lastname, "Marion") & regexm(firstname, "Anne")
+(18 real changes made)
+
+. replace Name= "Richard Edwin Marriott" if regexm(lastname, "Marriot") & regexm(firstname, "Richard")
+(9 real changes made)
+
+. replace lastname= "Marriott" if regexm(lastname, "Marriot") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "Edwin" if regexm(lastname, "Marriot") & regexm(firstname, "Richard")
+(24 real changes made)
+
+. replace Name= "John Willard Marriott Sr" if regexm(lastname, "Marriott") & regexm(firstname, "John") & regexm(Suffix, "Sr")
+(2 real changes made)
+
+. replace firstname= "John" if regexm(lastname, "Marriott") & regexm(firstname, "Bill") 
+(3 real changes made)
+
+. replace Name= "John Willard Marriott Jr" if regexm(lastname, "Marriott") & regexm(firstname, "J") & Suffix != "Sr"
+(23 real changes made)
+
+. replace firstname= "John" if regexm(lastname, "Marriott") & regexm(firstname, "J") & Suffix != "Sr"
+(2 real changes made)
+
+. replace midname= "Willard" if regexm(lastname, "Marriott") & regexm(firstname, "J") & Suffix != "Sr"
+(23 real changes made)
+
+. replace Name= "Jacqueline Mars" if regexm(lastname, "Mars") & regexm(firstname, "Jacqueline")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Mars") & regexm(firstname, "Jacqueline")
+(2 real changes made)
+
+. replace Name= "John Franklyn Mars" if regexm(lastname, "Mars") & regexm(firstname, "John") 
+(12 real changes made)
+
+. replace midname= "Franklyn" if regexm(lastname, "Mars") & regexm(firstname, "John") 
+(34 real changes made)
+
+. replace Name= "Forrest Edward Mars Jr" if regexm(lastname, "Mars") & regexm(firstname, "Forrest") 
+(49 real changes made)
+
+. replace Name= "Forrest Edward Mars Sr" if regexm(lastname, "Mars") & regexm(firstname, "Forrest") & regexm(Residence, "Las")
+(14 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Mars") & regexm(firstname, "Forrest") 
+(49 real changes made)
+
+. replace Name= "Barbara Hall Marshall" if regexm(lastname, "Marshall") & regexm(firstname, "Barbara")
+(1 real change made)
+
+. replace midname= "Hall" if regexm(lastname, "Marshall") & regexm(firstname, "Barbara")
+(19 real changes made)
+
+. replace Name= "James Howard Marshall II" if regexm(lastname, "Marshall") & regexm(firstname, "James") & regexm(Residence, "Houston")
+(6 real changes made)
+
+. replace midname= "Howard" if regexm(lastname, "Marshall") & regexm(firstname, "James") & regexm(Residence, "Houston")
+(6 real changes made)
+
+. replace Name= "James Howard Marshall III" if regexm(lastname, "Marshall") & regexm(firstname, "James") & regexm(Residence, "Cali")
+(1 real change made)
+
+. replace Name= "Thomas Marsico" if regexm(lastname, "Marsico") & regexm(firstname, "Thomas") 
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Marsico") & regexm(firstname, "Thomas") 
+(1 real change made)
+
+. replace Name= "Leonard Maximilian Marx" if regexm(lastname, "Marx") & regexm(firstname, "Leonard") 
+(4 real changes made)
+
+. replace midname= "Maximilian" if regexm(lastname, "Marx") & regexm(firstname, "Leonard") 
+(9 real changes made)
+
+. replace Name= "Jack Carroll Massey" if regexm(lastname, "Massey") & regexm(firstname, "Jack")
+(1 real change made)
+
+. replace midname= "Carroll" if regexm(lastname, "Massey") & regexm(firstname, "Jack")
+(2 real changes made)
+
+. replace Name= "Clayton Lee Mathile" if regexm(lastname, "Mathile") & regexm(firstname, "Clay")
+(12 real changes made)
+
+. replace firstname= "Clayton" if regexm(lastname, "Mathile") & regexm(firstname, "Clay")
+(1 real change made)
+
+. replace midname= "Lee" if regexm(lastname, "Mathile") & regexm(firstname, "Clay")
+(27 real changes made)
+
+. replace Name= "Irene Sophie Du Pont May" if regexm(lastname, "May") & regexm(firstname, "Irene")
+(1 real change made)
+
+. replace midname= "Sophie Du Pont" if regexm(lastname, "May") & regexm(firstname, "Irene")
+(15 real changes made)
+
+. replace Name= "L Lowry Mays" if regexm(lastname, "Mays") & regexm(firstname, "L")
+(1 real change made)
+
+. replace midname= "Lowry" if regexm(lastname, "Mays") & regexm(firstname, "L")
+(9 real changes made)
+
+. replace firstname= "L" if regexm(lastname, "Mays") & regexm(firstname, "L")
+(1 real change made)
+
+. replace Name= "Aubrey Mcclendon" if regexm(lastname, "Mcclendon") & regexm(firstname, "Aubrey")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Mcclendon") & regexm(firstname, "Aubrey")
+(1 real change made)
+
+. replace Name= "Billy Joe Mccombs" if regexm(lastname, "Mccombs") & regexm(firstname, "B")
+(15 real changes made)
+
+. replace firstname= "Billy" if regexm(lastname, "Mccombs") & regexm(firstname, "B")
+(1 real change made)
+
+. replace midname= "Joe" if regexm(lastname, "Mccombs") & regexm(firstname, "B")
+(17 real changes made)
+
+. replace Name= "Mark Mccormack" if regexm(lastname, "Mccormack") & regexm(firstname, "Mark")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Mccormack") & regexm(firstname, "Mark")
+(1 real change made)
+
+. replace Name= "Patrick Joseph Mcgovern" if regexm(lastname, "Mcgovern") & regexm(firstname, "Patrick")
+(10 real changes made)
+
+. replace midname= "Joseph" if regexm(lastname, "Mcgovern") & regexm(firstname, "Patrick")
+(32 real changes made)
+
+. replace Name= "Malcom Purcell Mclean" if regexm(lastname, "Mclean") & regexm(firstname, "Mal")
+(2 real changes made)
+
+. replace firstname= "Malcom" if regexm(lastname, "Mclean") & regexm(firstname, "Mal")
+(2 real changes made)
+
+. replace Name= "Gordon Barton Mclendon" if regexm(lastname, "Mclendon") & regexm(firstname, "Gordon")
+(2 real changes made)
+
+. replace midname= "Barton" if regexm(lastname, "Mclendon") & regexm(firstname, "Gordon")
+(4 real changes made)
+
+. replace Name= "Robert C Mcnair" if regexm(lastname, "Mcnair") & regexm(firstname, "Robert")
+(12 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Mcnair") & regexm(firstname, "Robert")
+(22 real changes made)
+
+. replace Name= "Scott G Mcnealy" if regexm(lastname, "Mcnealy") & regexm(firstname, "Scott")
+(1 real change made)
+
+. replace midname= "G" if regexm(lastname, "Mcnealy") & regexm(firstname, "Scott")
+(3 real changes made)
+
+. replace Name= "Frederik Meijer" if regexm(lastname, "Meijer") & regexm(firstname, "Frederik")
+(6 real changes made)
+
+. replace midname= "" if regexm(lastname, "Meijer") 
+(12 real changes made)
+
+. replace Name= "Hank Meijer" if regexm(lastname, "Meijer") & regexm(firstname, "Hank")
+(6 real changes made)
+
+. replace Name= "John R Menard" if regexm(lastname, "Menard") & regexm(firstname, "John")
+(12 real changes made)
+
+. replace midname= "R" if regexm(lastname, "Menard") & regexm(firstname, "John")
+(24 real changes made)
+
+. replace Name= "Bruce R Mccaw" if regexm(lastname, "Mccaw") & regexm(firstname, "Bruce")
+(4 real changes made)
+
+. replace midname= "R" if regexm(lastname, "Mccaw") & regexm(firstname, "Bruce")
+(19 real changes made)
+
+. replace Name= "Craig O Mccaw" if regexm(lastname, "Mccaw") & regexm(firstname, "Craig")
+(10 real changes made)
+
+. replace midname= "O" if regexm(lastname, "Mccaw") & regexm(firstname, "Craig")
+(29 real changes made)
+
+. replace Name= "Keith W Mccaw" if regexm(lastname, "Mccaw") & regexm(firstname, "Keith")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Mccaw") & regexm(firstname, "Keith")
+(16 real changes made)
+
+. replace Name= "John Elroy Mccaw" if regexm(lastname, "Mccaw") & regexm(firstname, "John")
+(1 real change made)
+
+. replace midname= "Elroy" if regexm(lastname, "Mccaw") & regexm(firstname, "John")
+(19 real changes made)
+
+. replace firstname= "Robert" if regexm(lastname, "Mclane") & regexm(firstname, "Drayton")
+(10 real changes made)
+
+. replace Name= "Robert Drayton Mclane" if regexm(lastname, "Mclane") & regexm(firstname, "Robert")
+(11 real changes made)
+
+. replace midname= "Drayton" if regexm(lastname, "Mclane") & regexm(firstname, "Robert")
+(24 real changes made)
+
+. replace firstname= "C" if regexm(lastname, "Mcvaney") & regexm(firstname, "Edward")
+(1 real change made)
+
+. replace Name= "C Edward Mcvaney" if regexm(lastname, "Mcvaney") & regexm(firstname, "C")
+(1 real change made)
+
+. replace midname= "Edward" if regexm(lastname, "Mcvaney") & regexm(firstname, "C")
+(5 real changes made)
+
+. replace Name= "Seward Prosser Mellon" if regexm(lastname, "Mellon") & regexm(firstname, "Seward")
+(1 real change made)
+
+. replace midname= "Prosser" if regexm(lastname, "Mellon") & regexm(firstname, "Seward")
+(9 real changes made)
+
+. replace Name= "Richard Prosser Mellon" if regexm(lastname, "Mellon") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "Prosser" if regexm(lastname, "Mellon") & regexm(firstname, "Richard")
+(9 real changes made)
+
+. replace Name= "Dominique De Menil" if regexm(lastname, "Menil") & regexm(firstname, "D")
+(5 real changes made)
+
+. replace midname= "De" if regexm(lastname, "Menil") & regexm(firstname, "D")
+(10 real changes made)
+
+. replace firstname= "Dominique" if regexm(lastname, "Menil") & regexm(firstname, "D")
+(5 real changes made)
+
+. replace Name= "August Christopher Meyer" if regexm(lastname, "Meyer") & regexm(firstname, "August")
+(1 real change made)
+
+. replace midname= "Christopher" if regexm(lastname, "Meyer") & regexm(firstname, "August")
+(10 real changes made)
+
+. replace Name= "Gary Karlin Michelson" if regexm(lastname, "Michelson") & regexm(firstname, "Gary")
+(7 real changes made)
+
+. replace midname= "Karlin" if regexm(lastname, "Michelson") & regexm(firstname, "Gary")
+(9 real changes made)
+
+. replace Name= "Michael Robert Milken" if regexm(lastname, "Milken") & regexm(firstname, "Michael")
+(12 real changes made)
+
+. replace midname= "Robert" if regexm(lastname, "Milken") & regexm(firstname, "Michael")
+(31 real changes made)
+
+. replace lastname= "Milliken" if regexm(lastname, "Illiken")
+(2 real changes made)
+
+. replace Name= "Lowell Jay Milken" if regexm(lastname, "Milken") & regexm(firstname, "Lowell")
+(1 real change made)
+
+. replace midname= "Jay" if regexm(lastname, "Milken") & regexm(firstname, "Lowell")
+(11 real changes made)
+
+. replace Name= "Alice Frances Du Pont Mills" if regexm(lastname, "Ills") 
+(2 real changes made)
+
+. replace firstname= "Alice" if regexm(lastname, "Ills") 
+(1 real change made)
+
+. replace midname= "Frances Du Pont" if regexm(lastname, "Ills") 
+(2 real changes made)
+
+. replace lastname= "Mills" if regexm(lastname, "Ills") 
+(2 real changes made)
+
+. replace Name= "Alice Francis Du Pont Mills" if regexm(lastname, "Mills") & regexm(firstname, "Alice")
+(3 real changes made)
+
+. replace midname= "Francis Du Pont" if regexm(lastname, "Mills") & regexm(firstname, "Alice")
+(18 real changes made)
+
+. replace Name= "George Phydias Mitchell" if regexm(lastname, "Mitchell") & regexm(firstname, "George")
+(9 real changes made)
+
+. replace midname= "Phydias" if regexm(lastname, "Mitchell") & regexm(firstname, "George")
+(28 real changes made)
+
+. replace Name= "Thomas Stephen Monaghan" if regexm(lastname, "Monaghan") & regexm(firstname, "Thomas")
+(4 real changes made)
+
+. replace midname= "Stephen" if regexm(lastname, "Monaghan") & regexm(firstname, "Thomas")
+(17 real changes made)
+
+. replace Name= "Robert Lee Moody" if regexm(lastname, "Moody") & regexm(firstname, "Robert")
+(2 real changes made)
+
+. replace midname= "Lee" if regexm(lastname, "Moody") & regexm(firstname, "Robert")
+(9 real changes made)
+
+. replace Name= "Gordon Earle Moore" if regexm(lastname, "Moore") & regexm(firstname, "Gordon")
+(17 real changes made)
+
+. replace midname= "Earle" if regexm(lastname, "Moore") & regexm(firstname, "Gordon")
+(35 real changes made)
+
+. replace Name= "James Martin Moran" if regexm(lastname, "Moran") & regexm(firstname, "James")
+(1 real change made)
+
+. replace midname= "Martin" if regexm(lastname, "Moran") & regexm(firstname, "James")
+(18 real changes made)
+
+. replace firstname= "Arturo" if regexm(lastname, "Moreno") & regexm(firstname, "Art")
+(2 real changes made)
+
+. replace Name= "Arturo Moreno" if regexm(lastname, "Moreno") & regexm(firstname, "Arturo")
+(2 real changes made)
+
+. replace Name= "John P Morgridge" if regexm(lastname, "Morgridge") & regexm(firstname, "John") 
+(5 real changes made)
+
+. replace midname= "P" if regexm(lastname, "Morgridge") & regexm(firstname, "John")
+(15 real changes made)
+
+. replace Name= "Manuel Moroun" if regexm(lastname, "Moroun") & regexm(firstname, "Manuel")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Moroun") & regexm(firstname, "Manuel")
+(1 real change made)
+
+. replace Name= "Clint William Murchison" if regexm(lastname, "Murchison")
+(2 real changes made)
+
+. replace midname= "William" if regexm(lastname, "Murchison") 
+(3 real changes made)
+
+. replace Name= "Minot King Milliken" if regexm(lastname, "Milliken") & regexm(firstname, "Minot")
+(3 real changes made)
+
+. replace midname= "King" if regexm(lastname, "Milliken") & regexm(firstname, "Minot")
+(10 real changes made)
+
+. replace Name= "Roger Milliken" if regexm(lastname, "Milliken") & regexm(firstname, "Roger")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Milliken") & regexm(firstname, "Roger")
+(1 real change made)
+
+. replace Name= "Gerrish Hill Milliken" if regexm(lastname, "Milliken") & regexm(firstname, "Gerrish")
+(4 real changes made)
+
+. replace midname= "Hill" if regexm(lastname, "Milliken") & regexm(firstname, "Gerrish")
+(12 real changes made)
+
+. replace Name= "William Alvin Moncrief Jr" if regexm(lastname, "Moncrief") & regexm(firstname, "W")
+(23 real changes made)
+
+. replace midname= "Alvin" if regexm(lastname, "Moncrief") & regexm(firstname, "W")
+(23 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Moncrief") & regexm(firstname, "W")
+(1 real change made)
+
+. replace Name= "William Alvin Moncrief" if regexm(lastname, "Moncrief") & regexm(firstname, "W") & Suffix== "Sr"
+(4 real changes made)
+
+. replace Name= "Charles T Munger" if regexm(lastname, "Munger") & regexm(firstname, "Charles")
+(9 real changes made)
+
+. replace midname= "T" if regexm(lastname, "Munger") & regexm(firstname, "Charles")
+(17 real changes made)
+
+. replace Name= "Keith Rupert Murdoch" if regexm(lastname, "Murdoch")
+(13 real changes made)
+
+. replace firstname= "Keith" if regexm(lastname, "Murdoch")
+(12 real changes made)
+
+. replace midname= "Rupert" if regexm(lastname, "Murdoch")
+(33 real changes made)
+
+. replace Name= "David Howard Murdock" if regexm(lastname, "Murdock")
+(15 real changes made)
+
+. replace midname= "Howard" if regexm(lastname, "Murdock")
+(34 real changes made)
+
+. replace Name= "Charles Haywood Murphy" if regexm(lastname, "Murphy") & regexm(firstname, "Charles")
+(2 real changes made)
+
+. replace midname= "Haywood" if regexm(lastname, "Murphy") & regexm(firstname, "Charles")
+(5 real changes made)
+
+. replace Name= "Robert Allen Naify" if regexm(lastname, "Naify") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "Allen" if regexm(lastname, "Naify") & regexm(firstname, "Robert")
+(21 real changes made)
+
+. replace Name= "Peter M Nicholas" if regexm(lastname, "Nicholas") & regexm(firstname, "Peter")
+(2 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Nicholas") & regexm(firstname, "Peter")
+(13 real changes made)
+
+. replace Name= "Marvin L Oates" if regexm(lastname, "Oates") & regexm(firstname, "Marvin")
+(4 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Oates") & regexm(firstname, "Marvin")
+(4 real changes made)
+
+. replace Name= "Pierre M Omidyar" if regexm(lastname, "Omidyar")
+(12 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Omidyar")
+(19 real changes made)
+
+. replace Name= "Dwight Darwin Opperman" if regexm(lastname, "Opperman") & regexm(firstname, "Dwight")
+(11 real changes made)
+
+. replace midname= "Darwin" if regexm(lastname, "Opperman") & regexm(firstname, "Dwight")
+(12 real changes made)
+
+. replace Name= "Donald Edward Newhouse" if regexm(lastname, "Newhouse") & regexm(firstname, "Donald")
+(14 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Newhouse") & regexm(firstname, "Donald")
+(36 real changes made)
+
+. replace Name= "Samuel Irving Newhouse" if regexm(lastname, "Newhouse") & regexm(firstname, "Samuel") | firstname== "Si"
+(13 real changes made)
+
+. replace midname= "Irving" if regexm(lastname, "Newhouse") & regexm(firstname, "Samuel") | firstname== "Si"
+(35 real changes made)
+
+. replace firstname= "Samuel" if regexm(lastname, "Newhouse") & regexm(firstname, "Samuel") | firstname== "Si"
+(1 real change made)
+
+. replace Name= "Abby Milton O'Neill" if regexm(lastname, "O'Neill") & regexm(firstname, "Abby")
+(2 real changes made)
+
+. replace midname= "Milton" if regexm(lastname, "O'Neill") & regexm(firstname, "Abby")
+(5 real changes made)
+
+. replace lastname= "O'Neill" if regexm(lastname, "Neill") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace lastname= "O'Neill" if regexm(lastname, "Oneill") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace Name= "Richard Jerome O'Neill" if regexm(lastname, "O'Neill") & regexm(firstname, "Richard")
+(4 real changes made)
+
+. replace midname= "Jerome" if regexm(lastname, "O'Neill") & regexm(firstname, "Richard")
+(11 real changes made)
+
+. replace Name= "Larry E Page" if regexm(lastname, "Page") & regexm(firstname, "Larry")
+(11 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Page") & regexm(firstname, "Larry")
+(14 real changes made)
+
+. replace Name= "Max Palevsky" if regexm(lastname, "Palevsky")
+(1 real change made)
+
+. replace firstname= "Max" if regexm(lastname, "Palevsky")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Palevsky")
+(1 real change made)
+
+. replace Name= "Blair Parry-Okeden" if regexm(lastname, "Parry-Ok") & regexm(firstname, "Blair")
+(2 real changes made)
+
+. replace lastname= "Parry-Okeden" if regexm(lastname, "Parry-Ok") & regexm(firstname, "Blair")
+(2 real changes made)
+
+. replace Name= "Frank James Pasquerilla" if regexm(lastname, "Pasquerilla") 
+(1 real change made)
+
+. replace midname= "James" if regexm(lastname, "Pasquerilla") 
+(3 real changes made)
+
+. replace Name= "Allen Eugene Paulson" if regexm(lastname, "Paulson") & regexm(firstname, "Allen")
+(3 real changes made)
+
+. replace midname= "Eugene" if regexm(lastname, "Paulson") & regexm(firstname, "Allen")
+(9 real changes made)
+
+. replace Name= "Luigino Francesco Paulucci" if regexm(lastname, "Paulucci")
+(2 real changes made)
+
+. replace firstname= "Luigino" if regexm(lastname, "Paulucci")
+(2 real changes made)
+
+. replace midname= "Francesco" if regexm(lastname, "Paulucci")
+(10 real changes made)
+
+. replace Name= "Charles Shipman Payson" if regexm(lastname, "Payson") & regexm(firstname, "Charles")
+(1 real change made)
+
+. replace midname= "Shipman" if regexm(lastname, "Payson") & regexm(firstname, "Charles")
+(3 real changes made)
+
+. replace Name= "Richard Taylor Peery" if regexm(lastname, "Peery") & regexm(firstname, "Richard")
+(13 real changes made)
+
+. replace midname= "Taylor" if regexm(lastname, "Peery") & regexm(firstname, "Richard")
+(30 real changes made)
+
+. replace Name= "Ronald Owen Perelman" if regexm(lastname, "Perelman") & regexm(firstname, "Ronald")
+(12 real changes made)
+
+. replace midname= "Owen" if regexm(lastname, "Perelman") & regexm(firstname, "Ronald")
+(31 real changes made)
+
+. replace Name= "Andrew Jerrold Perenchio" if regexm(lastname, "Perenchio") 
+(16 real changes made)
+
+. replace firstname= "Andrew" if regexm(lastname, "Perenchio") 
+(15 real changes made)
+
+. replace midname= "Jerrold" if regexm(lastname, "Perenchio") 
+(31 real changes made)
+
+. replace Name= "Jorge Perez" if regexm(lastname, "Perez") & regexm(firstname, "Jorge")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Perez") & regexm(firstname, "Jorge")
+(2 real changes made)
+
+. replace Name= "Irene Wells Pennington" if regexm(lastname, "Pennington") & regexm(firstname, "Irene")
+(1 real change made)
+
+. replace midname= "Wells" if regexm(lastname, "Pennington") & regexm(firstname, "Irene")
+(2 real changes made)
+
+. replace Name= "Claude Bernard Pennington" if regexm(lastname, "Pennington") & regexm(firstname, "Claude")
+(8 real changes made)
+
+. replace midname= "Bernard" if regexm(lastname, "Pennington") & regexm(firstname, "Claude")
+(12 real changes made)
+
+. replace firstname= "Roger" if regexm(lastname, "Penske") & regexm(firstname, "S")
+(1 real change made)
+
+. replace Name= "Roger S Penske" if regexm(lastname, "Penske") & regexm(firstname, "Roger")
+(9 real changes made)
+
+. replace midname= "S" if regexm(lastname, "Penske") & regexm(firstname, "Roger")
+(12 real changes made)
+
+. replace SUFFIX= "Jr" if regexm(lastname, "Perot") & regexm(firstname, "Henry") & Rank== "312"
+(1 real change made)
+
+. replace firstname= "Henry" if regexm(lastname, "Perot") & regexm(midname, "Ross") 
+(11 real changes made)
+
+. replace Name= "Henry Ross Perot" if regexm(lastname, "Perot") & regexm(firstname, "Henry") & SUFFIX != "Jr"
+(8 real changes made)
+
+. replace Name= "Henry Ross Perot Jr" if regexm(lastname, "Perot") & regexm(firstname, "Henry") & SUFFIX == "Jr"
+(8 real changes made)
+
+. replace Name= "Milton Jack Petrie" if regexm(lastname, "Petrie") & regexm(firstname, "Milton")
+(9 real changes made)
+
+. replace midname= "Jack" if regexm(lastname, "Petrie") & regexm(firstname, "Milton")
+(13 real changes made)
+
+. replace Name= "Carl Ray Pohlad" if regexm(lastname, "Pohlad") & regexm(firstname, "Carl")
+(15 real changes made)
+
+. replace midname= "Ray"  if regexm(lastname, "Pohlad") & regexm(firstname, "Carl")
+(25 real changes made)
+
+. replace Name= "Kenneth Nicholas Pontikes" if regexm(lastname, "Pontikes") & regexm(firstname, "Kenneth")
+(1 real change made)
+
+. replace midname= "Nicholas" if regexm(lastname, "Pontikes") & regexm(firstname, "Kenneth")
+(4 real changes made)
+
+. replace Name= "Michael F Price" if regexm(lastname, "Price") & regexm(firstname, "Michael")
+(6 real changes made)
+
+. replace midname= "F" if regexm(lastname, "Price") & regexm(firstname, "Michael")
+(17 real changes made)
+
+. replace Name= "Eugene Smith Pulliam" if regexm(lastname, "Pulliam") & regexm(firstname, "Eugene")
+(1 real change made)
+
+. replace midname= "Smith" if regexm(lastname, "Pulliam") & regexm(firstname, "Eugene")
+(4 real changes made)
+
+. replace Name= "Robert Einar Petersen" if regexm(lastname, "Petersen") & regexm(firstname, "Robert")
+(2 real changes made)
+
+. replace midname= "Einar" if regexm(lastname, "Petersen") & regexm(firstname, "Robert")
+(21 real changes made)
+
+. replace Name= "Sol Price" if regexm(lastname, "Price") & regexm(firstname, "Sol")
+(1 real change made)
+
+. replace firstname= "Sol" if regexm(lastname, "Price") & regexm(firstname, "Sol")
+(1 real change made)
+
+. replace Name= "Nicholas J Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Nicholas")
+(6 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Pritzker") & regexm(firstname, "Nicholas")
+(9 real changes made)
+
+. replace Name= "Jay Robert (JB) Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Jay") & regexm(midname, "Robert")
+(14 real changes made)
+
+. replace midname= "Robert (JB)" if regexm(lastname, "Pritzker") & regexm(firstname, "Jay") & regexm(midname, "Robert")
+(14 real changes made)
+
+. replace firstname= "Abram" if regexm(lastname, "Pritzker") & firstname== "A"
+(1 real change made)
+
+. replace midname= "Nicholas" if regexm(lastname, "Pritzker") & regexm(firstname, "Abra")
+(4 real changes made)
+
+. replace Name= "Abram Nicholas Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Abra")
+(2 real changes made)
+
+. replace firstname= "Abram" if regexm(lastname, "Pritzker") & regexm(firstname, "Abra")
+(1 real change made)
+
+. replace Name= "Robert Alan Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Rober")
+(2 real changes made)
+
+. replace firstname= "Robert" if regexm(lastname, "Pritzker") & regexm(firstname, "Rober")
+(1 real change made)
+
+. replace midname= "Alan" if regexm(lastname, "Pritzker") & regexm(firstname, "Rober")
+(22 real changes made)
+
+. replace Name= "Jean (Gigi) Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Jean")
+(1 real change made)
+
+. replace midname= "(Gigi)" if regexm(lastname, "Pritzker") & regexm(firstname, "Jean")
+(14 real changes made)
+
+. replace Name= "Thomas J Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "Thomas")
+(11 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Pritzker") & regexm(firstname, "Thomas")
+(18 real changes made)
+
+. replace Name= "John Pritzker" if regexm(lastname, "Pritzker") & regexm(firstname, "John")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Pritzker") & regexm(firstname, "John")
+(3 real changes made)
+
+. replace Name= "Alexis Felix Du Pont" if regexm(lastname, "Pont") & regexm(firstname, "Alexis")
+(1 real change made)
+
+. replace lastname= "Du Pont" if regexm(lastname, "Pont") & regexm(firstname, "Alexis")
+(15 real changes made)
+
+. replace midname= "Felix" if regexm(lastname, "Pont") & regexm(firstname, "Alexis")
+(15 real changes made)
+
+. replace Name= "Edward Bradford Du Pont" if regexm(lastname, "Pont") & regexm(firstname, "Edward")
+(0 real changes made)
+
+. replace midname= "Bradford" if regexm(lastname, "Pont") & regexm(firstname, "Edward")
+(2 real changes made)
+
+. replace lastname= "Du Pont" if regexm(lastname, "Pont") 
+(65 real changes made)
+
+. replace midname= "Rebecca" if regexm(lastname, "Pont") & regexm(firstname, "Evelyn") & regexm(midname, "Rebecca")
+(2 real changes made)
+
+. replace Name= "Helena Allaire Crozer Du Pont" if regexm(lastname, "Pont") & regexm(firstname, "Helena")
+(1 real change made)
+
+. replace midname= "Allaire Crozer" if regexm(lastname, "Pont") & regexm(firstname, "Helena")
+(6 real changes made)
+
+. replace midname= "Eleuthere Irenee" if regexm(lastname, "Pont") & regexm(firstname, "Henry")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Pont") & regexm(firstname, "Irenee")
+(16 real changes made)
+
+. replace midname= "Wheeler" if regexm(lastname, "Pont") & regexm(firstname, "Joan")
+(1 real change made)
+
+. replace midname= "Eleuthere" if regexm(lastname, "Pont") & regexm(firstname, "John")
+(4 real changes made)
+
+. replace lastname= "Pontikes" if regexm(Name, "Pontikes")
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "Pont") & regexm(firstname, "Marion")
+(1 real change made)
+
+. replace midname= "Samuel" if regexm(lastname, "Pont") & regexm(firstname, "Pierre")
+(9 real changes made)
+
+. replace Name= "Pierre Samuel Du Pont" if firstname== "Pierre" & lastname == "Du Pont"
+(2 real changes made)
+
+. replace firstname= "Willis" if regexm(lastname, "Pont") & firstname== "W"
+(1 real change made)
+
+. replace Name= "Willis Harrington Du Pont" if regexm(lastname, "Pont") & regexm(firstname, "Willis")
+(1 real change made)
+
+. replace midname= "Harrington" if regexm(lastname, "Pont") & regexm(firstname, "Willis")
+(13 real changes made)
+
+. replace midname= "" if regexm(lastname, "Pont") & regexm(firstname, "William")
+(2 real changes made)
+
+. replace Name= "Pierre Samuel Du Pont" if firstname== "Du" & regexm(midname, "Pierre")
+(6 real changes made)
+
+. replace lastname= "Du Pont" if firstname== "Du"
+(8 real changes made)
+
+. replace firstname= "Pierre" if lastname== "Du Pont" & regexm(midname, "Pierre")
+(6 real changes made)
+
+. replace midname= "Samuel" if lastname== "Du Pont" & firstname== "Pierre"
+(6 real changes made)
+
+. replace Name= "William Du Pont" if regexm(lastname, "Du Pont") & regexm(Name, "William")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Du Pont") & regexm(Name, "William")
+(2 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Du Pont") & regexm(Name, "William")
+(2 real changes made)
+
+. replace Name= "Ernest S Rady" if regexm(lastname, "Rady") & regexm(firstname, "Ernest")
+(1 real change made)
+
+. replace midname= "S" if regexm(lastname, "Rady") & regexm(firstname, "Ernest")
+(4 real changes made)
+
+. replace Name= "Richard Edward Rainwater" if regexm(lastname, "Rainwater")
+(13 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Rainwater")
+(28 real changes made)
+
+. replace Name= "Mitchell Rales" if regexm(lastname, "Rales") & regexm(firstname, "Mitchell")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Rales") & regexm(firstname, "Mitchell")
+(3 real changes made)
+
+. replace Name= "Steven M Rales" if regexm(lastname, "Rales") & regexm(firstname, "Steven")
+(20 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Rales") & regexm(firstname, "Steven")
+(23 real changes made)
+
+. replace Name= "Sumner Murray Redstone" if regexm(lastname, "Redstone") & regexm(firstname, "Sumner")
+(22 real changes made)
+
+. replace midname= "Murray" if regexm(lastname, "Redstone") & regexm(firstname, "Sumner")
+(34 real changes made)
+
+. replace Name= "Ira L Rennert" if regexm(lastname, "Rennert") & regexm(firstname, "Ira")
+(11 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Rennert") & regexm(firstname, "Ira")
+(13 real changes made)
+
+. replace Name= "J Joseph Ricketts" if regexm(lastname, "Ricketts") & regexm(firstname, "J")
+(6 real changes made)
+
+. replace midname= "Joseph" if regexm(lastname, "Ricketts") & regexm(firstname, "J")
+(11 real changes made)
+
+. replace firstname= "J" if regexm(lastname, "Ricketts") & regexm(firstname, "J")
+(1 real change made)
+
+. replace Name= "Marshall Edison Rinker" if regexm(lastname, "Rinker") & regexm(firstname, "Marshall")
+(9 real changes made)
+
+. replace midname= "Edison" if regexm(lastname, "Rinker") & regexm(firstname, "Marshall")
+(11 real changes made)
+
+. replace Name= "Joe Lewis Allbritton" if regexm(firstname, "Joe") & regexm(lastname, "Ritton")
+(1 real change made)
+
+. replace midname= "Lewis" if regexm(firstname, "Joe") & regexm(lastname, "Ritton")
+(1 real change made)
+
+. replace lastname= "Allbritton" if regexm(firstname, "Joe") & regexm(lastname, "Ritton")
+(1 real change made)
+
+. replace Name= "Leandro Rizzuto" if regexm(lastname, "Rizzuto") & regexm(firstname, "Leandro")
+(5 real changes made)
+
+. replace midname= "" if regexm(lastname, "Rizzuto") & regexm(firstname, "Leandro")
+(5 real changes made)
+
+. replace Name= "Billy Joe Mccombs" if regexm(lastname, "Red") & regexm(firstname, "Billy")
+(1 real change made)
+
+. replace midname= "Joe" if regexm(lastname, "Red") & regexm(firstname, "Billy")
+(1 real change made)
+
+. replace lastname= "Mccombs" if regexm(lastname, "Red") & regexm(firstname, "Billy")
+(1 real change made)
+
+. replace Name= "Archie Aldis Emmerson" if regexm(lastname, "Red") & regexm(firstname, "Archie")
+(1 real change made)
+
+. replace midname= "Aldis" if regexm(lastname, "Red") & regexm(firstname, "Archie")
+(1 real change made)
+
+. replace lastname= "Emmerson" if regexm(lastname, "Red") & regexm(firstname, "Archie")
+(1 real change made)
+
+. replace Name= "William Redington Hewlett" if regexm(lastname, "Red") & regexm(firstname, "William")
+(10 real changes made)
+
+. replace midname= "Redington" if regexm(lastname, "Red") & regexm(firstname, "William")
+(10 real changes made)
+
+. replace lastname= "Hewlett" if regexm(lastname, "Red") & regexm(firstname, "William")
+(10 real changes made)
+
+. replace Name= "Elizabeth Ann Reid" if regexm(lastname, "Reid") & regexm(firstname, "Elizabeth")
+(4 real changes made)
+
+. replace midname= "Ann" if regexm(lastname, "Reid") & regexm(firstname, "Elizabeth") 
+(19 real changes made)
+
+. replace Name= "Dewayne B Reinhart" if regexm(lastname, "Reinhart")
+(2 real changes made)
+
+. replace firstname= "Dewayne" if regexm(lastname, "Reinhart") 
+(2 real changes made)
+
+. replace Name= "Burton Paul Resnick" if regexm(lastname, "Resnick") & regexm(firstname, "Burt")
+(2 real changes made)
+
+. replace midname= "Paul" if regexm(lastname, "Resnick") & regexm(firstname, "Burt")
+(7 real changes made)
+
+. replace firstname= "Burton" if regexm(lastname, "Resnick") & regexm(firstname, "Burt")
+(1 real change made)
+
+. replace Name= "M Jude Reyes" if regexm(lastname, "Reyes") & regexm(firstname, "Jude")
+(7 real changes made)
+
+. replace midname= "Jude" if regexm(lastname, "Reyes") & regexm(firstname, "Jude")
+(7 real changes made)
+
+. replace firstname= "M" if regexm(lastname, "Reyes") & regexm(firstname, "Jude")
+(7 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Rich") & regexm(firstname, "Robert")
+(34 real changes made)
+
+. replace Name= "Robert Edward Rich" if regexm(lastname, "Rich") & regexm(firstname, "Robert")
+(18 real changes made)
+
+. replace Name= "Robert Edward Rich Jr" if regexm(lastname, "Rich") & regexm(firstname, "Robert") & regexm(Residence, "Islamorad")
+(11 real changes made)
+
+. replace Name= "David A Rich" if regexm(lastname, "Rich") & regexm(firstname, "David")
+(2 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Rich") & regexm(firstname, "David")
+(3 real changes made)
+
+. replace Name= "Marc Rich" if regexm(lastname, "Rich") & regexm(firstname, "Marc")
+(9 real changes made)
+
+. replace midname= "" if regexm(lastname, "Rich") & regexm(firstname, "Marc")
+(9 real changes made)
+
+. replace Name= "Brian L Roberts" if regexm(lastname, "Roberts") & regexm(firstname, "Brian")
+(1 real change made)
+
+. replace midname= "L" if regexm(lastname, "Roberts") & regexm(firstname, "Brian")
+(5 real changes made)
+
+. replace Name= "George R Roberts" if regexm(lastname, "Roberts") & regexm(firstname, "George")
+(11 real changes made)
+
+. replace midname= "R" if regexm(lastname, "Roberts") & regexm(firstname, "George")
+(30 real changes made)
+
+. replace Name= "Julian Robertson" if regexm(lastname, "Robertson") & regexm(firstname, "Julian")
+(9 real changes made)
+
+. replace midname= "" if regexm(lastname, "Robertson") & regexm(firstname, "Julian")
+(9 real changes made)
+
+. replace Name= "Arthur Rock" if regexm(lastname, "Rock") & regexm(firstname, "Arthur")
+(9 real changes made)
+
+. replace midname= "" if regexm(lastname, "Rock") & regexm(firstname, "Arthur")
+(9 real changes made)
+
+. replace Name= "E Claiborne Robins" if regexm(lastname, "Robins") & regexm(firstname, "E")
+(1 real change made)
+
+. replace firstname= "E" if regexm(lastname, "Robins") & regexm(firstname, "E")
+(1 real change made)
+
+. replace lastname= "Rockefeller" if regexm(firstname, "Rockefeller")
+(9 real changes made)
+
+. replace Name= "Laurance Spelman Rockefeller" if regexm(lastname, "Rockefeller") & regexm(firstname, "Laurance")
+(1 real change made)
+
+. replace midname= "Spelman" if regexm(lastname, "Rockefeller") & regexm(firstname, "Laurance")
+(22 real changes made)
+
+. replace Name= "John Davison Rockefeller" if regexm(lastname, "Rockefeller") & regexm(firstname, "John")
+(5 real changes made)
+
+. replace midname= "Davison" if regexm(lastname, "Rockefeller") & regexm(firstname, "John")
+(5 real changes made)
+
+. replace Name= "Winthrop Paul Rockefeller" if regexm(lastname, "Rockefeller") & regexm(firstname, "Winthrop")
+(1 real change made)
+
+. replace midname= "Paul" if regexm(lastname, "Rockefeller") & regexm(firstname, "Winthrop")
+(24 real changes made)
+
+. replace Name= "William Rockefeller" if regexm(lastname, "Rockefeller") & regexm(Name, "William")
+(3 real changes made)
+
+. replace firstname= "William" if regexm(lastname, "Rockefeller") & regexm(Name, "William")
+(3 real changes made)
+
+. replace Name= "John Davison Rockefeller" if regexm(lastname, "Rockefeller") & regexm(Name, "John")
+(6 real changes made)
+
+. replace firstname= "John" if regexm(lastname, "Rockefeller") & regexm(Name, "John")
+(6 real changes made)
+
+. replace midname= "Davison" if regexm(lastname, "Rockefeller") & regexm(Name, "John")
+(6 real changes made)
+
+. replace Name= "Chapman Shaw Root" if regexm(lastname, "Root") & regexm(firstname, "Chapman")
+(2 real changes made)
+
+. replace midname= "Shaw" if regexm(lastname, "Root") & regexm(firstname, "Chapman")
+(9 real changes made)
+
+. replace Name= "Ruth Blaustein Rosenberg" if regexm(lastname, "Rosenberg") & regexm(firstname, "Ruth")
+(2 real changes made)
+
+. replace midname= "Blaustein" if regexm(lastname, "Rosenberg") & regexm(firstname, "Ruth")
+(11 real changes made)
+
+. replace Name= "Edward Roski" if regexm(lastname, "Roski") & regexm(firstname, "Edward")
+(5 real changes made)
+
+. replace midname= "" if regexm(lastname, "Roski") & regexm(firstname, "Edward")
+(5 real changes made)
+
+. replace Name= "Stephen Ross" if regexm(lastname, "Ross") & regexm(firstname, "Stephen")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Ross") & regexm(firstname, "Stephen")
+(1 real change made)
+
+. replace Name= "Wilbur Ross" if regexm(lastname, "Ross") & regexm(firstname, "Wilbur")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Ross") & regexm(firstname, "Wilbur")
+(3 real changes made)
+
+. replace Name= "Reese Mcintosh Rowling" if regexm(lastname, "Rowling") & regexm(firstname, "Reese")
+(1 real change made)
+
+. replace midname= "Mcintosh" if regexm(lastname, "Rowling") & regexm(firstname, "Reese")
+(6 real changes made)
+
+. replace Name= "Phillip Ruffin" if regexm(lastname, "Ruffin") & regexm(firstname, "Phil")
+(2 real changes made)
+
+. replace firstname= "Phillip" if regexm(lastname, "Ruffin") & regexm(firstname, "Phil")
+(2 real changes made)
+
+. replace Name= "Eleanor Francis Du Pont Rust" if regexm(lastname, "Rust") & regexm(firstname, "Eleanor")
+(1 real change made)
+
+. replace midname= "Francis Du Pont" if regexm(lastname, "Rust") & regexm(firstname, "Eleanor")
+(12 real changes made)
+
+. replace firstname= "Orville" if regexm(lastname, "Rollins") & regexm(firstname, "O")
+(4 real changes made)
+
+. replace Name= "Orville Wayne Rollins" if regexm(lastname, "Rollins") & regexm(firstname, "Orville")
+(4 real changes made)
+
+. replace midname= "Wayne" if regexm(lastname, "Rollins") & regexm(firstname, "O")
+(11 real changes made)
+
+. replace Name= "Patrick George Ryan" if regexm(lastname, "Ryan") & regexm(firstname, "Patrick")
+(11 real changes made)
+
+. replace midname= "George" if regexm(lastname, "Ryan") & regexm(firstname, "Patrick")
+(30 real changes made)
+
+. replace Name= "Katsumasa (Roy) Sakioka" if regexm(lastname, "Sakioka")
+(2 real changes made)
+
+. replace firstname= "Katsumasa" if regexm(lastname, "Sakioka")
+(2 real changes made)
+
+. replace midname= "(Roy)" if regexm(lastname, "Sakioka")
+(5 real changes made)
+
+. replace Name= "Roger W Sant" if regexm(lastname, "Sant") & regexm(firstname, "Roger")
+(1 real change made)
+
+. replace midname= "W" if regexm(lastname, "Sant") & regexm(firstname, "Roger")
+(4 real changes made)
+
+. replace Name= "Fayez Shalaby Sarofim" if regexm(lastname, "Sarofim") & regexm(firstname, "Fayez")
+(5 real changes made)
+
+. replace midname= "Shalaby" if regexm(lastname, "Sarofim") & regexm(firstname, "Fayez")
+(24 real changes made)
+
+. replace firstname= "Fayez" if regexm(lastname, "Sarofim") & regexm(firstname, "Fayez")
+(1 real change made)
+
+. replace Name= "Bernard Francis Saul" if regexm(lastname, "Saul") & regexm(firstname, "B")
+(12 real changes made)
+
+. replace midname= "Francis" if regexm(lastname, "Saul") & regexm(firstname, "B")
+(23 real changes made)
+
+. replace firstname= "Bernard" if regexm(lastname, "Saul") & regexm(firstname, "B")
+(4 real changes made)
+
+. replace Name= "Richard Mellon Scaife" if regexm(lastname, "Scaife") & regexm(firstname, "Richard")
+(6 real changes made)
+
+. replace midname= "Mellon" if regexm(lastname, "Scaife") & regexm(firstname, "Richard")
+(32 real changes made)
+
+. replace Name= "Caroline Rose Hunt" if regexm(lastname, "Schoel") & firstname== "Caroline"
+(5 real changes made)
+
+. replace midname= "Rose" if regexm(lastname, "Schoel") & firstname== "Caroline"
+(5 real changes made)
+
+. replace lastname= "Hunt" if regexm(lastname, "Schoel") & firstname== "Caroline"
+(5 real changes made)
+
+. replace lastname= "Schulze" if regexm(midname, "Schulze")
+(1 real change made)
+
+. replace Name= "Howard Schultz" if regexm(lastname, "Schultz") & regexm(firstname, "Howard")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Schultz") & regexm(firstname, "Howard")
+(1 real change made)
+
+. replace Name= "Richard M Schulze" if regexm(lastname, "Schulze") & regexm(firstname, "Richard")
+(13 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Schulze") & regexm(firstname, "Richard")
+(20 real changes made)
+
+. replace Name= "Charles R Schwab" if regexm(lastname, "Schwab") & regexm(firstname, "Charles")
+(12 real changes made)
+
+. replace midname= "R" if regexm(lastname, "Schwab") & regexm(firstname, "Charles")
+(25 real changes made)
+
+. replace Name= "Stephen A Schwarzman" if regexm(lastname, "Schwarzman") & regexm(firstname, "Stephen")
+(10 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Schwarzman") & regexm(firstname, "Stephen")
+(14 real changes made)
+
+. replace Name= "William Louis Searle" if regexm(lastname, "Searle") & regexm(firstname, "William")
+(2 real changes made)
+
+. replace midname= "Louis" if regexm(lastname, "Searle") & regexm(firstname, "William")
+(10 real changes made)
+
+. replace Name= "David Shaw" if regexm(lastname, "Shaw") & regexm(firstname, "David")
+(2 real changes made)
+
+. replace midname= "" if regexm(lastname, "Shaw") & regexm(firstname, "David")
+(2 real changes made)
+
+. replace Name= "Leonard Samuel Shoen" if regexm(lastname, "Schoen") & regexm(firstname, "Leonard")
+(1 real change made)
+
+. replace lastname= "Shoen" if regexm(lastname, "Schoen") & regexm(firstname, "Leonard")
+(1 real change made)
+
+. replace Name= "Walter Herbert Shorenstein" if regexm(lastname, "Shorenstein") & regexm(firstname, "Walter")
+(6 real changes made)
+
+. replace midname= "Herbert" if regexm(lastname, "Shorenstein") & regexm(firstname, "Walter")
+(27 real changes made)
+
+. replace firstname= "Walter" if regexm(lastname, "Shorenstein") & regexm(firstname, "Walter")
+(1 real change made)
+
+. replace Name= "Kavitark Ram Shriram" if regexm(lastname, "Shriram") & regexm(firstname, "Kavitark")
+(2 real changes made)
+
+. replace midname= "Ram" if regexm(lastname, "Shriram") & regexm(firstname, "Kavitark")
+(13 real changes made)
+
+. replace Name= "Evgeny (Eugene) Markovich Shvidler" if regexm(lastname, "Shvidler") & regexm(firstname, "Evgeny")
+(8 real changes made)
+
+. replace midname= "(Eugene) Markovich" if regexm(lastname, "Shvidler") & regexm(firstname, "Evgeny")
+(9 real changes made)
+
+. replace Name= "Thomas Siebel" if regexm(lastname, "Siebel") & regexm(firstname, "T")
+(9 real changes made)
+
+. replace firstname= "Thomas" if regexm(lastname, "Siebel") & regexm(firstname, "T")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Siebel") & regexm(firstname, "T")
+(8 real changes made)
+
+. replace Name= "Herbert Siegel" if regexm(lastname, "Siegel") & regexm(firstname, "Herbert")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Siegel") & regexm(firstname, "Herbert")
+(1 real change made)
+
+. replace Name= "Mariana Du Pont Silliman" if regexm(firstname, "Marian") & regexm(lastname, "Silliman")
+(4 real changes made)
+
+. replace firstname= "Mariana" if regexm(firstname, "Marian") & regexm(lastname, "Silliman")
+(4 real changes made)
+
+. replace Name= "Larry Abraham Silverstein" if regexm(lastname, "Silverstein") & regexm(firstname, "Larry")
+(1 real change made)
+
+. replace midname= "Abraham" if regexm(lastname, "Silverstein") & regexm(firstname, "Larry")
+(8 real changes made)
+
+. replace Name= "Harold Clark Simmons" if regexm(lastname, "Simmons") & regexm(firstname, "Harold")
+(10 real changes made)
+
+. replace midname= "Clark" if regexm(lastname, "Simmons") & regexm(firstname, "Harold")
+(31 real changes made)
+
+. replace Name= "James Simons" if regexm(lastname, "Simons") & regexm(firstname, "James")
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Simons") & regexm(firstname, "James")
+(3 real changes made)
+
+. replace Name= "Leonard Samuel Skaggs" if regexm(lastname, "Skaggs") & regexm(firstname, "Leonard")
+(1 real change made)
+
+. replace midname= "Samuel" if regexm(lastname, "Skaggs") & regexm(firstname, "Leonard")
+(14 real changes made)
+
+. replace Name= "Dan Snyder" if regexm(lastname, "Snyder") & regexm(firstname, "Dan")
+(2 real changes made)
+
+. replace firstname= "Dan" if regexm(lastname, "Snyder") & regexm(firstname, "Dan")
+(2 real changes made)
+
+. replace Name= "Sheldon Henry Solow" if regexm(lastname, "Solow") & regexm(firstname, "Sheldon")
+(16 real changes made)
+
+. replace midname= "Henry" if regexm(lastname, "Solow") & regexm(firstname, "Sheldon")
+(33 real changes made)
+
+. replace Name= "James LeVoy Sorenson" if regexm(lastname, "Sorenson") & regexm(firstname, "James")
+(25 real changes made)
+
+. replace midname= "LeVoy" if regexm(lastname, "Sorenson") & regexm(firstname, "James")
+(25 real changes made)
+
+. replace Name= "Donald J Schneider" if regexm(lastname, "Schneider") & regexm(firstname, "Donald")
+(6 real changes made)
+
+. replace midname= "J" if regexm(lastname, "Schneider") & regexm(firstname, "Donald")
+(18 real changes made)
+
+. replace Name= "EW Scripps Family" if regexm(lastname, "Scripps") & firstname== "Ew"
+(2 real changes made)
+
+. replace Name= "EW Scripps Family" if regexm(lastname, "Scripps") & firstname== "E"
+(1 real change made)
+
+. replace firstname= "E" if regexm(lastname, "Scripps") & firstname== "Ew"
+(2 real changes made)
+
+. replace midname= "W" if regexm(lastname, "Scripps") & firstname== "E"
+(3 real changes made)
+
+. replace Name= "Edward Wyllis Scripps" if regexm(lastname, "Scripps") & regexm(firstname, "Edward")
+(1 real change made)
+
+. replace midname= "Wyllis" if regexm(lastname, "Scripps") & regexm(firstname, "Edward")
+(4 real changes made)
+
+. replace Name= "J E Scripps" if regexm(lastname, "Scripps") & regexm(firstname, "Je")
+(3 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Scripps") & regexm(firstname, "Je")
+(3 real changes made)
+
+. replace firstname= "J" if regexm(lastname, "Scripps") & regexm(firstname, "Je")
+(3 real changes made)
+
+. replace Name= "Peter Jay Sharp" if regexm(lastname, "Sharp") & regexm(firstname, "Peter")
+(5 real changes made)
+
+. replace midname= "Jay" if regexm(lastname, "Sharp") & regexm(firstname, "Peter")
+(11 real changes made)
+
+. replace Name= "Bayard T Sharp" if regexm(lastname, "Sharp") & regexm(firstname, "Bayard")
+(5 real changes made)
+
+. replace midname= "T" if regexm(lastname, "Sharp") & regexm(firstname, "Bayard")
+(7 real changes made)
+
+. replace Name= "William Edward Simon" if regexm(lastname, "Simon") & regexm(firstname, "William")
+(1 real change made)
+
+. replace midname= "Edward" if regexm(lastname, "Simon") & regexm(firstname, "William")
+(8 real changes made)
+
+. replace Name= "Melvin Simon" if regexm(lastname, "Simon") & regexm(firstname, "Melvin")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Simon") & regexm(firstname, "Melvin")
+(1 real change made)
+
+. replace Name= "Herbert Simon" if regexm(lastname, "Simon") & regexm(firstname, "Herbert")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Simon") & regexm(firstname, "Herbert")
+(1 real change made)
+
+. replace Name= "John Richard Simplot" if regexm(lastname, "Simplot") & regexm(firstname, "J")
+(9 real changes made)
+
+. replace firstname= "John" if regexm(lastname, "Simplot") & regexm(firstname, "J")
+(3 real changes made)
+
+. replace midname= "Richard" if regexm(lastname, "Simplot") & regexm(firstname, "J")
+(24 real changes made)
+
+. replace lastname= "Smith" if regexm(midname, "Dee") & regexm(firstname, "Smith")
+(1 real change made)
+
+. replace lastname= "Smith" if regexm(firstname, "Smith") & regexm(midname, "Charles")
+(5 real changes made)
+
+. replace Name= "Ollen Bruton Smith" if regexm(lastname, "Smith") & regexm(firstname, "O")
+(4 real changes made)
+
+. replace firstname= "Ollen" if regexm(lastname, "Smith") & regexm(firstname, "O")
+(4 real changes made)
+
+. replace Name= "Vivian Leatherberry Smith" if regexm(lastname, "Smith") & regexm(firstname, "Vivian")
+(2 real changes made)
+
+. replace midname= "Leatherberry" if regexm(lastname, "Smith") & regexm(firstname, "Vivian")
+(8 real changes made)
+
+. replace Name= "Frederick Wallace Smith" if regexm(lastname, "Smith") & regexm(firstname, "Fred")
+(15 real changes made)
+
+. replace midname= "Wallace" if regexm(lastname, "Smith") & regexm(firstname, "Fred")
+(30 real changes made)
+
+. replace firstname= "Frederick" if regexm(lastname, "Smith") & regexm(firstname, "Fred")
+(2 real changes made)
+
+. replace Name= "Richard Allan Smith" if regexm(lastname, "Smith") & regexm(firstname, "Richard")
+(15 real changes made)
+
+. replace midname= "Allan" if regexm(lastname, "Smith") & regexm(firstname, "Richard")
+(17 real changes made)
+
+. replace Name= "Athalie Irvine Smith" if regexm(lastname, "Smith") & regexm(firstname, "Athalie")
+(1 real change made)
+
+. replace midname= "Irvine" if regexm(lastname, "Smith") & regexm(firstname, "Athalie")
+(7 real changes made)
+
+. replace Name= "Charles E Smith" if regexm(lastname, "Smith") & regexm(midname, "Charles")
+(5 real changes made)
+
+. replace firstname= "Charles" if regexm(lastname, "Smith") & regexm(midname, "Charles")
+(5 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Smith") & regexm(midname, "Charles")
+(5 real changes made)
+
+. replace Name= "Dee G Smith" if regexm(lastname,"Smith") & regexm(midname, "Dee")
+(1 real change made)
+
+. replace firstname= "Dee" if regexm(lastname,"Smith") & regexm(midname, "Dee")
+(1 real change made)
+
+. replace midname= "G" if regexm(lastname,"Smith") & regexm(midname, "Dee")
+(1 real change made)
+
+. replace Name= "John Anthony Sobrato" if regexm(lastname, "Sobrato") & regexm(firstname, "John")
+(18 real changes made)
+
+. replace midname= "Anthony" if regexm(lastname, "Sobrato") & regexm(firstname, "John")
+(20 real changes made)
+
+. replace Name= "Clemmie Dixon Spangler" if regexm(lastname, "Spangler") & regexm(firstname, "Clemmie")
+(11 real changes made)
+
+. replace midname= "Dixon" if regexm(lastname, "Spangler") & regexm(firstname, "Clemmie")
+(28 real changes made)
+
+. replace Name= "Alexander Gus Spanos" if regexm(lastname, "Spanos") & regexm(firstname, "Alex")
+(10 real changes made)
+
+. replace firstname= "Alexander" if regexm(lastname, "Spanos") & regexm(firstname, "Alex")
+(4 real changes made)
+
+. replace midname= "Gus" if regexm(lastname, "Spanos") & regexm(firstname, "Alex")
+(28 real changes made)
+
+. replace Name= "Roy Merrill Speer" if regexm(lastname, "Speer") & regexm(firstname, "Roy")
+(4 real changes made)
+
+. replace midname= "Merrill" if regexm(lastname, "Speer") & regexm(firstname, "Roy")
+(10 real changes made)
+
+. replace Name= "John G Sperling" if regexm(lastname, "Sperling") & regexm(firstname, "John")
+(6 real changes made)
+
+. replace midname= "G" if regexm(lastname, "Sperling") & regexm(firstname, "John")
+(10 real changes made)
+
+. replace Name= "Steven Allan Spielberg" if regexm(lastname, "Spielberg") & regexm(firstname, "Steven")
+(25 real changes made)
+
+. replace midname= "Allan" if regexm(lastname, "Spielberg") & regexm(firstname, "Steven")
+(25 real changes made)
+
+. replace Name= "Stanley Irving Stahl" if regexm(lastname, "Stahl") & regexm(firstname, "Stanley") 
+(3 real changes made)
+
+. replace midname= "Irving" if regexm(lastname, "Stahl") & regexm(firstname, "Stanley") 
+(10 real changes made)
+
+. replace Name= "Doris Jones Stein" if regexm(lastname, "Stein") & regexm(firstname, "Doris")
+(1 real change made)
+
+. replace midname= "Jones" if regexm(lastname, "Stein") & regexm(firstname, "Doris")
+(2 real changes made)
+
+. replace Name= "Saul Phillip Steinberg" if regexm(lastname, "Steingberg") & regexm(firstname, "Saul")
+(0 real changes made)
+
+. replace midname= "Phillip" if regexm(lastname, "Steingberg") & regexm(firstname, "Saul")
+(0 real changes made)
+
+. replace Name= "Ernest E Stempel" if regexm(lastname, "Stempel") & regexm(firstname, "Ernest")
+(2 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Stempel") & regexm(firstname, "Ernest")
+(17 real changes made)
+
+. replace Name= "Leonard Norman Stern" if regexm(lastname, "Stern") & regexm(firstname, "Leonard")
+(12 real changes made)
+
+. replace midname= "Norman" if regexm(lastname, "Stern") & regexm(firstname, "Leonard")
+(33 real changes made)
+
+. replace Name= "James Edwards Stowers" if regexm(lastname, "Stowers") & regexm(firstname, "James")
+(9 real changes made)
+
+. replace midname= "Edwards" if regexm(lastname, "Stowers") & regexm(firstname, "James")
+(9 real changes made)
+
+. replace Name= "George Strawbridge" if regexm(lastname, "Strawbridge") & regexm(firstname, "George")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Strawbridge") & regexm(firstname, "George")
+(1 real change made)
+
+. replace Name= "Richard S Strong" if regexm(lastname, "Strong") & regexm(firstname, "Richard")
+(1 real change made)
+
+. replace midname= "S" if regexm(lastname, "Strong") & regexm(firstname, "Richard")
+(6 real changes made)
+
+. replace Name= "Donald L Sturm" if regexm(lastname, "Sturm") & regexm(firstname, "Donald")
+(1 real change made)
+
+. replace midname= "L" if regexm(lastname, "Sturm") & regexm(firstname, "Donald")
+(4 real changes made)
+
+. replace Name= "Jackson Thomas Stephens" if regexm(lastname, "Stephens") & regexm(firstname, "Jackson")
+(2 real changes made)
+
+. replace midname= "Thomas" if regexm(lastname, "Stephens") & regexm(firstname, "Jackson")
+(22 real changes made)
+
+. replace Name= "Wilton Robert Stephens" if regexm(lastname, "Stephens") & regexm(firstname, "Wi")
+(1 real change made)
+
+. replace midname= "Robert" if regexm(lastname, "Stephens") & regexm(firstname, "Wi")
+(10 real changes made)
+
+. replace firstname= "Wilton" if regexm(lastname, "Stephens") & regexm(firstname, "Wi")
+(1 real change made)
+
+. replace Name= "Warren Stephens" if regexm(lastname, "Stephens") & regexm(firstname, "Warren")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Stephens") & regexm(firstname, "Warren")
+(1 real change made)
+
+. replace Name= "Jon LLoyd Stryker" if regexm(lastname, "Stryker") & regexm(firstname, "Jon")
+(17 real changes made)
+
+. replace midname= "LLoyd" if regexm(lastname, "Stryker") & regexm(firstname, "Jon")
+(17 real changes made)
+
+. replace Name= "Ronda E Stryker" if regexm(lastname, "Stryker") & regexm(firstname, "Ronda")
+(11 real changes made)
+
+. replace midname= "E" if regexm(lastname, "Stryker") & regexm(firstname, "Ronda")
+(17 real changes made)
+
+. replace Name= "Pat Stryker" if regexm(lastname, "Stryker") & regexm(firstname, "Pat")
+(5 real changes made)
+
+. replace firstname= "Pat" if regexm(lastname, "Stryker") & regexm(firstname, "Pat")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Stryker") & regexm(firstname, "Pat")
+(5 real changes made)
+
+. replace Name= "Melvin Swig" if regexm(lastname, "Swig") & regexm(firstname, "Mel")
+(2 real changes made)
+
+. replace firstname= "Melvin" if regexm(lastname, "Swig") & regexm(firstname, "Mel")
+(2 real changes made)
+
+. replace Name= "Adolph Alfred Taubman" if regexm(lastname, "Taubman") & regexm(firstname, "A")
+(28 real changes made)
+
+. replace firstname= "Adolph" if regexm(lastname, "Taubman") & regexm(firstname, "A")
+(28 real changes made)
+
+. replace midname= "Alfred" if regexm(lastname, "Taubman") & regexm(firstname, "A")
+(33 real changes made)
+
+. replace Name= "Jack Tramiel" if regexm(lastname, "Tramiel")
+(1 real change made)
+
+. replace firstname= "Jack" if regexm(lastname, "Tramiel")
+(1 real change made)
+
+. replace Name= "Kenny A Troutt" if regexm(lastname, "Troutt") 
+(7 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Troutt") 
+(17 real changes made)
+
+. replace Name= "Donald John Trump" if regexm(lastname, "Trump") & regexm(firstname, "Donald")
+(13 real changes made)
+
+. replace midname= "John" if regexm(lastname, "Trump") & regexm(firstname, "Donald")
+(31 real changes made)
+
+. replace Name= "Kenneth Tuchman" if regexm(lastname, "Tuchman") & regexm(firstname, "Kenneth")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Tuchman") & regexm(firstname, "Kenneth")
+(1 real change made)
+
+. replace Name= "Albert Lee Ueltschi" if regexm(lastname, "Ueltschi")
+(8 real changes made)
+
+. replace midname= "Lee" if regexm(lastname, "Ueltschi")
+(29 real changes made)
+
+. replace Name= "Robert Donald Van Kampen" if regexm(lastname, "Kampen") & regexm(firstname, "Robert")
+(1 real change made)
+
+. replace midname= "Donald" if regexm(lastname, "Kampen") & regexm(firstname, "Robert")
+(3 real changes made)
+
+. replace lastname= "Van Kampen" if regexm(lastname, "Kampen") & regexm(firstname, "Robert")
+(3 real changes made)
+
+. replace Name= "Hope Hill Van Beuren" if regexm(lastname, "Beuren")
+(2 real changes made)
+
+. replace midname= "Hill" if regexm(lastname, "Beuren")
+(29 real changes made)
+
+. replace lastname= "Van Beuren" if regexm(lastname, "Beuren")
+(29 real changes made)
+
+. replace Name= "Robert Lee Vesco" if regexm(lastname, "Vesco")
+(1 real change made)
+
+. replace midname= "Lee" if regexm(lastname, "Vesco")
+(3 real changes made)
+
+. replace Name= "Richard M Devos" if regexm(lastname, "Vos") & regexm(firstname, "Richard")
+(2 real changes made)
+
+. replace midname= "M" if regexm(lastname, "Vos") & regexm(firstname, "Richard")
+(2 real changes made)
+
+. replace lastname= "Devos" if regexm(lastname, "Vos") & regexm(firstname, "Richard")
+(2 real changes made)
+
+. replace Name= "Charles A Vose" if regexm(lastname, "Vose") & regexm(firstname, "Charles")
+(2 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Vose") & regexm(firstname, "Charles")
+(6 real changes made)
+
+. replace Name= "Romesh T Wadhwani" if regexm(lastname, "Wadhwani")
+(2 real changes made)
+
+. replace midname= "T" if regexm(lastname, "Wadhwani")
+(10 real changes made)
+
+. replace Name= "Theodore W Waitt" if regexm(lastname, "Waitt") & regexm(firstname, "Theodore")
+(3 real changes made)
+
+. replace midname= "W" if regexm(lastname, "Waitt") & regexm(firstname, "Theodore")
+(15 real changes made)
+
+. replace Name= "Louis Larrick Ward" if regexm(lastname, "Ward") & regexm(firstname, "Louis")
+(1 real change made)
+
+. replace midname= "Larrick" if regexm(lastname, "Ward") & regexm(firstname, "Louis")
+(12 real changes made)
+
+. replace Name= "Tom Ward" if regexm(lastname, "Ward") & regexm(firstname, "Tom")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Ward") & regexm(firstname, "Tom")
+(1 real change made)
+
+. replace Name= "H Ty Warner" if regexm(lastname, "Warner") 
+(11 real changes made)
+
+. replace firstname= "H" if regexm(lastname, "Warner") 
+(11 real changes made)
+
+. replace midname= "Ty" if regexm(lastname, "Warner") 
+(17 real changes made)
+
+. replace Name= "Dennis Washington" if regexm(lastname, "Washington")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Washington")  
+(1 real change made)
+
+. replace Name= "Lewis Robert Wasserman" if regexm(lastname, "Wasserman") & regexm(firstname, "Lew")
+(4 real changes made)
+
+. replace firstname= "Lewis" if regexm(lastname, "Wasserman") & regexm(firstname, "Lew")
+(4 real changes made)
+
+. replace midname= "Robert" if regexm(lastname, "Wasserman") & regexm(firstname, "Lew")
+(17 real changes made)
+
+. replace Name= "Harry Wayne Huizenga" if regexm(lastname, "Wayne") & firstname== "H"
+(1 real change made)
+
+. replace midname= "Wayne" if regexm(lastname, "Wayne") & firstname== "H"
+(1 real change made)
+
+. replace lastname= "Huizenga" if regexm(lastname, "Wayne") & firstname== "H"
+(1 real change made)
+
+. replace firstname= "Harry" if regexm(lastname, "Huizenga") & firstname== "H" 
+(1 real change made)
+
+. replace Name= "Dorrance Hill Hamilton" if regexm(lastname, "Wayne") & regexm(firstname, "Dorrance")
+(1 real change made)
+
+. replace midname= "Hill" if regexm(lastname, "Wayne") & regexm(firstname, "Dorrance")
+(1 real change made)
+
+. replace lastname= "Hamilton" if regexm(lastname, "Wayne") & regexm(firstname, "Dorrance")
+(1 real change made)
+
+. replace Name= "Sigfried Weis" if regexm(lastname, "Weis") & regexm(firstname, "Sigfried")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Weis") & regexm(firstname, "Sigfried")
+(1 real change made)
+
+. replace Name= "Robert Freeman Weis" if regexm(lastname, "Weis") & regexm(firstname, "Robert")
+(2 real changes made)
+
+. replace midname= "Freeman" if regexm(lastname, "Weis") & regexm(firstname, "Robert")
+(14 real changes made)
+
+. replace Name= "David Wetherell" if regexm(lastname,"Wetherell")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname,"Wetherell")
+(1 real change made)
+
+. replace Name= "Leslie Herbert Wexner" if regexm(lastname, "Wexner") & regexm(firstname, "Les")
+(12 real changes made)
+
+. replace midname= "Herbert" if regexm(lastname, "Wexner") & regexm(firstname, "Les")
+(36 real changes made)
+
+. replace firstname= "Leslie" if regexm(lastname, "Wexner") & regexm(firstname, "Les")
+(2 real changes made)
+
+. replace Name= "Bella Wexner" if regexm(lastname, "Wexner") & regexm(firstname, "Bella")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Wexner") & regexm(firstname, "Bella")
+(1 real change made)
+
+. replace Name= "Dean White" if regexm(lastname, "White") & regexm(firstname, "Dean")
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "White") & regexm(firstname, "Dean")
+(4 real changes made)
+
+. replace Name= "Edwin C Whitehead" if regexm(lastname, "Whitehead") 
+(3 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Whitehead")
+(3 real changes made)
+
+. replace Name= "Margaret C Whitman" if regexm(lastname, "Whitman") & regexm(firstname, "M")
+(15 real changes made)
+
+. replace firstname= "Margaret" if regexm(lastname, "Whitman") & regexm(firstname, "M")
+(8 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Whitman") & regexm(firstname, "M")
+(18 real changes made)
+
+. replace Name= "Betsey Cushing Roosevelt Whitney" if regexm(lastname, "Whitney") & regexm(firstname, "Bets")
+(3 real changes made)
+
+. replace firstname= "Betsey" if regexm(lastname, "Whitney") & regexm(firstname, "Bets")
+(1 real change made)
+
+. replace Name= "Lawrence Arthur Wien" if regexm(lastname, "Wien") & regexm(firstname, "Lawrence")
+(1 real change made)
+
+. replace midname= "Arthur" if regexm(lastname, "Wien") & regexm(firstname, "Lawrence")
+(7 real changes made)
+
+. replace Name= "Arthur L Williams" if lastname== "Williams" & firstname== "Arthur"
+(1 real change made)
+
+. replace midname= "L" if lastname== "Williams" & firstname== "Arthur"
+(12 real changes made)
+
+. replace Name= "Clayton Wheat Williams" if lastname== "Williams" & firstname== "Clayton"
+(1 real change made)
+
+. replace midname= "Wheat" if lastname== "Williams" & firstname== "Clayton"
+(3 real changes made)
+
+. replace Name= "Randa Williams" if lastname== "Williams" & firstname== "Randa"
+(1 real change made)
+
+. replace midname= "" if lastname== "Williams" & firstname== "Randa"
+(1 real change made)
+
+. replace Name= "Jack Crawford Taylor" if lastname== "Taylor" & firstname== "Jack"
+(10 real changes made)
+
+. replace midname= "Crawford" if lastname== "Taylor" & firstname== "Jack"
+(26 real changes made)
+
+. replace Name= "Phyllis Miller Taylor" if lastname== "Taylor" & firstname== "Phyllis"
+(1 real change made)
+
+. replace midname= "Miller" if lastname== "Taylor" & firstname== "Phyllis"
+(3 real changes made)
+
+. replace Name= "Oakleigh Blakeman Thorne" if lastname== "Thorne" & firstname== "Oakleigh"
+(3 real changes made)
+
+. replace midname= "Blakeman" if lastname== "Thorne" & firstname== "Oakleigh"
+(19 real changes made)
+
+. replace Name= "Preston Robert Tisch" if regexm(lastname, "Tisch") & regexm(firstname, "Preston")
+(2 real changes made)
+
+. replace midname= "Robert" if regexm(lastname, "Tisch") & regexm(firstname, "Preston")
+(24 real changes made)
+
+. replace Name= "Joan Tisch" if regexm(lastname, "Tisch") & regexm(firstname, "Joan") 
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Tisch") & regexm(firstname, "Joan") 
+(1 real change made)
+
+. replace Name= "Wilma Tisch" if regexm(lastname, "Tisch") & regexm(firstname, "Wilma") 
+(3 real changes made)
+
+. replace midname= "" if regexm(lastname, "Tisch") & regexm(firstname, "Wilma")
+(3 real changes made)
+
+. replace Name= "Laurence Alan Tisch" if regexm(lastname, "Tisch") & regexm(firstname, "La")
+(8 real changes made)
+
+. replace firstname= "Laurence" if regexm(lastname, "Tisch") & regexm(firstname, "La")
+(1 real change made)
+
+. replace midname= "Alan" if regexm(lastname, "Tisch") & regexm(firstname, "La")
+(22 real changes made)
+
+. replace Name= "Fred Charles Trump" if regexm(lastname, "Trump") & regexm(firstname, "Fred")
+(1 real change made)
+
+. replace midname= "Charles" if regexm(lastname, "Trump") & regexm(firstname, "Fred")
+(3 real changes made)
+
+. replace Name= "Robert Edward (Ted) Turner" if regexm(lastname, "Turner") & regexm(firstname, "Robert")
+(13 real changes made)
+
+. replace midname= "Edward (Ted)" if regexm(lastname, "Turner") & regexm(firstname, "Robert")
+(20 real changes made)
+
+. replace Name= "Robert Edward (Ted) Turner" if regexm(lastname, "Turner") & regexm(firstname, "Ted")
+(9 real changes made)
+
+. replace midname= "Edward (Ted)" if regexm(lastname, "Turner") & regexm(firstname, "Ted")
+(9 real changes made)
+
+. replace firstname= "Robert" if regexm(lastname, "Turner") & regexm(firstname, "Ted")
+(9 real changes made)
+
+. replace Name= "Robert Edward (Ted) Turner" if regexm(lastname, "Turner") & regexm(firstname, "Re")
+(1 real change made)
+
+. replace midname= "Edward (Ted)" if regexm(lastname, "Turner") & regexm(firstname, "Re")
+(1 real change made)
+
+. replace firstname= "Robert" if regexm(lastname, "Turner") & regexm(firstname, "Re")
+(1 real change made)
+
+. replace Name= "William B Turner" if regexm(lastname, "Turner") & regexm(firstname, "William")
+(10 real changes made)
+
+. replace midname= "B" if regexm(lastname, "Turner") & regexm(firstname, "William")
+(11 real changes made)
+
+. replace Name= "Charles B Wang" if regexm(lastname, "Wang") & regexm(firstname, "Charles")
+(1 real change made)
+
+. replace midname= "B" if regexm(lastname, "Wang") & regexm(firstname, "Charles")
+(7 real changes made)
+
+. replace Name= "An Wang" if regexm(lastname, "Wang") & regexm(firstname, "An")
+(1 real change made)
+
+. replace firstname= "An" if regexm(lastname, "Wang") & regexm(firstname, "An")
+(1 real change made)
+
+. replace Name= "Steven Udvar-Hazy" if regexm(lastname, "Udvar-Hazy") & regexm(firstname, "Steve")
+(9 real changes made)
+
+. replace midname= "" if regexm(lastname, "Udvar-Hazy") & regexm(firstname, "Steve")
+(8 real changes made)
+
+. replace firstname= "Steven" if regexm(lastname, "Udvar-Hazy") & regexm(firstname, "Steve")
+(1 real change made)
+
+. replace Name= "Alberto Vilar" if regexm(lastname, "Vilar") & regexm(firstname, "Alberto")
+(1 real change made)
+
+. replace lastname= "Vilar" if regexm(lastname, "Vilar") & regexm(firstname, "Alberto")
+(1 real change made)
+
+. replace Name= "Todd Wagner" if regexm(lastname, "Wagner") & regexm(firstname, "Todd")
+(4 real changes made)
+
+. replace midname= "" if regexm(lastname, "Wagner") & regexm(firstname, "Todd")
+(4 real changes made)
+
+. replace Name= "Cyril Wagner" if regexm(lastname, "Wagner") & regexm(firstname, "Cyril")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Wagner") & regexm(firstname, "Cyril")
+(1 real change made)
+
+. replace Name= "Samuel Moore Walton" if regexm(lastname, "Walton") & regexm(midname, "M") & regexm(firstname, "Sam")
+(10 real changes made)
+
+. replace firstname= "Samuel" if regexm(lastname, "Walton") & regexm(midname, "M") & regexm(firstname, "Sam")
+(10 real changes made)
+
+. replace midname= "Moore" if regexm(lastname, "Walton") & regexm(midname, "M") & regexm(firstname, "Sam")
+(11 real changes made)
+
+. replace Name= "Alice L Walton" if regexm(lastname, "Walton") & regexm(firstname, "Alice")
+(12 real changes made)
+
+. replace midname= "L" if regexm(lastname, "Walton") & regexm(firstname, "Alice")
+(29 real changes made)
+
+. replace Name= "James Lawrence Walton" if regexm(lastname, "Walton") & regexm(firstname, "James")
+(1 real change made)
+
+. replace midname= "Lawrence" if regexm(lastname, "Walton") & regexm(firstname, "James")
+(9 real changes made)
+
+. replace Name= "Jim C Walton" if regexm(lastname, "Walton") & regexm(firstname, "Jim")
+(10 real changes made)
+
+. replace midname= "C" if regexm(lastname, "Walton") & regexm(firstname, "Jim")
+(29 real changes made)
+
+. replace Name= "Gary Wilson" if regexm(lastname, "Wilson") & regexm(firstname, "Gary")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Wilson") & regexm(firstname, "Gary")
+(1 real change made)
+
+. replace Name= "Oprah Winfrey" if regexm(lastname, "Winfrey") & regexm(firstname, "Oprah")
+(1 real change made)
+
+. replace midname= "" if regexm(lastname, "Winfrey") & regexm(firstname, "Oprah")
+(1 real change made)
+
+. replace Name= "Samuel Wyly" if regexm(lastname, "Wyly") & regexm(firstname, "Sam")
+(2 real changes made)
+
+. replace firstname= "Samuel" if regexm(lastname, "Wyly") & regexm(firstname, "Sam")
+(2 real changes made)
+
+. replace Name= "Denise Debartolo York" if regexm(lastname, "York") & regexm(firstname, "Denise")
+(4 real changes made)
+
+. replace midname= "Debartolo" if regexm(lastname, "York") & regexm(firstname, "Denise")
+(7 real changes made)
+
+. replace Name= "Henry C Yuen" if regexm(lastname, "Yuen") & regexm(firstname, "Henry")
+(1 real change made)
+
+. replace midname= "C" if regexm(lastname, "Yuen") & regexm(firstname, "Henry")
+(3 real changes made)
+
+. replace Name= "Mortimer Benjamin Zuckerman" if regexm(lastname, "Zuckerman") & regexm(firstname, "Mort")
+(13 real changes made)
+
+. replace midname= "Benjamin" if regexm(lastname, "Zuckerman") & regexm(firstname, "Mort")
+(29 real changes made)
+
+. replace firstname= "Mortimer" if regexm(lastname, "Zuckerman") & regexm(firstname, "Mort")
+(1 real change made)
+
+. replace Name= "Stephen A Wynn" if regexm(lastname, "Wynn") & regexm(firstname, "S")
+(11 real changes made)
+
+. replace midname= "A" if regexm(lastname, "Wynn") & regexm(firstname, "S")
+(16 real changes made)
+
+. replace firstname= "Stephen" if regexm(lastname, "Wynn") & regexm(firstname, "S")
+(9 real changes made)
+
+. replace firstname= "De" if regexm(lastname, "Young") & regexm(firstname, "Marvin")
+(1 real change made)
+
+. replace Name= "De Young" if regexm(lastname, "Young") & regexm(firstname, "De")
+(1 real change made)
+
+. replace lastname= "De Young" if regexm(lastname, "Young") & regexm(firstname, "De")
+(5 real changes made)
+
+. replace midname= "" if regexm(lastname, "Young") & regexm(firstname, "De")
+(1 real change made)
+
+. replace Name= "Samuel Zell" if lastname== "Zell"
+(9 real changes made)
+
+. replace firstname= "Samuel" if lastname== "Zell"
+(9 real changes made)
+
+. replace Name= "Daniel Morton Ziff" if regexm(lastname, "Ziff") & regexm(firstname, "Daniel")
+(12 real changes made)
+
+. replace midname= "Morton" if regexm(lastname, "Ziff") & regexm(firstname, "Daniel")
+(24 real changes made)
+
+. replace Name= "William Bernard Ziff" if regexm(lastname, "Ziff") & regexm(firstname, "William")
+(2 real changes made)
+
+. replace midname= "Bernard" if regexm(lastname, "Ziff") & regexm(firstname, "William")
+(13 real changes made)
+
+. replace Name= "Robert David Ziff" if regexm(lastname, "Ziff") & regexm(firstname, "Robert")
+(11 real changes made)
+
+. replace midname= "David" if regexm(lastname, "Ziff") & regexm(firstname, "Robert")
+(23 real changes made)
+
+. replace Name= "Dirk Edward Ziff" if regexm(lastname, "Ziff") & regexm(firstname, "Dirk")
+(12 real changes made)
+
+. replace midname= "Edward" if regexm(lastname, "Ziff") & regexm(firstname, "Dirk")
+(24 real changes made)
+
+. 
+. *End of alphbetical-- begin reported without first or last names
+. replace Name= "Cargill/Macmillan" if regexm(Name, "Cargill") & firstname== ""
+(1 real change made)
+
+. replace Name= "John Richard Simplot" if regexm(Name, "Simplot")
+(1 real change made)
+
+. replace firstname= "John" if regexm(Name, "Simplot")
+(1 real change made)
+
+. replace midname= "Richard" if regexm(Name, "Simplot")
+(1 real change made)
+
+. replace lastname= "Simplot" if regexm(Name, "Simplot")
+(1 real change made)
+
+. replace Name= "Cullen" if regexm(firstname, "Cullen") & lastname== "'"
+(1 real change made)
+
+. replace firstname= "" if regexm(firstname, "Cullen") & lastname== "'"
+(1 real change made)
+
+. replace lastname= "" if regexm(Name, "Cullen") & firstname== ""
+(1 real change made)
+
+. replace Name= "J E Scripps" if regexm(firstname, "Scripps") & regexm(lastname, "Je")
+(6 real changes made)
+
+. replace lastname= "Scripps" if regexm(firstname, "Scripps") & regexm(lastname, "Je")
+(6 real changes made)
+
+. replace firstname= "J" if Name== "J E Scripps"
+(6 real changes made)
+
+. replace midname= "E" if Name== "J E Scripps"
+(6 real changes made)
+
+. replace Name= "E W Scripps" if regexm(firstname, "Scripps") & regexm(lastname, "Ew")
+(6 real changes made)
+
+. replace lastname= "Scripps" if regexm(firstname, "Scripps") & regexm(lastname, "Ew")
+(6 real changes made)
+
+. replace firstname= "E" if Name== "E W Scripps"
+(6 real changes made)
+
+. replace midname= "W" if Name== "E W Scripps"
+(6 real changes made)
+
+. replace Name= "Gardner Cowles" if regexm(firstname, "Cowles") & regexm(lastname, "Gardner")
+(6 real changes made)
+
+. replace firstname= "Gardner" if Name== "Gardner Cowles"
+(6 real changes made)
+
+. replace lastname= "Cowles" if Name== "Gardner Cowles"
+(6 real changes made)
+
+. replace Name= "William Cowles" if regexm(firstname, "Cowles") & regexm(lastname, "William")
+(3 real changes made)
+
+. replace firstname= "William" if Name== "William Cowles"
+(3 real changes made)
+
+. replace lastname= "Cowles" if Name== "William Cowles"
+(3 real changes made)
+
+. replace Name= "Bean" if firstname== "Bean" & regexm(lastname, "Gorman")
+(5 real changes made)
+
+. replace lastname= "" if firstname== "Bean" & regexm(lastname, "Gorman")
+(5 real changes made)
+
+. replace firstname= "" if Name== "Bean" & lastname== ""
+(5 real changes made)
+
+. replace Name= "Hughes" if regexm(lastname, "Howard") & firstname== "Hughes"
+(2 real changes made)
+
+. replace firstname= "" if Name== "Hughes"
+(2 real changes made)
+
+. replace lastname= "" if Name== "Hughes"
+(2 real changes made)
+
+. replace Name= "Watson, Thomas Family" if firstname== "Watson (Thomas) Family" 
+(0 real changes made)
+
+. replace Name = "Thomas Watson" if firstname == "Watson"
+(1 real change made)
+
+. replace firstname = "Thomas" if Name == "Thomas Watson"
+(1 real change made)
+
+. replace lastname = "Watson" if Name == "Thomas Watson"
+(1 real change made)
+
+. replace Suffix = "And Family" if Name == "Thomas Watson" & year == "1992"
+(1 real change made)
+
+. replace Suffix = "And Family" if Name == "Watson" & year == "1992"
+(1 real change made)
+
+. *replace firstname= "" if Name== "Watson"
+. *replace lastname= "" if Name== "Watson"
+. replace Name= "Unanue" if firstname== "Unanue" & regexm(Name, "Unanue")
+(1 real change made)
+
+. replace firstname= "" if Name== "Unanue"
+(1 real change made)
+
+. replace lastname= "" if Name== "Unanue"
+(1 real change made)
+
+. replace Name= "Marshall Edison Rinker" if regexm(firstname, "Marshall") & regexm(midname, "Edison Rinker")
+(1 real change made)
+
+. replace lastname= "Rinker" if regexm(firstname, "Marshall") & regexm(midname, "Edison Rinker")
+(1 real change made)
+
+. replace midname= "Edison" if regexm(firstname, "Marshall") & regexm(midname, "Edison Rinker")
+(1 real change made)
+
+. replace Name= "Claude Bernard Pennington" if regexm(midname, "Pennington") & regexm(firstname, "Claude")
+(1 real change made)
+
+. replace lastname= "Pennington" if regexm(midname, "Pennington") & regexm(firstname, "Claude")
+(1 real change made)
+
+. replace midname= "Bernard" if regexm(midname, "Pennington") & regexm(firstname, "Claude")
+(1 real change made)
+
+. replace lastname= "Engelhard" if Name== "Jane B Engelhard"
+(2 real changes made)
+
+. replace Name= "Maurice Raymond Greenberg" if firstname== "Maurice" & regexm(Name, "Greenberg")
+(2 real changes made)
+
+. replace midname= "Raymond" if firstname== "Maurice" & regexm(Name, "Greenberg")
+(2 real changes made)
+
+. replace lastname= "Greenberg" if firstname== "Maurice" & regexm(Name, "Greenberg")
+(2 real changes made)
+
+. replace Name= "Haroldson Lafayette (Hassie) Hunt" if regexm(lastname, "Hassie") & firstname== "Haroldson"
+(1 real change made)
+
+. replace midname= "Lafayette (Hassie)" if regexm(lastname, "Hassie") & firstname== "Haroldson"
+(1 real change made)
+
+. replace lastname= "Hunt" if regexm(lastname, "Hassie") & firstname== "Haroldson"
+(1 real change made)
+
+. replace Name= "Hope Aldrich Rockefeller" if regexm(Name, "Aldrich") & firstname== "Hope"
+(1 real change made)
+
+. replace lastname= "Rockefeller" if regexm(Name, "Aldrich") & firstname== "Hope"
+(1 real change made)
+
+. replace Name= "Ted Leonsis" if regexm(Name, "Leonsis")
+(1 real change made)
+
+. replace firstname= "Ted" if regexm(Name, "Leonsis")
+(1 real change made)
+
+. replace lastname= "Leonsis" if regexm(Name, "Leonsis")
+(1 real change made)
+
+. replace Name= "Frederick Woodruff Field" if regexm(Name, "Field") & firstname== "Frederick"
+(1 real change made)
+
+. replace midname= "Woodruff" if regexm(Name, "Field") & firstname== "Frederick"
+(1 real change made)
+
+. replace lastname= "Field" if regexm(Name, "Field") & firstname== "Frederick"
+(1 real change made)
+
+. replace Name= "Theodore G Schwartz" if regexm(Name, "Schwartz")
+(1 real change made)
+
+. replace firstname= "Theodore" if regexm(Name, "Schwartz")
+(1 real change made)
+
+. replace midname= "G" if regexm(Name, "Schwartz")
+(2 real changes made)
+
+. replace lastname= "Schwartz" if regexm(Name, "Schwartz")
+(1 real change made)
+
+. replace Name= "Robert Edward (Ted) Turner" if regexm(Name, "Turner") & regexm(Name, "Ted")
+(5 real changes made)
+
+. replace midname= "Edward (Ted)" if regexm(Name, "Turner") & regexm(Name, "Ted")
+(5 real changes made)
+
+. replace lastname= "Turner" if regexm(Name, "Turner") & regexm(Name, "Ted")
+(5 real changes made)
+
+. replace Name= "Whittier" if regexm(Name, "Whittier") & firstname== ""
+(1 real change made)
+
+. replace Name= "Marianne Liebmann" if regexm(Name, "iebmann")
+(1 real change made)
+
+. replace firstname= "Marianne" if regexm(Name, "iebmann")
+(1 real change made)
+
+. replace lastname= "Liebmann" if regexm(Name, "iebmann")
+(1 real change made)
+
+. replace Name= "Mccormick/Patterson" if regexm(Name, "Patterson") & firstname==""
+(1 real change made)
+
+. replace lastname= "Unknown -- O'Neill" if regexm(lastname, "Eill")
+(2 real changes made)
+
+. replace Name= "Richard Jerome O'Neill" if regexm(lastname, "Unknown") & firstname== "Richard"
+(1 real change made)
+
+. replace midname= "Jerome" if regexm(lastname, "Unknown") & firstname== "Richard"
+(1 real change made)
+
+. replace lastname= "O'Neill" if regexm(lastname, "Unknown") & firstname== "Richard"
+(1 real change made)
+
+. replace Name= "O'Neill" if regexm(lastname, "Unknown") & regexm(lastname, "Neill")
+(1 real change made)
+
+. replace firstname= "" if regexm(lastname, "Unknown") & regexm(lastname, "Neill")
+(1 real change made)
+
+. replace lastname= "" if regexm(lastname, "Unknown") & regexm(lastname, "Neill")
+(1 real change made)
+
+. replace lastname= "Unknown -- ..." if regexm(lastname, "...") & firstname== "Kirby"
+(1 real change made)
+
+. replace Name= "Kirby" if regexm(lastname, "Unknown") & regexm(Name, "Kirby")
+(1 real change made)
+
+. replace firstname= "" if regexm(lastname, "Unknown") & regexm(Name, "Kirby")
+(1 real change made)
+
+. replace lastname= "" if regexm(lastname, "Unknown") & regexm(Name, "Kirby")
+(1 real change made)
+
+. replace lastname= "Unknown -- S" if regexm(firstname, "Coor") & lastname== "S"
+(1 real change made)
+
+. replace Name= "Coors" if regexm(lastname, "Unknown") & regexm(Name, "Coor")
+(1 real change made)
+
+. replace firstname= "" if regexm(lastname, "Unknown") & regexm(Name, "Coor")
+(1 real change made)
+
+. replace lastname= "" if regexm(lastname, "Unknown") & regexm(Name, "Coor")
+(1 real change made)
+
+. replace Name= "O'Connor" if regexm(Name, "Connor") & midname== ""
+(3 real changes made)
+
+. replace Name= "O'Connor" if regexm(Name, "Oconnor") & midname== ""
+(1 real change made)
+
+. replace firstname= "" if regexm(Name, "Connor") & midname== ""
+(1 real change made)
+
+. replace lastname= "" if regexm(Name, "Connor") & midname== ""
+(1 real change made)
+
+. replace Name= "Disney" if regexm(Name, "Walt") & regexm(Name, "Disney")
+(2 real changes made)
+
+. replace firstname= "" if regexm(Name, "Walt") & regexm(Name, "Disney")
+(0 real changes made)
+
+. replace lastname= "" if regexm(Name, "Walt") & regexm(Name, "Disney")
+(0 real changes made)
+
+. replace Name= "Disney" if regexm(Name, "Disney") & firstname== "Walt"
+(0 real changes made)
+
+. replace midname= "" if regexm(Name, "Disney") & firstname== "Walt"
+(1 real change made)
+
+. replace lastname= "" if regexm(Name, "Disney") & firstname== "Walt"
+(1 real change made)
+
+. replace firstname= "" if regexm(Name, "Disney") & firstname== "Walt"
+(1 real change made)
+
+. replace Name= "O'Connor" if Name== "O'Conner"
+(1 real change made)
+
+. 
+. replace midname = "F" if lastname == "Brennan" & year == "1995"
+(1 real change made)
+
+. replace Name = "Bernard F Brennan" if lastname == "Brennan"
+(6 real changes made)
+
+. replace midname = "Leroy" if lastname == "Bren"
+(36 real changes made)
+
+.  
+. save "stata_data/FORBES_1982_2017_partially_cleaned.dta", replace
+file stata_data/FORBES_1982_2017_partially_cleaned.dta saved
+
+. 
+. /*
+> stop 
+> * Check number of unique observations
+> gen count = 1
+> collapse (sum) count, by(Name lastname firstname midname)
+> *collapse (sum) count, by(firstlast)
+> 
+> 
+> sort lastname
+> 
+> sort firstname
+> 
+> sort year
+> 
+> gsort - family
+>  */
+. 
+end of do-file
+
+. 
+. 
+. /******STEP 3
+> Pulls in the data set with the cleaned names and constructs a consistent
+> state fips indicator. Individuals have at most 3 states indicated. 
+> Statefips1-3 go alphabetically in the end. If a state is out of the country
+>  or invalid, the statefips variable is set to 100.
+> 
+> Input: ./FORBES_1982_2017_partially_cleaned.dta
+> Output:  ./forbes400_DW_EM_long.dta AND  ./forbes400_DW_EM_wide.dta
+> Previous versions: 
+> **************************************************************************/
+. do "`programloc'clean_forbes_locations.do"
+
+. clear all
+
+. set more off
+
+. cap log close

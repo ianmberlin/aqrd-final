@@ -1,0 +1,50 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{8}{c}}
+\hline\hline
+                &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}\\
+                &\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{IV}&\multicolumn{1}{c}{Per Capita}&\multicolumn{1}{c}{Wealth}&\multicolumn{1}{c}{Incl. inher. tax}&\multicolumn{1}{c}{Drop 2002-04}\\
+\hline
+ET-state X post-2001 X old&   -0.881\sym{***}&   -0.689\sym{***}&   -0.663\sym{**} &   -1.651\sym{***}&   -0.623\sym{***}&   -20.11\sym{***}&   -0.955\sym{***}&   -1.033\sym{***}\\
+                &  (0.303)         &  (0.249)         &  (0.310)         &  (0.518)         &  (0.209)         &  (4.794)         &  (0.342)         &  (0.248)         \\
+[1em]
+ET-state X old  &    0.239         &   0.0583         &   0.0694         &    2.674\sym{***}&    0.439\sym{***}&    5.746\sym{**} &    0.313\sym{**} &    0.239         \\
+                &  (0.155)         &  (0.187)         &  (0.152)         &  (0.450)         &  (0.156)         &  (2.373)         &  (0.155)         &  (0.155)         \\
+[1em]
+ET-state X post-2001&   -1.629\sym{***}&   -0.995\sym{**} &   -0.781\sym{***}&   -0.705         & 0.000921         &    2.151         &   -0.727\sym{**} &   -0.804\sym{**} \\
+                &  (0.400)         &  (0.493)         &  (0.299)         &  (0.929)         & (0.0737)         &  (2.529)         &  (0.290)         &  (0.346)         \\
+[1em]
+old X post-2001 &    1.701\sym{***}&    2.915\sym{***}&    1.630\sym{***}&    2.015\sym{***}&    0.331\sym{***}&    18.26\sym{***}&    1.726\sym{***}&    1.764\sym{***}\\
+                &  (0.274)         &  (0.566)         &  (0.282)         &  (0.456)         & (0.0757)         &  (3.283)         &  (0.299)         &  (0.269)         \\
+[1em]
+ET-state        &    0.689\sym{***}&    0.648\sym{*}  &    0.573\sym{*}  &   -1.664\sym{***}&  -0.0563         &    2.811         &    0.479\sym{**} &    0.508         \\
+                &  (0.247)         &  (0.334)         &  (0.296)         &  (0.112)         & (0.0793)         &  (4.060)         &  (0.225)         &  (0.315)         \\
+[1em]
+old             &   -0.591\sym{***}&   -1.780\sym{***}&   -0.534\sym{**} &   -1.402\sym{***}&  -0.0857\sym{*}  &   -7.179\sym{***}&   -0.615\sym{***}&   -0.591\sym{***}\\
+                &  (0.218)         & (0.0941)         &  (0.225)         &  (0.450)         & (0.0507)         &  (1.582)         &  (0.237)         &  (0.218)         \\
+[1em]
+PIT X post-2001 X old&                  &   -0.269\sym{***}&                  &                  &                  &                  &                  &                  \\
+                &                  & (0.0930)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+PIT X old       &                  &    0.264\sym{***}&                  &                  &                  &                  &                  &                  \\
+                &                  & (0.0199)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+PIT X post-2001 &                  &    0.149\sym{**} &                  &                  &                  &                  &                  &                  \\
+                &                  & (0.0679)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+PIT             &                  &   0.0474         &                  &                  &                  &                  &                  &                  \\
+                &                  & (0.0467)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+High earners share&                  &                  &    0.396\sym{***}&                  &                  &                  &                  &                  \\
+                &                  &                  & (0.0976)         &                  &                  &                  &                  &                  \\
+\hline
+Observations    &     3500         &     3500         &     3500         &     3500         &     3500         &     3500         &     3500         &     3300         \\
+Semi-elasticity, Young      &-.560         &    -.342         &    -.268         &    -.242         &     .002         &      .15         &     -.25         &    -.276         \\
+\quad \textit{Std. Error}    &     .137         &     .169         &     .103         &     .319         &     .161         &     .176         &       .1         &     .119         \\
+Semi-elasticity, Old        &      -.6         &    -.403         &    -.345         &-.523         &    -.866         &    -.642         &    -.402         &    -.439         \\
+\quad \textit{Std. Error}      &     .092         &     .108         &     .109         &     .161         &     .359         &     .102         &     .105         &     .098         \\
+\hline \hline
+\multicolumn{9}{l}{\footnotesize Driscoll-Kraay (with 10-year bandwidth) standard errors in parentheses. All regressions include year fixed effects. Note state fixed effects are absorbed by} \\
+\multicolumn{9}{l}{\footnotesize old-young differencing. IV regression instruments for ET-state\textsubscript{s,t} and its interactions using a variable (and its corresponding interactions) equal to} \\
+\multicolumn{9}{l}{\footnotesize ET-state\textsubscript{s,t} for t$<$2001 and to ET-state\textsubscript{s,2001} for t$\geq$2001..} \\
+\multicolumn{9}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}  \end{tabular} }

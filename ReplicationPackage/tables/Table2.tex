@@ -1,0 +1,31 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{8}{c}}
+\hline\hline
+                &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}\\
+                &\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{IV}&\multicolumn{1}{c}{Per Capita}&\multicolumn{1}{c}{Wealth}&\multicolumn{1}{c}{Incl. inher. tax}&\multicolumn{1}{c}{Drop 2002-04}\\
+\hline
+ET-state X post-2001&   -2.454\sym{***}&   -2.679\sym{***}&   -2.324\sym{***}&   -3.061\sym{**} &   -0.621\sym{**} &   -15.81\sym{***}&   -2.373\sym{***}&   -2.641\sym{***}\\
+                &  (0.696)         &  (0.914)         &  (0.725)         &  (1.538)         &  (0.316)         &  (2.476)         &  (0.672)         &  (0.715)         \\
+[1em]
+ET-state        &    1.394\sym{***}&    1.355\sym{**} &    1.243\sym{**} &   -0.653\sym{*}  &    0.326\sym{***}&    11.37\sym{*}  &    1.205\sym{***}&    1.256\sym{**} \\
+                &  (0.525)         &  (0.548)         &  (0.588)         &  (0.341)         &  (0.112)         &  (6.466)         &  (0.425)         &  (0.542)         \\
+[1em]
+PIT X post-2001 &                  & 0.000285         &                  &                  &                  &                  &                  &                  \\
+                &                  &(0.00109)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+PIT             &                  &  0.00358\sym{***}&                  &                  &                  &                  &                  &                  \\
+                &                  &(0.000958)         &                  &                  &                  &                  &                  &                  \\
+[1em]
+High earners share&                  &                  &    1.042         &                  &                  &                  &                  &                  \\
+                &                  &                  &  (0.697)         &                  &                  &                  &                  &                  \\
+\hline
+Observations    &     1750         &     1750         &     1750         &     1750         &     1750         &     1750         &     1750         &     1650         \\
+Semi-elasticity            &    -.346         &    -.378         &    -.328         &    -.432         &    -.528         &    -.373         &    -.335         &    -.372         \\
+\quad \textit{Std. Error}          &     .098         &     .129         &     .102         &     .217         &     .269         &     .058         &     .095         &     .101         \\
+State Fixed Effects         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         \\
+Year Fixed Effects          &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         \\
+\hline \hline
+\multicolumn{8}{l}{\footnotesize Driscoll-Kraay (with 10-year bandwidth) standard errors in parentheses. IV regression instruments for ET-state\textsubscript{s,t}} \\
+\multicolumn{8}{l}{\footnotesize and its interactions using a variable (and its corresponding interactions) equal to ET-state\textsubscript{s,t} for t$<$2001 and to ET-state\textsubscript{s,2001}} \\
+\multicolumn{8}{l}{\footnotesize  for t$\geq$2001.  \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}  \end{tabular} }

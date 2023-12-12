@@ -1,0 +1,1604 @@
+--------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  s:\dan\Paper - Forbes\ReplicationPackage\data\../log/analysis19 Dec 2022.log
+  log type:  text
+ opened on:  19 Dec 2022, 13:33:29
+
+. 
+. ///SET LOCALS AND GLOBALS
+> local postyear = 2001
+
+. 
+. ///     Set controls to empty set if no controls:
+> local controls
+
+. local drop_condition "" 
+
+. local wealth wealth_normalized
+
+. 
+. *************************
+. 
+. global BuildData "yes"
+
+. global run2D "yes"
+
+. global run3D "yes"
+
+. global runINDV "yes"
+
+. global runMOVERS "yes"
+
+. global runCB "yes"
+
+. global runCOUNTS_BY_STATE "yes"
+
+. 
+. 
+. if "$BuildData"=="yes" {
+. /*
+> //Import state GDP data and create GDP change variable
+> use "stata_data/gdp_inst.dta", clear 
+> rename state abbr
+> xtset fips year, yearly
+> g gdp_change = 100*log(gdp-L1.gdp)
+> tempfile stateGDP
+> save `stateGDP'
+> 
+> //Import EI and Total tax revenues by state and year
+> use "stata_data/EI_Tax.dta", clear
+> rename Year year
+> destring Total_Taxes, replace ignore(",")
+> tempfile EI_Tax
+> save `EI_Tax'
+> 
+> //Import population data and create population change variable
+> import haver ??rbt@uspop, tvar(year) clear
+> describe *uspop, varlist
+> 
+> foreach var in `r(varlist)' {
+>         local tmp = strupper(substr("`var'", 1, 2))
+>         di "`tmp'"
+>         rename `var' pop`tmp'
+> }
+> 
+> drop popC1 popC2 popC3 popC4 popC5 popC6 popC7 popC8 popC9
+> drop popR1 popR2 popR3 popR4 
+> drop popDC popPR
+> drop if year < 1981
+> reshape long pop, i(year) j(state) string
+> rename state abbr
+> egen id = group(abbr)
+> xtset id year, yearly
+> g pop_change = 100*log(pop-L1.pop)
+> drop if year==1981
+> 
+> 
+> /// ENTER EI INDICATOR
+> gen EI = 0
+> 
+> /// From Conway & Rork (2004 NTJ), Table 1:
+> replace EI = 1 if inlist(abbr,"AK","AL","GA","FL","AR","NV")==0 //ALL BUT 6 STATES HAD EI BEYOND PICK-UP TAX PRIOR TO 1976
+> replace EI = 0 if abbr=="NM" & year>=1976
+> replace EI = 0 if abbr=="UT" & year>=1977
+> replace EI = 0 if abbr=="ND" & year>=1979
+> replace EI = 0 if inlist(abbr,"AZ","VA","CO","VT") & year>=1980
+> replace EI = 0 if abbr=="MO" & year>=1981
+> replace EI = 0 if inlist(abbr,"CA","WA") & year>=1982
+> replace EI = 0 if inlist(abbr,"IL","WY","TX") & year>=1983
+> replace EI = 0 if abbr=="WV" & year>=1985
+> replace EI = 0 if inlist(abbr,"MN","ME") & year>=1986
+> replace EI = 0 if abbr=="OR" & year>=1987
+> replace EI = 0 if abbr=="ID" & year>=1988
+> replace EI = 0 if abbr=="WV" & year>=1985
+> replace EI = 0 if abbr=="RI" & year>=1991
+> replace EI = 0 if inlist(abbr,"SC","WI") & year>=1992
+> replace EI = 0 if abbr=="MI" & year>=1993
+> replace EI = 0 if abbr=="MA" & year>=1997
+> replace EI = 0 if inlist(abbr,"DE","NC") & year>=1999
+> replace EI = 0 if inlist(abbr,"MS", "NY") & year>=2000 //from Conway-Rork. Though NY is unclear because of EI with no gift tax: http
+> s://www.tax.ny.gov/pit/estate/etidx.htm
+> replace EI = 0 if inlist(abbr,"SD","MT") & year>=2001
+> 
+> //from https://www.thebalance.com/does-hawaii-collect-an-estate-tax-3505218...says HI replaced stand-alone I tax with pick-up tax in
+>  1983
+> replace EI = 0 if abbr=="HI" & year>=1983
+> 
+> /// Some states from above list reinstated EI tax later on
+> replace EI = 1 if abbr=="OR" & year>=2003 //https://olis.leg.state.or.us/liz/2019R1/Downloads/CommitteeMeetingDocument/159041
+> replace EI = 1 if abbr=="VT" & year>=2004
+> replace EI = 1 if abbr=="RI" & year>=2002 //http://www.tax.ri.gov/forms/2018/Estate/RI-100A_2002-2014_m2018.pdf
+> replace EI = 1 if abbr=="DE" & inrange(year,2009,2017)
+> replace EI = 1 if abbr=="IL" & year>=2009
+> replace EI = 1 if abbr=="HI" & year>=2010 //https://www.thebalance.com/does-hawaii-collect-an-estate-tax-3505218
+> replace EI = 1 if abbr=="NC" & year>=2002
+> replace EI = 1 if abbr=="WA" & year>=2005 //(https://dor.wa.gov/sites/default/files/legacy/Docs/reports/2010/Tax_Reference_2010/06ta
+> xhistory.pdf)
+> 
+> replace EI = 1 if abbr=="WI" & inrange(year,2001,2007) //pick-up tax kept after EGTRRA, then repealed after 2007. https://www.wisbar
+> .org/newspublications/wisconsinlawyer/pages/Article.aspx?Volume=80&Issue=12&ArticleID=1396
+> replace EI = 1 if abbr=="VA" & inrange(year,2001,2006) //pick-up tax kept after EGTRRA, then repealed after 2006. https://www.mcpleg
+> al.com/practice-areas/trusts-estate-planning/taxes/
+> replace EI = 1 if abbr=="ME" & year>=2013 //from MN study and verified at https://www.maine.gov/revenue/incomeestate/estate/index.ht
+> m
+> replace EI = 1 if abbr=="MA" & year>=2001 //from https://www.mass.gov/guides/a-guide-to-estate-taxes
+> replace EI = 1 if abbr=="MN" & year>=2001
+> 
+> replace EI = 0 if abbr=="KS" & year>2009 //KS estate tax repealed after 2009: https://www.ksrevenue.org/taxnotices/notice10-07.pdf
+> 
+> //NY: from https://www.tax.ny.gov/pit/estate/etidx.htm and http://riker.com/publications/significant-new-york-tax-legislation-replac
+> es-current-estate-tax-with-a-pic
+> //It seems NY replaced their EI tax with a pick-up tax in 2000 and they repealed their gift tax. Hence, one could avoid EI taxes by 
+> giving gifts before death. In April 2014, they brought back the gift tax.
+> replace EI = 1 if abbr=="NY" & /*year>=2001*/ year>2014
+> 
+> ***************** CT PUT $20M CAP ON ESTATE TAX PAYMENT STARTING IN 2016 (REDUCED TO $15M IN 2019) ***************
+> ***************** NOTE $20M WOULD BE THE ET BILL FOR A CT ESTATE WORTH $323M ($20M/(12%*(8.25/16)))
+> ***************** ALSO NOTE THAT $20M ET BILL ON $1B CT ESTATE EQUATE TO ET RATE OF 2%...SO SMALL BUT NON-TRIVIAL
+> ***************** WE TREAT CT HAS CONTINUING TO HAVE ET AFTER 2015. BUT LATER SHOW RESULTS ROBUST TO DROPPING CT.
+> *replace EI = 0 if abbr=="CT" & year>=2016  //https://www.cga.ct.gov/2017/ACT/pa/2017PA-00002-R00SB-01502SS1-PA.htm
+> 
+> /// More recent repeals (from MN study)
+> replace EI = 0 if inlist(abbr,"NJ") & year>=2018
+> replace EI = 0 if inlist(abbr,"NC","OH") & year>=2013
+> replace EI = 0 if abbr=="OK" & year>=2010               //found online
+> 
+> /// Dealing with Inheritance-tax-only cases, which all have low or zero rates for lineal heirs (and ~16% for non-lineal heirs). 
+> //B&S says IA, KY, and NJ had I tax (as of 1998) only on collateral heirs. I confirmed this is true post-98 as well (see Michael 201
+> 8).
+> //NE repealed its estate tax in 2007. It retained an inheritance tax but with a rate on lineal heirs (kids) of just 1%. EI taxes/gdp
+>  plummeted after 2007
+> //NH had an I tax for death before 2003: https://www.revenue.nh.gov/faq/inheritance-estate.htm
+> //In 2008, LA repealed its I tax which was a pick-up tax that had never been coupled to fed credit; deaths after 2004 not subject to
+>  tax 
+> //In 2012, TN I tax was phased out to be fully repealed by 2016.
+> //The IN I tax is being phased out from 2013-2022 by 10% each year. Lineal heirs have low rate.
+> 
+> // NJ had an estate tax in addition to I tax up until 2018: https://www.state.nj.us/treasury/taxation/inheritance-estate/tax-rates.s
+> html
+> replace EI = 0 if inlist(abbr,"IA","KY","NE","NH","LA","TN","IN")
+> gen Ionly = 0 
+> replace Ionly = 1 if inlist(abbr,"IA","KY") | (abbr=="NE" & year>=2007) | (abbr=="NH" & year<2003) | (abbr=="LA" & year<2008) | (abb
+> r=="TN" & year<2012) | (abbr=="IN" & year<2013)  | (abbr=="NJ" & year>=2018)
+> 
+> preserve
+> keep abbr year EI Ionly
+> save stata_data/stateEI.dta, replace  //save state panel dataset of estate taxes for researchers who request it.
+> restore
+> 
+> 
+> // COULD CHANGE PA TO I-ONLY STATE (SEE MICHAEL 2018 ). It is unique among I-only states in having tax (4.5%) on lineal heirs (and 1
+> 5% on other heirs)...so more similar to ET.
+> // at least check into robustness of this choice
+> 
+> levelsof abbr if EI==1 & year==2000, local(temp)
+> levelsof abbr if EI==1 & year==2001, local(temp)
+> levelsof abbr if EI==1 & year==2017, local(temp)
+> 
+> /// ENTER STATUTORY ET RATES AND THEN COMPUTE COMBINED FED+STATE ET RATE FOR EACH STATE-YEAR
+> gen EIrate_state = 0
+> replace EIrate_state = 0.16*EI if inlist(abbr,"NJ","OR","OK","KS","MN","WI","IL","OH","NC") | inlist(abbr,"VA","MD","DE","PA","NY","
+> RI","MA","VT")
+> replace EIrate_state = 0.157*EI if abbr=="HI"
+> replace EIrate_state = 0.12*EI if abbr=="ME"
+> replace EIrate_state = 0.20*EI if abbr=="WA"
+> 
+> replace EIrate_state = 0.16*EI if abbr=="CT" & year<2010
+> replace EIrate_state = 0.12*EI if abbr=="CT" & year>=2010
+> replace EIrate_state = 0.02*EI if abbr=="CT" & inrange(year,2016,2018) //implied ET rate on $1B estate given $20M max tax
+> replace EIrate_state = 0.015*EI if abbr=="CT" & year>=2019 //implied ET rate on $1B estate given $15M max tax
+> 
+> 
+> /// Federal top ET rate by year (https://www.sparrowcapital.com/resource-center/estate/a-brief-history-of-estate-taxes)
+> gen EIrate_fed = .70 if year<1982
+> replace EIrate_fed = .65 if inrange(year,1982,1982) 
+> replace EIrate_fed = .60 if inrange(year,1983,1983) 
+> replace EIrate_fed = .55 if inrange(year,1984,2001) 
+> replace EIrate_fed = .50 if inrange(year,2002,2002)
+> replace EIrate_fed = .49 if inrange(year,2003,2003)
+> replace EIrate_fed = .48 if inrange(year,2004,2004)
+> replace EIrate_fed = .47 if inrange(year,2005,2005)
+> replace EIrate_fed = .46 if inrange(year,2006,2006)
+> replace EIrate_fed = .45 if inrange(year,2007,2009)
+> replace EIrate_fed = 0 if inrange(year,2010,2010)
+> replace EIrate_fed = .35 if inrange(year,2011,2012)
+> replace EIrate_fed = .396 if inrange(year,2013,2017)
+> replace EIrate_fed = .37 if inrange(year,2018,2019)
+> 
+> gen EIratecombined = EIrate_state + EIrate_fed - EIrate_state if year<=2001  //full federal credit for state ET
+> replace EIratecombined = EIrate_state + EIrate_fed - .75*EIrate_state if year==2002  //75% federal credit for state ET
+> replace EIratecombined = EIrate_state + EIrate_fed - .5*EIrate_state if year==2003  //50% federal credit for state ET
+> replace EIratecombined = EIrate_state + EIrate_fed - .25*EIrate_state if year==2004  //25% federal credit for state ET
+> replace EIratecombined = EIrate_state + EIrate_fed*(1 - EIrate_state) if year>=2005  //federal deduction for state ET
+> 
+> save stata_data/popEI.dta, replace
+> 
+> //Merge in state GDP data
+> use "stata_data/EI_Tax_Merged_v2.dta", clear
+> 
+> rename Year year
+> sort year State
+> drop if year < 1982
+> drop if abbr == "" | abbr == "DC"
+> merge m:1 abbr year using stata_data/popEI.dta, nogen keepusing(pop_change pop EI Ionly) keep(1 3)
+> merge m:1 abbr year using `stateGDP', nogen keepusing(gdp gdp_change) keep(1 3)
+> 
+> //Relabel variables that will be included in regression
+> label variable pop_change "Pop. Change"
+> label variable gdp_change "GDP Change"
+> label variable EI "ET indicator"
+> 
+> /// EI tax revenues data
+> destring Total_Taxes, replace ignore(",")
+> gen EIshare = EI_Tax/Total_Taxes
+> 
+> //Import annual CPI-U data
+> preserve
+> import haver cpiuann@usecon, tvar(year) clear
+> rename cpiuann cpi
+> replace cpi = cpi/245.120  //re-base cpi to be 1 in 2017
+> tempfile cpi
+> save `cpi'
+> restore
+> merge m:1 year using `cpi', nogen keep(1 3)
+> 
+> // Dropping observations that are not reported, out of the country, or Washington D.C.
+> drop if State == "Washington DC"
+> drop if State == ""
+> drop if Name == ""
+> 
+> //Generate average
+> g avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+> 
+> glevelsof abbr, local(state)
+> 
+> drop if Name == "Henry Earl Singleton" & year == 1988 & ourrank == . // Keeping higher ranked observation
+> 
+> //Adding 2 to the younger family members with the same name in order to be able to differentiate
+> duplicates tag Name year, gen(tag)
+> g young_man=0
+> sort year Name Age_num
+> replace young_man = 1 if Name[_n]==Name[_n+1] & year[_n]==year[_n+1] & Age_num[_n]!=Age_num[_n+1] & tag==1
+> 
+> replace Name = "Charles A Vose 2" if Name == "Charles A Vose" & young_man==1
+> replace Name = "Pierre Samuel Du Pont Family" if Name == "Pierre Samuel Du Pont" & family == 1
+> replace Name = "Stephen Davidson Betchel 2" if Name == "Stephen Davidson Betchel" & young_man == 1
+> replace Name = "Stephen Davidson Betchel Family" if Name == "Stephen Davidson Betchel" & family == 1
+> replace Name = "Robert Boisseau Pamplin 2" if Name == "Robert Boisseau Pamplin" & young_man == 1
+> replace Name = "Robert Boisseau Pamplin 2" if Name == "Robert Boisseau Pamplin" & year >= 1995
+> *****I am letting the second occurence of Alice Francis Du Pont Mills in 1994 drop because I did not see two entries in the scanned 
+> Forbes document**********
+> replace Name = "Frank Batten 2" if Name == "Frank Batten" & young_man == 1
+> replace Name = "Jim Davis 2" if Name == "Jim Davis" & young_man == 1
+> replace Name = "Edward Crosby Johnson 2" if Name == "Edward Crosby Johnson" & young_man == 1
+> 
+> drop tag
+> 
+> duplicates tag Name year, gen(tag)
+> drop if tag~=0  //drops individuals with multiple residences
+> drop tag
+> tempfile cleaned
+> save `cleaned'
+> 
+> //Relabel some variables
+> label variable avg "Top State Personal MTR"
+> label variable our_wealthy "Inheritors" 
+> label variable state_tax "CIT Rate"
+> 
+> //Changing name to make it easier to differentiate between family members with same name
+> replace Name = "Edward Johnson" if Name == "Edward Crosby Johnson" & year == 2017 & Age_num == 53 
+> 
+> //Other name fixes
+> replace Name = "Oakleigh Blakeman Thorne" if Name=="Oakleigh Blakeman Thome"
+> 
+> drop stab //redundant with abbr
+> 
+> //Fix units
+> replace our_wealthy = 1 if our_wealthy==2
+> replace avg = avg/100
+> 
+> encode Name, gen(nameid)
+> egen stateyear = group(abbr year)
+> egen stateyearnameid = group(abbr year nameid)
+> 
+> /// CLEAN UP THE AGE VARIABLE (Note: there truly was someone who was 101, and the ages for 400 and 800 are for families and are mist
+> akes)
+> if _rc==0 {
+> tab Age
+> replace Age_num = 25 if Age == "20s"
+> replace Age_num = 35 if Age == "30s"
+> replace Age_num = 45 if Age == "40s"
+> replace Age_num = 55 if inlist(Age,"50s",">51")
+> replace Age_num = 65 if Age == "60s"
+> replace Age_num = 75 if Age == "70s"
+> replace Age_num = 85 if Age == "80s"
+> replace Age_num = 95 if Age == "90s"
+> replace Age_num = 68 if Age == "late 60s"
+> replace Age_num = 78 if Age == "late 70s"
+> replace Age_num = 88 if Age == "late 80s"
+> replace Age_num = 50 if Age == "near 50"
+> replace Age_num = 70 if Age == "near 70"
+> replace Age_num = 68 if Age == "late 60s"
+> replace Age_num = 83 if Age == "83, 79 "
+> replace Age_num = 74 if Age == "74, 75 "
+> replace Age_num = 65 if Age == "65, 63 "
+> replace Age_num = real(subinstr(Age,",","",.))
+> replace Age_num = real(subinstr(Age,"*","",.))
+> replace Age_num = real(subinstr(Age,"'","",.))
+> replace Age_num = real(subinstr(Age,"`","",.))
+> replace Age_num = real(subinstr(Age,"_","",.))
+> replace Age_num = real(subinstr(Age,"-","",.))
+> replace Age_num = real(subinstr(Age," ","",.))
+> replace Age_num = real(subinstr(Age,"Q","0",.))
+> replace Age_num = real(subinstr(Age,">","",.))
+> replace Age_num = real(subinstr(Age,"a","0",.))
+> replace Age_num = real(subinstr(Age,".","",.))
+> 
+> 
+> //Fixing Forbes age issues 
+> replace Age_num = 77 if Name == "John Hammond Krehbiel Jr" & year == 1983
+> replace Age_num = 33 if Name == "Swanee Hunt" & year == 1983
+> replace Age_num = (1998 - 1945) if year == 1998 & Name == "Gary Tharaldson"
+> replace Age_num = (1997 - 1945) if year == 1997 & Name == "Gary Tharaldson"
+> replace Age_num = 85 if year==2015 & Name == "Warren Edward Buffett"
+> replace Age_num = 60 if year==2015 & Name == "William Henry Gates"
+> replace Age_num = 95 if year==1994 & Name == "Katsumasa (Roy) Sakioka"
+> 
+> replace Age_num = 51 if Name == "Abigail Johnson" & year == 2012
+> replace Age_num = . if Name == "Abigail Johnson" & (year >= 2013 | year < 2012)
+> 
+> replace Age_num = 58 if Name == "Adolph Alfred Taubman" & year == 1982
+> replace Age_num = . if Name == "Adolph Alfred Taubman" & year >= 1983
+> 
+> replace Age_num = 48 if Name == "Alan C Ashton" & year == 1990 
+> replace Age_num = . if Name == "Alan C Ashton" & year > 1990
+> 
+> replace Age_num = 82 if Name == "Alan Gerry" & year == 2011
+> replace Age_num = . if Name == "Alan Gerry" & year > 2011
+> 
+> replace Age_num = 66 if Name == "Albert Lee Ueltschi" & year == 1983
+> 
+> replace Age_num = 64 if Name == "Alberto Vilar" & year == 2004
+> 
+> replace Age_num = 72 if Name == "Zachary Fisher" & year == 1982
+> replace Age_num = . if Name == "Zachary Fisher" & year > 1982
+> 
+> replace Age_num = 44 if Name == "Winthrop Paul Rockefeller" & year == 1992
+> replace Age_num = . if Name == "Winthrop Paul Rockefeller" & year > 1992
+> 
+> replace Age_num = 46 if Name == "Winnie Johnson-Marquart" & year == 2004
+> replace Age_num = . if Name == "Winnie Johnson-Marquart" & year > 2004
+> 
+> replace Age_num = 62 if Name == "Alec Gores" & year == 2015
+> 
+> replace Age_num = 38 if Name == "Alejandro Santo Domingo" & year == 2015
+> replace Age_num = . if Name == "Alejandro Santo Domingo" & year > 2015
+> 
+> replace Age_num = 66 if Name == "Alice L Walton" & year == 2015
+> replace Age_num = . if Name == "Alice L Walton" & year > 2015
+> 
+> replace Age_num = 74 if Name == "Allan Goldman" & year == 2016
+> 
+> replace Age_num = 81 if Name == "Amos Barr Hostetter" & year == 2017
+> replace Age_num = . if Name == "Amos Barr Hostetter" & year < 2017
+> 
+> replace Age_num = 44 if Name == "Amy Wyss" & year == 2015
+> replace Age_num = 45 if Name == "Amy Wyss" & year == 2016
+> 
+> replace Age_num = 37 if Name == "Andres Santo Domingo" & year == 2015
+> 
+> replace Age_num = 62 if Name == "Andrew Beal" & year == 2014
+> replace Age_num = . if Name == "Andrew Beal" & year > 2014
+> 
+> replace Age_num = 84 if Name == "Andrew Jerrold Perenchio" & year == 2015
+> replace Age_num = 85 if Name == "Andrew Jerrold Perenchio" & year == 2016
+> 
+> replace Age_num = 59 if Name == "Anita Zucker" & year == 2010 //Overwrote Forbes age
+> replace Age_num = . if Name == "Anita Zucker" & year > 2010
+> 
+> replace Age_num = . if Name == "Ann Walton Kroenke" & year < 2017
+> 
+> replace Age_num = . if Name == "Anne Cox Chambers" & year > 1982
+> 
+> replace Age_num = 80 if Name == "Anne Gittinger" & year == 2015
+> replace Age_num = . if Name == "Anne Gittinger" & year < 2015
+> 
+> replace Age_num = 54 if Name == "Anthony Pritzker" & year == 2015
+> replace Age_num = . if Name == "Anthony Pritzker" & year > 2015
+> 
+> replace Age_num = . if Name == "Archie Aldis Emmerson" & year < 2017
+> 
+> replace Age_num = . if Name == "Arthur M Blank" & year < 2017
+> 
+> replace Age_num = . if Name == "Arturo Moreno" & year < 2017
+> 
+> replace Age_num = . if Name == "Austen S Cargill" & year < 2017
+> 
+> replace Age_num = 69 if Name == "Barbara Carlson Gage" & year == 2011 //Overwrote Forbes age
+> replace Age_num = . if Name == "Barbara Carlson Gage" & year > 2011  //Overwrote Forbes age
+> replace Age_num = . if Name == "Barbara Carlson Gage" & year < 2011  //Overwrote Forbes age
+> 
+> replace Age_num = . if Name == "Barry Diller" & year < 2017
+> 
+> replace Age_num = . if Name == "Bennett Dorrance" & year < 2017
+> 
+> replace Age_num = . if Name == "Bernard Francis Saul" & year < 2017
+> 
+> replace Age_num = . if Name == "Bernard Marcus" & year < 2017
+> 
+> replace Age_num = . if Name == "Bharat Desai" & year < 2016
+> 
+> replace Age_num = . if Name == "Bill Haslam" & year < 2017
+> 
+> replace Age_num = . if Name == "Blase Thomas Golisano" & year < 2017
+> 
+> replace Age_num = . if Name == "Bob Parsons" & year < 2017
+> 
+> replace Age_num = . if Name == "Bobby Murphy" & year < 2017
+> 
+> replace Age_num = . if Name == "Brad Kelley" & year < 2017
+> 
+> replace Age_num = . if Name == "Bradley Wayne Hughes" & year < 2017
+> 
+> replace Age_num = . if Name == "Brian Acton" & year < 2017
+> 
+> replace Age_num = . if Name == "Brian Chesky" & year < 2017
+> 
+> replace Age_num = . if Name == "Bruce Halle" & year < 2016
+> 
+> replace Age_num = . if Name == "Bruce Karsh" & year < 2017
+> 
+> replace Age_num = . if Name == "Bruce Kovner" & year < 2017
+> 
+> replace Age_num = . if Name == "Bubba Cathy" & year < 2017
+> 
+> replace Age_num = . if Name == "C Dean Metropoulos" & year < 2017
+> 
+> replace Age_num = . if Name == "Carl Celian Icahn" & year < 2017
+> 
+> replace Age_num = . if Name == "Carl Cook" & year < 2017
+> 
+> replace Age_num = . if Name == "Charles Bartlett Johnson" & year < 2017
+> 
+> replace Age_num = . if Name == "Charles Butt" & year >= 2014
+> 
+> replace Age_num = 65 if Name == "Charles Cohen" & year == 2016
+> 
+> replace Age_num = . if Name == "Charles Ergen" & year < 2017
+> 
+> replace Age_num = . if Name == "Charles Francis Dolan" & year < 2017
+> 
+> replace Age_num = . if Name == "Charles R Schwab" & year < 2017
+> 
+> replace Age_num = . if Name == "Charles de Ganahl Koch" & year < 2017
+> 
+> replace Age_num = . if Name == "Chase Coleman" & year < 2017
+> 
+> replace Age_num = . if Name == "Christopher Cline" & year < 2017
+> 
+> replace Age_num = . if Name == "Christy Walton" & year < 2017
+> 
+> replace Age_num = . if Name == "Clayton Lee Mathile" & year < 2017
+> 
+> replace Age_num = . if Name == "Clemmie Dixon Spangler" & year < 2017
+> 
+> replace Age_num = 66 if Name == "Craig O Mccaw" & year == 2015 //Forbes age overwritten
+> 
+> replace Age_num = . if Name == "Dagmar Dolby" & year < 2017
+> 
+> replace Age_num = . if Name == "Dan Cathy" & year < 2017
+> 
+> replace Age_num = . if Name == "Dan Friedkin" & year < 2017
+> 
+> replace Age_num = . if Name == "Dan Snyder" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel D'Aniello" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel Gilbert" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel Loeb" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel Morton Ziff" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel Och" & year < 2017
+> 
+> replace Age_num = . if Name == "Daniel Pritzker" & year < 2017
+> 
+> replace Age_num = 51 if Name == "Dannine Avara" & year == 2014
+> replace Age_num = . if Name == "Dannine Avara" & year > 2014
+> 
+> replace Age_num = . if Name == "David A Duffield" & year < 2017
+> 
+> replace Age_num = . if Name == "David Bonderman" & year < 2017
+> 
+> replace Age_num = 44 if Name == "David Einhorn" & year == 2012
+> replace Age_num = . if Name == "David Einhorn" & year > 2012
+> 
+> replace Age_num = . if Name == "David Filo" & year < 2017
+> 
+> replace Age_num = . if Name == "David Geffen" & year < 2017
+> 
+> replace Age_num = . if Name == "David Green" & year < 2017
+> 
+> replace Age_num = . if Name == "David Hamilton Koch" & year < 2017
+> 
+> replace Age_num = . if Name == "David Howard Murdock" & year < 2017
+> 
+> replace Age_num = 101 if Name == "David Rockefeller" & year == 2016
+> replace Age_num = 99 if Name == "David Rockefeller" & year == 2014
+> replace Age_num = . if Name == "David Rockefeller" & year < 2014
+> 
+> replace Age_num = . if Name == "David Rubenstein" & year < 2017
+> 
+> replace Age_num = . if Name == "David Shaw" & year < 2017
+> 
+> replace Age_num = . if Name == "David Siegel" & year < 2017 & Source == "Hedge Funds"
+> 
+> replace Age_num = . if Name == "David Sun" & year < 2017
+> 
+> replace Age_num = . if Name == "David Tepper" & year < 2017
+> 
+> replace Age_num = . if Name == "David Walentas" & year < 2017
+> 
+> replace Age_num = 92 if Name == "Dean White" & year == 2015
+> 
+> replace Age_num = . if Name == "Denise Debartolo York" & year < 2017
+> 
+> replace Age_num = . if Name == "Dennis Washington" & year < 2017
+> 
+> replace Age_num = . if Name == "Diane Hendricks" & year < 2017
+> 
+> replace Age_num = . if Name == "Dirk Edward Ziff" & year < 2017
+> 
+> replace Age_num = . if Name == "Don Hankey" & year < 2017
+> 
+> replace Age_num = . if Name == "Donald Edward Newhouse" & year < 2017
+> 
+> replace Age_num = . if Name == "Donald Leroy Bren" & year < 2017
+> 
+> replace Age_num = . if Name == "Donald Sterling" & year < 2017
+> 
+> replace Age_num = . if Name == "Doris Feigenbaum Fisher" & year < 2017
+> 
+> replace Age_num = . if Name == "Douglas Leone" & year < 2017
+> 
+> replace Age_num = . if Name == "Dustin Moskovitz" & year < 2017
+> 
+> replace Age_num = . if Name == "Edward Crosby Johnson" & year < 2016
+> 
+> replace Age_num = . if Name == "Edward John Debartolo Jr" & year < 2017
+> 
+> replace Age_num = 53 if Name == "Edward Lampert" & year == 2015
+> 
+> replace Age_num = . if Name == "Edward Perry Bass" & year < 2017
+> 
+> replace Age_num = . if Name == "Edward Roski" & year < 2017
+> 
+> replace Age_num = . if Name == "Eli Broad" & year < 2017
+> 
+> replace Age_num = 31 if Name == "Elizabeth Holmes" & year == 2015
+> 
+> replace Age_num = . if Name == "Elon Musk" & year < 2017
+> 
+> replace Age_num = . if Name == "Enos Stanley Kroenke" & year < 2017
+> 
+> replace Age_num = . if Name == "Eric Schmidt" & year < 2017
+> 
+> replace Age_num = . if Name == "Evan Spiegel" & year < 2017
+> 
+> replace Age_num = 43 if Name == "Evan Williams" & year == 2015 //Overwrote Forbes age
+> 
+> replace Age_num = 87 if Name == "Fayez Shalaby Sarofim" & year == 2015 //Overwrote Forbes age
+> replace Age_num = . if Name == "Fayez Shalaby Sarofim" & year < 2015
+> 
+> replace Age_num = 84 if Name == "Forrest Edward Mars Jr" & year == 2015
+> replace Age_num = . if Name == "Forrest Edward Mars Jr" & year < 2015
+> 
+> replace Age_num = 82 if Name == "Forrest Preston" & year == 2015
+> 
+> replace Age_num = . if Name == "Frank Fertitta" & year < 2017
+> 
+> replace Age_num = . if Name == "Frederick Wallace Smith" & year < 2017
+> 
+> replace Age_num = . if Name == "Gabe Newell" & year < 2017
+> 
+> replace Age_num = 73 if Name == "Gail Miller" & year == 2015
+> replace Age_num = 74 if Name == "Gail Miller" & year == 2016
+> 
+> replace Age_num = . if Name == "Gary Rollins" & year < 2017
+> 
+> replace Age_num = . if Name == "Gayle Cook" & year < 2013
+> 
+> replace Age_num = . if Name == "George B Kaiser" & year < 2017
+> 
+> replace Age_num = . if Name == "George Bishop" & year < 2017
+> 
+> replace Age_num = . if Name == "George L Lindemann" & year < 2017
+> 
+> replace Age_num = . if Name == "George Leon Argyros" & year < 2017
+> 
+> replace Age_num = . if Name == "George Lucas" & year < 2017
+> 
+> replace Age_num = . if Name == "George R Roberts" & year < 2017
+> 
+> replace Age_num = . if Name == "George Soros" & year < 2017
+> 
+> replace Age_num = . if Name == "Gerald J Ford" & year < 2017
+> 
+> replace Age_num = . if Name == "Glen Taylor" & year < 2017
+> 
+> replace Age_num = . if Name == "Glenn Dubin" & year < 2017
+> 
+> replace Age_num = . if Name == "Gordon Earle Moore" & year < 2017
+> 
+> replace Age_num = . if Name == "Gordon Peter Getty" & year < 2017
+> 
+> replace Age_num = . if Name == "Gwendolyn Sontheim Meyer" & year < 2017
+> 
+> replace Age_num = . if Name == "H Fisk Johnson" & year < 2017
+> 
+> replace Age_num = . if Name == "H Ty Warner" & year < 2017
+> 
+> replace Age_num = . if Name == "Haim Saban" & year < 2017
+> 
+> replace Age_num = 64 if Name == "Hamilton James" & year == 2015
+> 
+> replace Age_num = . if Name == "Harold Hamm" & year < 2017
+> 
+> replace Age_num = . if Name == "Harry Stine" & year < 2017
+> 
+> replace Age_num = . if Name == "Harry Wayne Huizenga" & year < 2017
+> 
+> replace Age_num = . if Name == "Helen Johnson-Leipold" & year < 2017
+> 
+> replace Age_num = 97 if Name == "Henry Lea Hillman" & year == 2016
+> 
+> replace Age_num = . if Name == "Henry Nicholas" & year < 2017
+> 
+> replace Age_num = . if Name == "Henry R Kravis" & year < 2017
+> 
+> replace Age_num = . if Name == "Henry Ross Perot" & year < 2017
+> 
+> replace Age_num = . if Name == "Henry Ross Perot Jr" & year < 2017
+> 
+> replace Age_num = . if Name == "Henry Samueli" & year < 2017
+> 
+> replace Age_num = . if Name == "Herbert Kohler" & year < 2017
+> 
+> replace Age_num = 88 if Name == "Herbert Louis" & year == 2014
+> 
+> replace Age_num = . if Name == "Herbert Simon" & year < 2017
+> 
+> replace Age_num = . if Name == "Howard Marks" & year < 2017
+> 
+> replace Age_num = . if Name == "Howard Schultz" & year < 2017
+> 
+> replace Age_num = . if Name == "Igor Olenicoff" & year < 2017
+> 
+> replace Age_num = 86 if Name == "Imogene Powers Johnson" & year == 2017
+> replace Age_num = . if Name == "Imogene Powers Johnson" & year < 2017
+> 
+> replace Age_num = . if Name == "Ira L Rennert" & year < 2017
+> 
+> replace Age_num = . if Name == "Irwin Mark Jacobs" & year < 2014
+> 
+> replace Age_num = . if Name == "Isaac Perlmutter" & year < 2017
+> 
+> replace Age_num = . if Name == "Israel Englander" & year < 2017
+> 
+> replace Age_num = . if Name == "J Christopher Reyes" & year < 2017
+> 
+> replace Age_num = 93 if Name == "Jack Crawford Taylor" & year == 2015
+> 
+> replace Age_num = . if Name == "Jack Dangermond" & year < 2017
+> 
+> replace Age_num = . if Name == "Jack Dorsey" & year < 2017
+> 
+> replace Age_num = . if Name == "Jacqueline Mars" & year < 2017
+> 
+> replace Age_num = . if Name == "James C France" & year < 2016
+> 
+> replace Age_num = . if Name == "James Coulter"  & year < 2017
+> 
+> replace Age_num = . if Name == "James Dinan" & year < 2016
+> 
+> replace Age_num = . if Name == "James Goodnight" & year < 2017
+> 
+> replace Age_num = . if Name == "James H Clark" & year < 2017
+> 
+> replace Age_num = . if Name == "James Irsay" & year < 2017
+> 
+> replace Age_num = . if Name == "James Jannard" & year < 2017
+> 
+> replace Age_num = . if Name == "James Leprino" & year < 2017
+> 
+> replace Age_num = . if Name == "James R Cargill II" & year < 2017
+> 
+> replace Age_num = . if Name == "James Simons" & year < 2017
+> 
+> replace Age_num = . if Name == "Jan Koum" & year < 2017
+> 
+> replace Age_num = . if Name == "Jay Paul" & year < 2017
+> 
+> replace Age_num = . if Name == "Jay Robert (JB) Pritzker" & year < 2017
+> 
+> replace Age_num = . if Name == "Jean (Gigi) Pritzker" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeff Greene" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeff Sutton" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeffery Hildebrand" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeffrey Lorberbaum" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeffrey P Bezos" & year < 2017
+> 
+> replace Age_num = . if Name == "Jeffrey Skoll" & year < 2017
+> 
+> replace Age_num = . if Name == "Jen-Hsun Huang" & year < 2017
+> 
+> replace Age_num = . if Name == "Jennifer Pritzker" & year < 2016
+> 
+> replace Age_num = . if Name == "Jeremy Maurice Jacobs" & year < 2017
+> 
+> replace Age_num = . if Name == "Jerral Wayne Jones" & year < 2017
+> 
+> replace Age_num = . if Name == "Jerry Speyer" & year < 2017
+> 
+> replace Age_num = . if Name == "Jerry Yang" & year < 2017
+> 
+> replace Age_num = . if Name == "Jim Breyer" & year < 2017
+> 
+> replace Age_num = . if Name == "Jim C Walton" & year < 2017
+> 
+> replace Age_num = 72 if Name == "Jim Davis" & year == 2015
+> 
+> replace Age_num = . if Name == "Jim Kennedy" & year < 2017
+> 
+> replace Age_num = 62 if Name == "Jimmy Haslam" & year == 2015
+> replace Age_num = . if Name == "Jimmy Haslam" & year > 2015
+> replace Age_num = . if Name == "Jimmy Haslam" & year < 2015
+> 
+> replace Age_num = . if Name == "Jin Sook & Do Won Chang" & year < 2017
+> 
+> replace Age_num = . if Name == "Joan Tisch" & year < 2016
+> 
+> replace Age_num = . if Name == "Joe Gebbia" & year < 2017
+> 
+> replace Age_num = . if Name == "John Andreas Catsimatidis" & year < 2017
+> 
+> replace Age_num = . if Name == "John Anthony Sobrato" & year < 2017
+> 
+> replace Age_num = 44 if Name == "John Arnold" & year == 2017
+> replace Age_num = . if Name == "John Arnold" & year < 2017
+> 
+> replace Age_num = 78 if Name == "John Arrillaga" & year == 2015
+> 
+> replace Age_num = . if Name == "John C Malone" & year < 2017
+> 
+> replace Age_num = 90 if Name == "John Farber" & year == 2015
+> 
+> replace Age_num = . if Name == "John Franklyn Mars" & year < 2017
+> 
+> replace Age_num = . if Name == "John Henry" & year < 2017 & Source == "Sports"
+> 
+> replace Age_num = . if Name == "John J Fisher" & year < 2017 
+> 
+> replace Age_num = 72 if Name == "John Kapoor" & year == 2015
+> 
+> replace Age_num = . if Name == "John Middleton" & year < 2017
+> 
+> replace Age_num = . if Name == "John Morris" & year < 2017
+> 
+> replace Age_num = . if Name == "John Overdeck" & year < 2017
+> 
+> replace Age_num = . if Name == "John Paul Dejoria" & year < 2017
+> 
+> replace Age_num = . if Name == "John Paulson" & year < 2017
+> 
+> replace Age_num = 62 if Name == "John Pritzker" & year == 2015
+> replace Age_num = . if Name == "John Pritzker" & year > 2015
+> 
+> replace Age_num = . if Name == "John R Menard" & year < 2017
+> 
+> replace Age_num = 67 if Name == "John Sall" & year == 2015
+> 
+> replace Age_num = . if Name == "John Tu" & year < 2017
+> 
+> replace Age_num = . if Name == "John W Brown" & year < 2017 
+> 
+> replace Age_num = . if Name == "Johnelle Hunt" & year < 2017
+> 
+> replace Age_num = . if Name == "Jon LLoyd Stryker" & year < 2017
+> 
+> replace Age_num = . if Name == "Jonathan Gray" & year < 2017
+> 
+> replace Age_num = 59 if Name == "Jonathan Nelson" & year == 2015
+> 
+> replace Age_num = 66 if Name == "Jorge Perez" & year == 2015
+> 
+> replace Age_num = . if Name == "Joseph D Mansueto" & year < 2017
+> 
+> replace Age_num = . if Name == "Joseph Dahr Jamail" & year < 2014
+> 
+> replace Age_num = . if Name == "Joseph Grendys" & year < 2017
+> 
+> replace Age_num = 85 if Name == "Josephine Louis" & year == 2015
+> 
+> replace Age_num = . if Name == "Joshua Harris" & year < 2017
+> 
+> replace Age_num = . if Name == "Judy Faulkner" & year < 2017
+> 
+> replace Age_num = . if Name == "Julian Robertson" & year < 2017
+> 
+> replace Age_num = . if Name == "Julio Mario Santo Domingo" & year < 2017
+> 
+> replace Age_num = . if Name == "Karen Pritzker" & year < 2017
+> 
+> replace Age_num = . if Name == "Kavitark Ram Shriram" & year < 2017
+> 
+> replace Age_num = 87 if Name == "Keith Rupert Murdoch" & year == 2017
+> replace Age_num = . if Name == "Keith Rupert Murdoch" & year < 2017
+> 
+> replace Age_num = . if Name == "Kelcy Warren" & year < 2017
+> 
+> replace Age_num = . if Name == "Ken Fisher" & year < 2017
+> 
+> replace Age_num = . if Name == "Kenneth C Griffin" & year < 2017
+> 
+> replace Age_num = . if Name == "Kenneth Feld" & year < 2017
+> 
+> replace Age_num = . if Name == "Kenneth G Langone" & year < 2017
+> 
+> replace Age_num = . if Name == "Kevin Plank" & year < 2016
+> 
+> replace Age_num = . if Name == "Kieu Hoang" & year < 2017
+> 
+> replace Age_num = 97 if Name == "Kirk Kerkorian" & year == 2014
+> 
+> replace Age_num = . if Name == "L John Doerr" & year < 2017
+> 
+> replace Age_num = . if Name == "Larry E Page" & year < 2017
+> 
+> replace Age_num = 46 if Name == "Larry Robbins" & year == 2015
+> 
+> replace Age_num = 52 if Name == "Laurene Powell Jobs" & year == 2015
+> 
+> replace Age_num = . if Name == "Lawrence Joseph Ellison" & year < 2017
+> 
+> replace Age_num = . if Name == "Leandro Rizzuto" & year < 2016
+> 
+> replace Age_num = . if Name == "Lee Marshall Bass" & year < 2017
+> 
+> replace Age_num = . if Name == "Leon Black" & year < 2017
+> 
+> replace Age_num = . if Name == "Leon G Cooperman" & year < 2017
+> 
+> replace Age_num = 84 if Name == "Leonard Alan Lauder" & year == 2017 //Overwrote Forbes Age
+> replace Age_num = . if Name == "Leonard Alan Lauder" & year < 2017
+> 
+> replace Age_num = . if Name == "Leonard Norman Stern" & year < 2017
+> 
+> replace Age_num = . if Name == "Leslie Herbert Wexner" & year < 2017
+> 
+> replace Age_num = . if Name == "Linda Pritzker" & year < 2016
+> 
+> replace Age_num = . if Name == "Lorenzo Fertitta" & year < 2017
+> 
+> replace Name = "Louis Moore Bacon" if Name == "Lours Moore Bacon" //Name mistake
+> replace Age_num = . if Name == "Louis Moore Bacon" & year < 2016
+> 
+> replace Age_num = . if Name == "Lynn Schusterman" & year < 2017
+> 
+> replace Age_num = . if Name == "M Jude Reyes" & year < 2017
+> 
+> replace Age_num = 88 if Name == "Manuel Moroun" & year == 2015
+> 
+> replace Age_num = . if Name == "Marc Benioff" & year < 2017
+> 
+> replace Age_num = 55 if Name == "Marc Lasry" & year == 2015
+> 
+> replace Age_num = 53 if Name == "Marc Rowan" & year == 2015
+> 
+> replace Age_num = . if Name == "Margaret C Whitman" & year < 2017
+> 
+> replace Age_num = . if Name == "Marianne Liebmann" & year < 2017
+> 
+> replace Age_num = . if Name == "Marilyn Carlson Nelson" & year < 2014
+> 
+> replace Age_num = . if Name == "Mark Cuban" & year < 2017
+> 
+> replace Age_num = . if Name == "Mark Shoen" & year < 2017
+> 
+> replace Age_num = . if Name == "Mark Stevens" & year < 2017
+> 
+> replace Age_num = . if Name == "Mark Walter" & year < 2017
+> 
+> replace Age_num = . if Name == "Mark Zuckerberg" & year < 2017
+> 
+> replace Age_num = . if Name == "Martha Robinson Rivers Ingram" & year < 2017
+> 
+> replace Age_num = . if Name == "Mary Alice Dorrance Malone" & year < 2017
+> 
+> replace Age_num = . if Name == "Michael Dell" & year < 2017
+> 
+> replace Age_num = . if Name == "Michael Moritz" & year < 2017
+> 
+> replace Age_num = . if Name == "Michael Robert Milken" & year < 2017
+> 
+> replace Age_num = . if Name == "Michael Rubens Bloomberg" & year < 2017
+> 
+> replace Age_num = . if Name == "Michael Rubin" & year < 2017
+> 
+> replace Age_num = . if Name == "Micky Arison" & year < 2017
+> 
+> replace Age_num = . if Name == "Milane Duncan Frantz" & year < 2017
+> 
+> replace Age_num = . if Name == "Min H Kao" & year < 2017
+> 
+> replace Age_num = . if Name == "Mitchell Rales" & year < 2017
+> 
+> replace Age_num = . if Name == "Mortimer Benjamin Zuckerman" & year < 2017
+> 
+> replace Age_num = . if Name == "Nancy Walton Laurie" & year < 2017
+> 
+> replace Age_num = . if Name == "Nathan Blecharczyk" & year < 2017
+> 
+> replace Age_num = . if Name == "Neil Gary Bluhm" & year < 2017
+> 
+> replace Age_num = 73 if Name == "Nelson Peltz" & year == 2015
+> 
+> replace Age_num = 40 if Name == "Nicholas Woodman" & year == 2015
+> 
+> replace Age_num = . if Name == "Noam Gottesman" & year < 2017
+> 
+> replace Age_num = . if Name == "Norman Braman" & year < 2017
+> 
+> replace Age_num = . if Name == "Oprah Winfrey" & year < 2017
+> 
+> replace Age_num = . if Name == "Pat Stryker" & year < 2017
+> 
+> replace Age_num = . if Name == "Patrick George Ryan" & year < 2017
+> 
+> replace Age_num = 76 if Name == "Patrick Joseph Mcgovern" & year == 2013
+> 
+> replace Age_num = . if Name == "Patrick Soon-Shiong" & year < 2017
+> 
+> replace Age_num = 64 if Name == "Paul Gardner Allen" & year == 2017 //overwrote Forbes age
+> replace Age_num = . if Name == "Paul Gardner Allen" & year < 2017
+> 
+> replace Age_num = . if Name == "Paul Tudor Jones" & year < 2017
+> 
+> replace Age_num = 83 if Name == "Pauline Macmillan Keinath" & year == 2017 //overwrote Forbes age
+> replace Age_num = . if Name == "Pauline Macmillan Keinath" & year < 2017
+> 
+> replace Age_num = . if Name == "Peter Buck" & year < 2017
+> 
+> replace Age_num = . if Name == "Peter R Kellogg" & year < 2017
+> 
+> replace Age_num = . if Name == "Peter Thiel" & year < 2017
+> 
+> replace Age_num = . if Name == "Philip Hampson Knight" & year < 2017
+> 
+> replace Age_num = . if Name == "Phillip Frederick Anschutz" & year < 2017
+> 
+> replace Age_num = 82 if Name == "Phillip Frost" & year == 2017
+> replace Age_num = . if Name == "Phillip Frost" & year < 2017
+> 
+> replace Age_num = . if Name == "Phillip Ruffin" & year < 2017
+> 
+> replace Age_num = . if Name == "Pierre M Omidyar" & year < 2017
+> 
+> replace Age_num = . if Name == "Ralph Lauren" & year < 2017
+> 
+> replace Age_num = . if Name == "Randa Williams" & year < 2017
+> 
+> replace Age_num = . if Name == "Randal J Kirk" & year < 2017
+> 
+> replace Age_num = . if Name == "Randall Rollins" & year < 2017
+> 
+> replace Age_num = . if Name == "Ray Dalio" & year < 2017
+> 
+> replace Age_num = . if Name == "Ray Davis" & year < 2017
+> 
+> replace Age_num = . if Name == "Ray Lee Hunt" & year < 2017
+> 
+> replace Age_num = . if Name == "Reid Hoffman" & year < 2017
+> 
+> replace Age_num = . if Name == "Reinhold Schmieding" & year < 2017
+> 
+> replace Age_num = . if Name == "Richard Kinder" & year < 2017
+> 
+> replace Age_num = . if Name == "Richard Lefrak" & year < 2017
+> 
+> replace Age_num = 91 if Name == "Richard M Devos" & year == 2017
+> replace Age_num = . if Name == "Richard M Devos" & year < 2017
+> 
+> replace Age_num = . if Name == "Richard M Schulze" & year < 2017
+> 
+> replace Age_num = . if Name == "Richard Taylor Peery" & year < 2017
+> 
+> replace Age_num = . if Name == "Richard Yuengling" & year < 2016
+> 
+> replace Age_num = . if Name == "Rick Caruso" & year < 2017
+> 
+> replace Age_num = . if Name == "Riley P Bechtel" & year < 2017
+> 
+> replace Age_num = 80 if Name == "Robert C Mcnair" & year == 2017
+> replace Age_num = . if Name == "Robert C Mcnair" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert David Ziff" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Drayton Mclane" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Duggan" & year < 2016
+> 
+> replace Age_num = . if Name == "Robert Edward (Ted) Turner" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Edward Rich Jr" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Kraft" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Muse Bass" & year < 2017
+> 
+> replace Age_num = 40 if Name == "Robert Pera" & year == 2017
+> replace Age_num = . if Name == "Robert Pera" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Rowling" & year < 2017
+> 
+> replace Age_num = . if Name == "Robert Smith" & year < 2017
+> 
+> replace Age_num = . if Name == "Romesh T Wadhwani" & year < 2017
+> 
+> replace Age_num = . if Name == "Ron Baron" & year < 2017
+> 
+> replace Age_num = . if Name == "Ronald Owen Perelman" & year < 2017
+> 
+> replace Age_num = . if Name == "Ronald Steven Lauder" & year < 2017
+> 
+> replace Age_num = . if Name == "Ronald Wanek" & year < 2017
+> 
+> replace Age_num = . if Name == "Ronda E Stryker" & year < 2017
+> 
+> replace Age_num = . if Name == "Rupert Harris Johnson" & year < 2017
+> 
+> replace Age_num = . if Name == "Russ Weiner" & year < 2017
+> 
+> replace Age_num = . if Name == "Alexander Gus Spanos" & year < 2017
+> 
+> replace Age_num = 63 if Name == "Alfred James Clark" & year == 1991
+> 
+> replace Age_num = . if Name == "Amar Gopal Bose" & year < 2008
+> 
+> replace Age_num = . if Name == "Arthur Charles Nielsen" & year < 1992
+> 
+> replace Age_num = 65 if Name == "David Durst" & year == 1990
+> 
+> replace Age_num = . if Name == "Donald John Trump" & year < 2016
+> 
+> replace Age_num = 83 if Name == "Dorothy Green" & year == 1989
+> replace Age_num = . if Name == "Dorothy Green" & year < 1989
+> 
+> replace Age_num = . if Name == "Elizabeth Ann Reid" & year < 2004
+> 
+> replace Age_num = . if Name == "Estee Lauder" & year < 1995
+> 
+> replace Age_num = . if Name == "Fred Deluca" & year < 2014
+> 
+> replace Age_num = . if Name == "Harry Brakmann Helmsley" & year < 1996
+> 
+> replace Age_num = . if Name == "Irene Sophie Du Pont May" & year < 1997
+> 
+> replace Age_num = . if Name == "James LeVoy Sorenson" & year < 2007
+> 
+> replace Age_num = . if Name == "Jane B Engelhard" & year < 1996
+> 
+> replace Age_num = 77 if Name == "Larry Fisher" & year == 1985
+> replace Age_num = . if Name == "Larry Fisher" & year < 1985
+> 
+> replace Age_num = . if Name == "Louis Larrick Ward" & year < 1994
+> 
+> replace Age_num = . if Name == "Marc Lasry" & year < 2015
+> 
+> replace Age_num = . if Name == "Patrick Joseph Mcgovern" & year < 2013
+> 
+> replace Age_num = . if Name == "Paul Milstein" & year < 2009
+> 
+> replace Age_num = . if Name == "Preston Robert Tisch" & year < 2005
+> 
+> replace Age_num = . if Name == "Richard Mellon Scaife" & year < 2013
+> 
+> replace Age_num = . if Name == "S Robson Walton" & year < 2017
+> 
+> replace Age_num = . if Name == "Samuel Irving Newhouse" & year < 2016
+> 
+> replace Age_num = . if Name == "Samuel Zell" & year < 2017
+> 
+> replace Age_num = . if Name == "Scott Duncan" & year < 2017
+> 
+> replace Age_num = . if Name == "Sergey Brin" & year < 2017
+> 
+> replace Age_num = . if Name == "Sheldon Adelson" & year < 2017
+> 
+> replace Age_num = . if Name == "Sheldon Henry Solow" & year < 2017
+> 
+> replace Age_num = . if Name == "Sid Richardson Bass" & year < 2017
+> 
+> replace Age_num = . if Name == "Stanley Druckenmiller" & year < 2017
+> 
+> replace Age_num = . if Name == "Stephen A Schwarzman" & year < 2017
+> 
+> replace Age_num = . if Name == "Stephen A Wynn" & year < 2017
+> 
+> replace Age_num = . if Name == "Stephen Ross" & year < 2017
+> 
+> replace Age_num = . if Name == "Steve Ballmer" & year < 2017
+> 
+> replace Age_num = . if Name == "Steven A Cohen" & year < 2017
+> 
+> replace Age_num = . if Name == "Steven Allan Spielberg" & year < 2017
+> 
+> replace Age_num = . if Name == "Steven Udvar-Hazy" & year < 2017
+> 
+> replace Age_num = . if Name == "Stewart Rahr" & year < 2017
+> 
+> replace Age_num = . if Name == "Sumner Murray Redstone" & year < 2017
+> 
+> replace Age_num = . if Name == "Theodore Nathan Lerner" & year < 2017
+> 
+> replace Age_num = . if Name == "Thomas F Frist" & year < 2017
+> 
+> replace Age_num = . if Name == "Thomas J Pritzker" & year < 2017
+> 
+> replace Age_num = . if Name == "Trevor Rees-Jones" & year < 2017
+> 
+> replace Age_num = . if Name == "Warren Stephens" & year < 2017
+> 
+> replace Age_num = . if Name == "Whitney Macmillan" & year < 2017
+> 
+> replace Age_num = . if Name == "William Bernard Ziff" & year < 1994
+> 
+> replace Age_num = . if Name == "William Herbert Hunt" & year < 2017
+> 
+> replace Age_num = 75 if Name == "William Ingrahm Koch" & year == 2015
+> replace Age_num = . if Name == "William Ingrahm Koch" & year < 2015
+> 
+> replace Age_num = . if Name == "William Morse Davidson" & year < 2008
+> 
+> replace Age_num = . if Name == "William Wrigley" & year < 2017
+> }
+> 
+> 
+> ///Impute age for individual-year obs when we observe age for same individual in another year
+> sort nameid year
+> tsset nameid  year, yearly
+> sleep 1000
+> foreach lag of num 1/36 {
+>         replace Age_num = L`lag'.Age_num + (year - L`lag'.year) if Age_num==. & L`lag'.Age_num ~=.
+> }
+> foreach lag of num 1/36 {
+>         replace Age_num = F`lag'.Age_num + (year - F`lag'.year) if Age_num==. & F`lag'.Age_num ~=.
+> }
+> replace Age_num = . if Age_num > 110
+> replace Age_num = 96 if Age_num>=96 & Age_num~=.  //lumping together for graphing purposes
+> 
+> gen flag = 0
+> replace flag = 1 if (Age_num ~= L.Age_num+1) & (L.Age_num~=. & Age_num~=.)
+> tab Name if flag == 1
+> 
+> drop if Age_num==.
+> tab Age_num
+> gen old = 0 if Age_num~=.
+> replace old = 1 if Age_num >= 65 & Age_num~=.
+> gen old60 = 0 if Age_num~=. 
+> replace old60 = 1 if Age_num >= 60 & Age_num~=. 
+> gen old70 = 0 if Age_num~=. & inrange(Age_num,65,69)==0
+> replace old70 = 1 if Age_num >= 70 & Age_num~=.
+> gen old75 = 0 if Age_num~=. & inrange(Age_num,65,74)==0
+> replace old75 = 1 if Age_num >= 75 & Age_num~=.
+> gen footloose = (our_wealthy | old)
+> label variable Age_num "Age"
+> gen wealth = (NetWorthMill/1000)/cpi
+> label variable wealth "Net Worth (billions, 2017 dollars)"
+> 
+> drop if inrange(year,2002,2002)  // no location for Forbes 400 in 2002...and possibly exclude phase-out period
+> 
+> gen post=(year>`postyear')
+> gen AgeXpost = Age_num*post
+> label variable post "post-`postyear'"
+> label variable AgeXpost "Age X post-`postyear'"
+> label variable Age_num "Age"
+> encode abbr, gen(statenum)
+> 
+> 
+> drop _m
+> merge 1:1 Name year Forbes_Rank using "stata_data\Forbes_2015_top_100_companies.dta", keep(1 3) keepusing(company* officer* company_
+> location*) gen(from_company)
+> 
+> ******** construct officer_tied = 1 if any officer* are non-missing AND Residence==company_location* 
+> generate company_state = substr(company_location,-2,2)
+> generate company_state_2 = substr(company_location_2,-2,2)
+> generate company_state_3 = substr(company_location_3,-2,2)
+> generate company_tied = .
+> replace company_tied = 0 if from_company==3
+> replace company_tied = 1 if from_company==3 & abbr==company_state
+> 
+> save ./stata_data/IndivAnalysisDataset.dta, replace
+> */
+. 
+. use ./stata_data/IndivAnalysisDataset.dta, clear
+. stop
+command stop is unrecognized
+r(199);
+. 
+. 
+. /// GET STATE*YEAR DATA ON PIT RATES TO MERGE IN BELOW
+> use stata_data/State_Max_Tax_Rates.dta, clear
+. rename Year year
+. rename State_ID irsstatecode
+. merge m:1 irsstatecode using stata_data/irscode_fips_xwalk.dta
+. rename stateabbrev abbr
+. rename fips statefips
+. drop irsstatecode statefips
+. sort abbr year
+. tempfile PIT
+. save `PIT'
+. 
+. /// Get state CIT rates
+> use stata_data/CIT_rates.dta, clear
+. rename Year year
+. keep year State state_tax
+. rename state_tax CIT_rate
+. label var CIT_rate "state corp income tax rate"
+. tempfile CIT
+. save `CIT'
+. 
+. //Import CEPR/CPS data (h/t Olivia Lofton) on state-year population for top 3%, top 10%, and total
+. use "stata_data/styr_pop_by_wpctile.dta", clear
+. drop state
+. rename st_string State
+. gen pop_90to97 = (pop_above90 - pop_above97)/1000
+. label var pop_above90 "State population with earnings in top 10% nationally (from CPS)"
+. label var pop_above97 "State population with earnings in top 3% nationally (from CPS)"
+. label var pop_total "State population (thous)(from CPS)"
+. label var pop_90to97 "State population with earnings between top 10% and 3% nationally (from CPS)"
+. tempfile toppop
+. save `toppop'
+. 
+. use "stata_data/styr_pop_by_wpctile_young.dta", clear
+. append using "stata_data/styr_pop_by_wpctile_old.dta", gen(old)
+. drop state
+. rename st_string State
+. gen pop_90to97 = (pop_above90 - pop_above97)/1000
+. label var pop_above90 "State population with earnings in top 10% nationally (from CPS)"
+. label var pop_above97 "State population with earnings in top 3% nationally (from CPS)"
+. label var pop_total "State population (thous)(from CPS)"
+. label var pop_90to97 "State population with earnings between top 10% and 3% nationally (from CPS)"
+. tempfile toppop_old
+. save `toppop_old'
+. 
+. /// CREATE STATE*YEAR PANEL DATA SET
+> use ./stata_data/IndivAnalysisDataset.dta, clear
+. gcollapse (count) stock=nameid (sum) wealth NetWorthMill (mean) pop_change gdp_change gdp Age_num cpi, by(year abbr)
+. label variable stock "Population of Forbes 400"
+. label variable Age_num "Age"
+. label variable wealth "Net Worth (billions 2017 dollars)"
+. label variable NetWorthMill "Net Worth of Forbes 400 (billions nom. dollars)"
+. 
+. 
+. /// Add observations for AK, which had no billionaires over the entire sample period
+> insobs 1, before(1)
+. replace abbr = "AK" if _n==1
+. replace year = 1982 if abbr=="AK"
+. 
+. fillin abbr year
+. replace wealth = 0 if _fillin | abbr=="AK"
+. replace stock = 0 if _fillin | abbr=="AK"
+. 
+. merge 1:1 abbr year using stata_data/popEI.dta, keep(1 3) nogen
+. label variable EI "Estate Tax Indicator"
+. 
+. merge 1:1 abbr year using `PIT', nogen keep(1 3)
+. gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+. label variable avg "Top PIT Rate"
+. 
+. merge 1:1 State year using `CIT', nogen keep(1 3)
+. merge 1:1 State year using `toppop', nogen keep(1 3)
+. merge 1:1 abbr year using `EI_Tax', nogen keep(1 3)
+. gen EIshare = EI_Tax/Total_Taxes
+. 
+. egen stateyear = group(abbr year)
+. sort abbr year
+. encode abbr, gen(statenum)
+. tsset statenum year, yearly
+. save ./stata_data/StateyearAnalysisDataset.dta, replace
+. 
+. preserve
+. gen EI_GDP = EI_Tax/(gdp)
+. line EI_Tax year if abbr=="NY"
+. restore
+. 
+. 
+. /// CREATE STATE*YEAR PANEL DATA SET FOR FORBES 100, 200, 300
+> foreach x of num 100 200 300 {
+  2.         use ./stata_data/IndivAnalysisDataset.dta, clear
+  3.         drop if ourrank>`x'
+  4.         gcollapse (count) stock=nameid (sum) wealth NetWorthMill (mean) pop_change gdp_change Age_num cpi, by(year abbr)
+  5.         label variable stock "Population of Forbes 200"
+  6.         label variable Age_num "Age"
+  7.         label variable wealth "Net Worth (billions 2017 dollars)"
+  8.         label variable NetWorthMill "Net Worth of Forbes 200 (billions nom. dollars)"
+  9.         
+.         /// Add observations for AK, which had no billionaires over the entire sample period
+>         insobs 1, before(1)
+ 10.         replace abbr = "AK" if _n==1
+ 11.         replace year = 1982 if abbr=="AK"
+ 12. 
+.         fillin abbr year
+ 13.         replace wealth = 0 if _fillin | abbr=="AK"
+ 14.         replace stock = 0 if _fillin | abbr=="AK"
+ 15. 
+.         merge 1:1 abbr year using stata_data/popEI.dta, keep(1 3) nogen
+ 16.         label variable EI "Estate Tax Indicator"
+ 17. 
+.         merge 1:1 abbr year using `PIT', nogen keep(1 3)
+ 18.         gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+ 19.         label variable avg "Top PIT Rate"
+ 20. 
+.         merge 1:1 abbr year using `EI_Tax', nogen keep(1 3)
+ 21.         gen EIshare = EI_Tax/Total_Taxes
+ 22. 
+.         egen stateyear = group(abbr year)
+ 23.         sort abbr year
+ 24.         encode abbr, gen(statenum)
+ 25.         tsset statenum year, yearly
+ 26.         save ./stata_data/StateyearTop`x'AnalysisDataset.dta, replace
+ 27. }
+. /// CREATE STATE*YEAR PANEL DATA SET FOR FORBES INDIVIDUAL WITH AT LEAST 10 OBSERVATIONS
+> use ./stata_data/IndivAnalysisDataset.dta, clear
+. egen obs = count(year), by(nameid)
+. keep if obs>=10
+. gcollapse (count) stock=nameid (sum) wealth NetWorthMill (mean) pop_change gdp_change Age_num cpi, by(year abbr)
+. label variable stock "Population of Forbes 400"
+. label variable Age_num "Age"
+. label variable wealth "Net Worth (billions 2017 dollars)"
+. label variable NetWorthMill "Net Worth of Forbes 400 (billions nom. dollars)"
+. 
+. 
+. /// Add observations for AK, which had no billionaires over the entire sample period
+> insobs 1, before(1)
+. replace abbr = "AK" if _n==1
+. replace year = 1982 if abbr=="AK"
+. 
+. fillin abbr year
+. replace wealth = 0 if _fillin | abbr=="AK"
+. replace stock = 0 if _fillin | abbr=="AK"
+. 
+. merge 1:1 abbr year using stata_data/popEI.dta, keep(1 3) nogen
+. label variable EI "Estate Tax Indicator"
+. 
+. merge 1:1 abbr year using `PIT', nogen keep(1 3)
+. gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+. label variable avg "Top PIT Rate"
+. 
+. merge 1:1 abbr year using `EI_Tax', nogen keep(1 3)
+. gen EIshare = EI_Tax/Total_Taxes
+. 
+. egen stateyear = group(abbr year)
+. sort abbr year
+. encode abbr, gen(statenum)
+. tsset statenum year, yearly
+. save ./stata_data/Stateyear10obsAnalysisDataset.dta, replace
+. 
+. 
+. /// CREATE STATE*YEAR*AGE PANEL DATA SET
+> use ./stata_data/IndivAnalysisDataset.dta, clear
+. gcollapse (count) stock=nameid (sum) wealth NetWorthMill (mean) pop_change gdp_change cpi, by(year abbr Age_num)
+. label variable stock "Population of Forbes 400"
+. label variable Age_num "Age"
+. label variable wealth "Net Worth of Forbes 400 (billions 2017 dollars)"
+. label variable NetWorthMill "Net Worth of Forbes 400 (billions nom. dollars)"
+. 
+. /// Add observation AK, which had no billionaires over the entire sample period
+> insobs 1, before(1)
+. replace abbr = "AK" if _n==1
+. replace year = 1982 if abbr=="AK"
+. replace Age_num = 96 if abbr=="AK"
+. fillin abbr year Age_num
+. 
+. replace wealth = 0 if _fillin | abbr=="AK"
+. replace stock = 0 if _fillin | abbr=="AK"
+. merge m:1 abbr year using stata_data/popEI.dta, nogen keep(1 3)
+. 
+. merge m:1 abbr year using `PIT', nogen keep(1 3)
+. gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+. label variable avg "Top PIT Rate"
+. 
+. encode abbr, gen(statenum)
+. egen stateyear = group(abbr year)
+. save ./stata_data/StateyearAgeAnalysisDataset.dta, replace
+. 
+. 
+. /// CREATE STATE*YEAR*OLD PANEL DATA SET
+> foreach v in old old60 old70 old75 {
+  2.         use ./stata_data/IndivAnalysisDataset.dta, clear
+  3.         drop if `v'==.
+  4.         gcollapse (count) stock=nameid (sum) wealth (mean) stateyear pop_change gdp_change, by(year abbr `v')
+  5.         rename `v' old
+  6. 
+.         /// Add observations for AK, which had no billionaires over the entire sample period
+>         insobs 1, before(1)
+  7.         replace abbr = "AK" if _n==1
+  8.         replace year = 1982 if abbr=="AK"
+  9.         replace old = 0 if abbr=="AK"
+ 10.         fillin abbr year old
+ 11.         replace wealth = 0 if _fillin | abbr=="AK"
+ 12.         replace stock = 0 if _fillin | abbr=="AK"
+ 13. 
+.         merge m:1 abbr year using stata_data/popEI.dta, nogen keep(1 3)
+ 14.         label variable EI "Estate Tax Indicator"
+ 15.         merge m:1 abbr year using `PIT', nogen keep(1 3)
+ 16.         gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+ 17.         label variable avg "Top Personal Income Tax (PIT) Rate"
+ 18.         merge 1:1 State year old using `toppop_old', nogen keep(1 3)
+ 19. 
+.         gen post=(year>`postyear')
+ 20.         label variable EI "ET-state"
+ 21.         label variable post "post-`postyear'"
+ 22.         gen EIxPost = EI*post
+ 23.         label variable EIxPost "ET-state X post-`postyear'"
+ 24.         gen avgxPost = avg*post
+ 25.         label variable avgxPost "PIT X post-`postyear'"
+ 26.         gen EIratecombinedxPost = EIratecombined*post
+ 27.         label variable EIratecombinedxPost "ET rate X post-`postyear'"
+ 28.         gen EIxold = EI*old
+ 29.         label variable EIxold "ET-state X old"
+ 30.         gen avgxold = avg*old
+ 31.         label variable avgxold "PIT X old"
+ 32.         gen oldxPost = old*post
+ 33.         label variable oldxPost "old X post-`postyear'"
+ 34.         gen EIxPostxold = EI*post*old
+ 35.         label variable EIxPostxold "ET-state X post-`postyear' X old"
+ 36.         gen avgxPostxold = avg*post*old
+ 37.         label variable avgxPostxold "PIT X post-`postyear' X old"
+ 38.         gen EIratecombinedxPostxold = EIratecombined*post*old
+ 39.         label variable EIratecombinedxPostxold "ET rate X post-`postyear' X old"
+ 40.         egen stateold = group(abbr old)
+ 41. 
+.         encode abbr, gen(statenum)
+ 42.         tsset stateold year, yearly
+ 43.         save ./stata_data/Stateyear`v'AnalysisDataset.dta, replace
+ 44. }
+.         
+. /// CREATE STATE*YEAR*OLD PANEL DATA SET FOR TOP 100, 200, AND 300
+> foreach x of num 100 200 300 {
+  2.         use ./stata_data/IndivAnalysisDataset.dta, clear
+  3.         drop if ourrank>`x'     
+  4.         gcollapse (count) stock=nameid (sum) wealth (mean) stateyear pop_change gdp_change, by(year abbr old)
+  5. 
+.         /// Add observations for AK, which had no billionaires over the entire sample period
+>         insobs 1, before(1)
+  6.         replace abbr = "AK" if _n==1
+  7.         replace year = 1982 if abbr=="AK"
+  8.         replace old = 0 if abbr=="AK"
+  9.         fillin abbr year old
+ 10.         replace wealth = 0 if _fillin | abbr=="AK"
+ 11.         replace stock = 0 if _fillin | abbr=="AK"
+ 12. 
+.         merge m:1 abbr year using stata_data/popEI.dta, nogen keep(1 3)
+ 13.         label variable EI "Estate Tax Indicator"
+ 14.         merge m:1 abbr year using `PIT', nogen keep(1 3)
+ 15.         gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+ 16.         label variable avg "Top PIT Rate"
+ 17. 
+.         gen post=(year>`postyear')
+ 18.         label variable EI "ET-state"
+ 19.         label variable post "post-`postyear'"
+ 20.         gen EIxPost = EI*post
+ 21.         label variable EIxPost "ET-state X post-`postyear'"
+ 22.         gen EIxold = EI*old
+ 23.         label variable EIxold "ET-state X old"
+ 24.         gen oldxPost = old*post
+ 25.         label variable oldxPost "old X post-`postyear'"
+ 26.         gen EIxPostxold = EI*post*old
+ 27.         label variable EIxPostxold "ET-state X post-`postyear' X old"
+ 28.         egen stateold = group(abbr old)
+ 29. 
+.         encode abbr, gen(statenum)
+ 30.         tsset stateold year, yearly
+ 31.         save ./stata_data/StateyearOldTop`x'AnalysisDataset.dta, replace
+ 32. }
+. 
+. /// CREATE STATE*YEAR*OLD PANEL DATA SET FOR FORBES INDIVIDUAL WITH AT LEAST 10 OBSERVATIONS
+> use ./stata_data/IndivAnalysisDataset.dta, clear
+. egen obs = count(year), by(nameid)
+. keep if obs>=10
+. gcollapse (count) stock=nameid (sum) wealth (mean) stateyear pop_change gdp_change, by(year abbr old)
+. 
+. /// Add observations for AK, which had no billionaires over the entire sample period
+> insobs 1, before(1)
+. replace abbr = "AK" if _n==1
+. replace year = 1982 if abbr=="AK"
+. replace old = 0 if abbr=="AK"
+. fillin abbr year old
+. replace wealth = 0 if _fillin | abbr=="AK"
+. replace stock = 0 if _fillin | abbr=="AK"
+. 
+. merge m:1 abbr year using stata_data/popEI.dta, nogen keep(1 3)
+. label variable EI "Estate Tax Indicator"
+. merge m:1 abbr year using `PIT', nogen keep(1 3)
+. gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+. label variable avg "Top PIT Rate"
+. 
+. gen post=(year>`postyear')
+. label variable EI "ET-state"
+. label variable post "post-`postyear'"
+. gen EIxPost = EI*post
+. label variable EIxPost "ET-state X post-`postyear'"
+. gen EIxold = EI*old
+. label variable EIxold "ET-state X old"
+. gen oldxPost = old*post
+. label variable oldxPost "old X post-`postyear'"
+. gen EIxPostxold = EI*post*old
+. label variable EIxPostxold "ET-state X post-`postyear' X old"
+. egen stateold = group(abbr old)
+. 
+. encode abbr, gen(statenum)
+. tsset stateold year, yearly
+. save ./stata_data/StateyearOld10obsAnalysisDataset.dta, replace
+. 
+. /// CREATE STATE*YEAR*OLD UNDER-40 PANEL DATA SET
+> use ./stata_data/IndivAnalysisDataset.dta, clear
+. keep if Age_num>=40
+. gcollapse (count) stock=nameid (sum) wealth (mean) stateyear pop_change gdp_change, by(year abbr old)
+. 
+. /// Add observation AK, which had no billionaires over the entire sample period
+> insobs 1, before(1)
+. replace abbr = "AK" if _n==1
+. replace year = 1982 if abbr=="AK"
+. replace old = 0 if abbr=="AK"
+. 
+. fillin abbr year old
+. replace wealth = 0 if _fillin | abbr=="AK"
+. replace stock = 0 if _fillin | abbr=="AK"
+. 
+. merge m:1 abbr year using stata_data/popEI.dta, nogen keep(1 3)
+. label variable EI "Estate Tax Indicator"
+. merge m:1 abbr year using `PIT', nogen keep(1 3)
+. gen avg = (State_Rate_Wages + State_Rate_Long_Gains)/2
+. label variable avg "PIT"
+. 
+. gen post=(year>`postyear')
+. label variable EI "ET-state"
+. label variable post "post-`postyear'"
+. gen EIxPost = EI*post
+. label variable EIxPost "ET-state X post-`postyear'"
+. gen EIxold = EI*old
+. label variable EIxold "ET-state X old"
+. gen EIxPostxold = EI*post*old
+. label variable EIxPostxold "ET-state X post-`postyear' X old"
+. gen oldxPost = old*post
+. label variable oldxPost "old X post-`postyear'"
+. egen stateold = group(abbr old)
+. 
+. gen avgxold = avg*old
+. label variable avgxold "PIT X old"
+. gen avgxPostxold = avg*post*old
+. label variable avgxPostxold "PIT X post-`postyear' X old"
+. gen avgxPost = avg*post
+. label variable avgxPost "PIT X post-`postyear'"
+. 
+. encode abbr, gen(statenum)
+. tsset stateold year, yearly     
+. save ./stata_data/StateyearOldU40AnalysisDataset.dta, replace
+. }  //end BuildData IF code
+r(199);
+
+end of do-file
+
+r(199);
+
+. keep nameid wealth NetWorthMill pop_change gdp_change gdp Age_num cpi year abbr old old60 old70 old75 ourrank stateyear
+
+. exit, clear
