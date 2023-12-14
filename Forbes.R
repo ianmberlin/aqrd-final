@@ -7,53 +7,106 @@ library(gt)
 library(readxl)
 library(fuzzyjoin)
 library(usethis)
+library(panelView)
 
-forbes <- read_dta("data/brookings_forbes_2022.dta")
+# Load Files
 state_year<- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
 state_year_age <- read_dta("ReplicationPackage/data/stata_data/StateyearAgeAnalysisDataset.dta")
-person_year <- read_dta("ReplicationPackage/data/stata_data/IndivAnalysisDataset.dta") |>
+person_year_orig <- read_dta("ReplicationPackage/data/stata_data/IndivAnalysisDataset.dta") 
+
+
+person_year <- person_year_orig |>
   rename(name = Name) |>
-  filter(year != "1982")
+  filter(!year %in% c("1982", "1984"))
 
-dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members, 2017 end.xlsx")
+dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members.xlsx")
 
+## Fuzzy Matching ----
 dynasty_clean <- dynastic |>
   filter(dynasty_binary != "") |>
   mutate(dynasty_binary = as.character(dynasty_binary)) |> 
   select(!"Grand Total") |>
-  mutate(name = gsub("(Child|Spouse).*", "", name))
-
-moretti_names <- person_year |>
-  select(name) |>
-  unique()
-
-
-dynasty_long <- dynastic |>
-  filter(dynasty_binary != "") |> 
-  mutate(dynasty_binary = as.character(dynasty_binary)) |> 
-  select(!"Grand Total") |> 
+  mutate(name = gsub("(Child|Spouse).*", "", name)) |>
   pivot_longer(cols = !c("name", "dynasty_binary"),
                names_to = "year",
                values_to = "NetWorth") |>
   filter(NetWorth != "",
-         !year %in% c("2018", "2019", "2020")) |>
-  mutate(NetWorthMill = NetWorth/1000000) 
+         !year %in% c("2002", "2018", "2019", "2020")) |>
+  pivot_wider(id_cols = c("name", "dynasty_binary"),
+              names_from = year,
+              values_from = NetWorth,
+              names_sort = TRUE) |>
+  select(c("name", "dynasty_binary"))
+
+moretti_names <- person_year |>
+  arrange(lastname) |>
+  select(name) |>
+  unique()
 
 
-
-join <- stringdist_inner_join(dynasty_clean, moretti_names, 
+join <- stringdist_join(moretti_names, dynasty_clean,
                 by='name',
-                max_dist = 3) |>
-  select(c("name.x", "name.y", "dynasty_binary"))
+                method = "lv",
+                mode = "inner",
+                max_dist = 1,
+                distance_col = 'dist') |>
+  select(c("name.x", "name.y", "dynasty_binary", "dist"))
   
-  
-  #match based on tea) |>
 
-?stringdist_inner_join
+dynasty_long <- dynastic |>
+  filter(dynasty_binary != "") |>
+  mutate(dynasty_binary = as.character(dynasty_binary)) |> 
+  select(!"Grand Total") |>
+  mutate(name = gsub("(Child|Spouse).*", "", name)) |>
+  pivot_longer(cols = !c("name", "dynasty_binary"),
+               names_to = "year",
+               values_to = "NetWorth") |>
+  filter(NetWorth != "",
+         !year %in% c("2002", "2018", "2019", "2020")) |>
+  mutate(NetWorthMill = NetWorth/1000000)
+
+distance_join(person_year, dynasty_long,
+              by = join_by(name, year, NetWorthMill),
+              mode = "inner",
+              max_dist = 1,
+              distance_col = "dist")
+
+
 #test for git 
 
+# Panel View
+
+state_year |>
+  panelview(stock ~ EI,
+            index = c("State", "year"),
+            axis.lab.gap = c(1,0),
+            xlab = "",
+            ylab = "",
+            main = "Estate Tax",
+            leave.gap = TRUE)
+
+?panelview
+
+test <- state_year |>
+  group_by(year) |>
+  count()
 
 ## Replication attempt ----
+
+# Figure 5.
+
+person_year_orig <- person_year_orig |> 
+  group_by(State) |>
+  mutate(EI2001 = if_else(any(year == 2001 & EI == 1), 1, 0)) |>
+  ungroup()
+
+
+person_year_orig |>
+  group_by(year) |>
+  summarize(share = mean(EI2001)*100) |>
+  ggplot(aes(x = year, y = share)) +
+  geom_line()
+
 
 state_year <- state_year |>
   mutate(post_year = if_else(year > 2001, 1, 0)) |>
@@ -67,8 +120,6 @@ state_year <- state_year |>
   mutate(wealth_share = (wealth/total_wealth)*100) |>
   mutate(stockpc = (stock/pop)*1000) |>
   mutate(inheritance_estate = if_else(EI == 1 | Ionly == 1, 1, 0))
-
-state_year$Ionly
 
 mod1 <- feols(stock ~ EI*post_year + EI  | State + year, state_year)
 mod2 <- feols(stock ~ EI*post_year + EI + PIT*post_year + PIT | State + year, state_year)
