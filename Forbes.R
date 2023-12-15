@@ -8,6 +8,7 @@ library(readxl)
 library(fuzzyjoin)
 library(usethis)
 library(panelView)
+library(patchwork)
 
 # Load Files
 state_year<- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
@@ -98,16 +99,58 @@ test <- state_year |>
 person_year_orig <- person_year_orig |> 
   group_by(State) |>
   mutate(EI2001 = if_else(any(year == 2001 & EI == 1), 1, 0)) |>
-  ungroup()
+  ungroup() |>
+  mutate(prepost = case_when(year < 2001 ~ 0,
+                             year > 2001 ~ 1))
 
+mean <- person_year_orig |>
+  group_by(prepost) |>
+  summarize(mean = mean(EI2001)*100)
 
 person_year_orig |>
   group_by(year) |>
   summarize(share = mean(EI2001)*100) |>
   ggplot(aes(x = year, y = share)) +
-  geom_line()
+  geom_line() +
+  geom_segment(aes(x = 1983, y = 21.4, xend = 2001, yend = 21.4), 
+               linetype = "dashed", color = "red") +
+  geom_segment(aes(x = 2002, y = 17.4, xend = 2017, yend = 17.4), 
+               linetype = "dashed", color = "red") +
+  geom_vline(xintercept = 2001) +
+  annotate("rect",xmin = 2001, xmax = 2004, ymin = -Inf, ymax = Inf, alpha = .5) +
+  scale_y_continuous(limits =c(0,30),
+                     breaks = seq(0, 30, by = 5)) +
+  labs(x = "Year",
+       y = "Percentage")
 
+# Figure 6
 
+trend_pre <- person_year_orig |> 
+  filter(Age_num > 40,
+         Age_num <= 85,
+         year <= 2001) |>
+  group_by(Age_num) |>
+  summarize(share = mean(EI)) |>
+  ggplot(aes(x = Age_num, y = share)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = F, color = "darkred") +
+  scale_y_continuous(limits = c(0, .5))
+
+trend_post <- person_year_orig |> 
+  filter(Age_num > 40,
+         Age_num <= 85,
+         year > 2001) |>
+  group_by(Age_num) |>
+  summarize(share = mean(EI)) |>
+  ggplot(aes(x = Age_num, y = share)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = F, color = "darkred") +
+  scale_y_continuous(limits = c(0, .5))
+
+# combine graphs
+trend_pre + trend_post
+
+# Table 2
 state_year <- state_year |>
   mutate(post_year = if_else(year > 2001, 1, 0)) |>
   mutate(PIT = avg*100) 
@@ -121,23 +164,24 @@ state_year <- state_year |>
   mutate(stockpc = (stock/pop)*1000) |>
   mutate(inheritance_estate = if_else(EI == 1 | Ionly == 1, 1, 0))
 
-mod1 <- feols(stock ~ EI*post_year + EI  | State + year, state_year)
+mod1 <- feols(stock ~  EI*post_year | State + year, state_year)
 mod2 <- feols(stock ~ EI*post_year + EI + PIT*post_year + PIT | State + year, state_year)
 mod3 <- feols(stock ~ EI*post_year + EI + topshr_90to97  | State + year, state_year)
 mod5 <- feols(stockpc ~ EI*post_year + EI  | State + year, state_year)
 mod6 <- feols(wealth ~ EI*post_year + EI  | State + year, state_year)
 mod7 <- feols(stock ~ inheritance_estate*post_year + inheritance_estate | State + year, state_year)
 
+summary(mod1)
+
 summary(mod7)
 #create dataset without 2002-2004
 state_year_drop <- state_year|>
-  filter(year != "2002",
-         year != "2003",
-         year != "2004")
+  filter(!year %in% c("2002", "2003", "2004"))
 
 mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
 
-
+modelsummary(list(mod1, mod2, mod3, mod5, mod8),
+             gof_map = c("nobs", "FE: State", "FE: year"))
 modelsummary(list(mod1, mod2, mod3, mod5, mod6, mod7, mod8), gof_map = c("nobs", "FE: State", "FE: year"))
 
 
