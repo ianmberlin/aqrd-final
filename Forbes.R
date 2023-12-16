@@ -9,18 +9,25 @@ library(fuzzyjoin)
 library(usethis)
 library(panelView)
 library(patchwork)
+library(zoomerjoin)
+
+install.packages(
+  'zoomerjoin',
+  repos = c('https://beniaminogreen.r-universe.dev', getOption("repos"))
+)
 
 # Load Files
 state_year<- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
 state_year_age <- read_dta("ReplicationPackage/data/stata_data/StateyearAgeAnalysisDataset.dta")
 person_year_orig <- read_dta("ReplicationPackage/data/stata_data/IndivAnalysisDataset.dta") 
 
-
 person_year <- person_year_orig |>
   rename(name = Name) |>
-  filter(!year %in% c("1982", "1984"))
+  filter(!year %in% c("1982", "1984")) |>
+  mutate(across(where(is.character), str_trim))
 
-dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members.xlsx")
+dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members.xlsx") |>
+  mutate(across(where(is.character), str_trim))
 
 ## Fuzzy Matching ----
 dynasty_clean <- dynastic |>
@@ -44,6 +51,23 @@ moretti_names <- person_year |>
   select(name) |>
   unique()
 
+dynasty_clean <- dynasty_clean |>
+  mutate(name_lower = tolower(name))
+
+moretti_names <- moretti_names |>
+  mutate(name_lower = tolower(name))
+
+join <- jaccard_inner_join(moretti_names, dynasty_clean,
+                   by = c("name_lower" = "name_lower"), # THE TWO COLUMN NAMES # but make both lowercase first
+                   n_gram_width = 2,
+                   band_width = 5, 
+                   n_bands = 100, 
+                   threshold = .7,
+                   similarity_column = "dist") |>
+  arrange(name.x) |>
+  mutate(moretti_is_na = ifelse(is.na(name.y), 1, 0))
+
+?jaccard_inner_join
 
 join <- stringdist_join(moretti_names, dynasty_clean,
                 by='name',
@@ -155,6 +179,10 @@ state_year <- state_year |>
   mutate(post_year = if_else(year > 2001, 1, 0)) |>
   mutate(PIT = avg*100) 
 
+mean_2017 <- state_year |>
+  filter(year == 2017) |>
+  summarize(mean = mean(wealth))
+
 state_year <- state_year |>
   group_by(year) |>
   mutate(pop_90to97_natl = sum(pop_90to97)) |>
@@ -162,25 +190,26 @@ state_year <- state_year |>
   mutate(total_wealth = sum(wealth)) |>
   mutate(wealth_share = (wealth/total_wealth)*100) |>
   mutate(stockpc = (stock/pop)*1000) |>
-  mutate(inheritance_estate = if_else(EI == 1 | Ionly == 1, 1, 0))
+  mutate(inheritance_estate = if_else(EI == 1 | Ionly == 1, 1, 0)) |>
+  mutate(wealth_deflated = if_else(year>2001, wealth/52.1, wealth))
+
+wealth
+
 
 mod1 <- feols(stock ~  EI*post_year | State + year, state_year)
-mod2 <- feols(stock ~ EI*post_year + EI + PIT*post_year + PIT | State + year, state_year)
-mod3 <- feols(stock ~ EI*post_year + EI + topshr_90to97  | State + year, state_year)
-mod5 <- feols(stockpc ~ EI*post_year + EI  | State + year, state_year)
-mod6 <- feols(wealth ~ EI*post_year + EI  | State + year, state_year)
+mod2 <- feols(stock ~ EI*post_year  + PIT*post_year + PIT | State + year, state_year)
+mod3 <- feols(stock ~ EI*post_year + topshr_90to97  | State + year, state_year)
+mod5 <- feols(stockpc ~ EI*post_year | State + year, state_year)
+mod6 <- feols(wealth_deflated ~ EI*post_year | State + year, state_year)
 mod7 <- feols(stock ~ inheritance_estate*post_year + inheritance_estate | State + year, state_year)
 
-summary(mod1)
-
-summary(mod7)
 #create dataset without 2002-2004
 state_year_drop <- state_year|>
   filter(!year %in% c("2002", "2003", "2004"))
 
 mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
 
-modelsummary(list(mod1, mod2, mod3, mod5, mod8),
+modelsummary(list(mod1, mod2, mod3, mod5, mod6, mod8),
              gof_map = c("nobs", "FE: State", "FE: year"))
 modelsummary(list(mod1, mod2, mod3, mod5, mod6, mod7, mod8), gof_map = c("nobs", "FE: State", "FE: year"))
 
