@@ -14,78 +14,81 @@ format:
     include-in-header: header.tex
 bibliography: aqrd-bibliography.bib
 abstract: | 
-  Recent studies have shown that wealth among the 400 richest Americans — the _Forbes_ 400 — has grown increasingly concentrated among individuals who inherited their wealth.  At the same time, these individuals tend to be more stable within the Forbes 400 over time.  One potential explination for this divergence could be that individuals who belong to dynastic fortunes are better able to collude to avoid state level estate taxes. Building off of [@moretti2023], I replicate their findings that billionaires are generally sensitive to estate taxes and move between states to avoid taxation, but find that there is no difference in the rate of movement depending on whether and invidiaul belongs to a dynasty or not.  
+  Recent studies have shown that wealth among the 400 richest Americans — the _Forbes_ 400 — has grown increasingly concentrated among individuals who inherited their wealth.  At the same time, these individuals tend to be more stable within the Forbes 400 over time.  One potential explination for this divergence could be that individuals who belong to dynastic fortunes are better able to collude to avoid state level estate taxes. Building off of @moretti_taxing_2023, I replicate their findings that billionaires are generally sensitive to estate taxes and move between states to avoid taxation, but find that there is no difference in the rate of movement depending on whether and invidiaul belongs to a dynasty or not.  
 ---
 
 # Introduction
 
-Economic inequality is one of the biggest problems plaguing today's world. The richest 1% of people own almost 46% of the world's wealth while 55% of adults have less than \$10,000; more than half of the world owns only 1.3% of its wealth.[^1] 
-One proposed mechanism for addressing growing economic inequality is inheritance taxation. Some politicians have suggested that it can raise revenue and reduce inequality of opportunity for future generations, especially when the wealthiest citizens are taxed at higher rates [@wilson2023]. **SK: This paragraph uses a footnote and a citation.**
+American's billionaires are growing increasingly older (see CITE.)  Not only has billionaire wealth been growing steadily over time, wealth concentration has grown increasingly strong among the richest Americans as well [@saez_progressive_2019].  As these billionaires die, they will transfer trillions/hundreds of billions of dollars in wealth to their heirs — and many of them will do it tax free.  Plus, thanks to the stepped-up-basis, which resets the basis for capital gains at death, billions of dollars in capital gains will pass to the next generation with no ability to tax them.  
 
-[^1]: "Global Inequality." 2022. *Inequality.org*. <https://inequality.org/facts/global-inequality/>.
+Ultimately, a progressive estate tax target at the richest estates represents the best chance for fairly taxing a population that is notorious difficult to tax as a result of countless loopholes in the tax code.  Understanding how billionaires respond to an estate tax is essential as both individual states and the federal government contend with how best to design taxes ahead of a large wave of expected billionaire deaths.  In this study, I replicate evidence from @moretti_taxing_2023 that billionaires are highly sensitive to how much they pay in estate taxes in deciding where to live.  While Moretti and Wilson go on to show that this effect is much stronger for billionaires above 65 — who are much more actively engaged in estate planning — I instead look at whether or not individuals belonging to dynastic family fortunes behave differently in response to estate taxes.  I find that at least in terms of interstate migration, dynastic fortunes do not behave significantly differently than non-dynastic fortunes.  
 
-There is some disagreement about what political factors influence redistributive taxes. Some studies find that democratization leads to increased taxation while others argue that democracy and economic redistribution are only related under certain political conditions . On the other hand, some argue that democratization does not increase redistributive taxes, including, who argue that mass mobilization is a main determinant of the implementation of inheritance taxation. Using universal male suffrage and competitive elections indicators, they do not find a positive relationship between democracy and the top rate of inheritance taxation. **SK: This paragraph uses multiple citations in a group. See <https://quarto.org/docs/authoring/footnotes-and-citations.html> for more.**
+The paper proceeds as follows: Section 2 provides a literature review and motivates the focus on dynastic wealth; Section 3 presents the data and methods; Section 4 presents the results and discussion; Section 5 concludes.  
+
+# Literature Review
+
+This paper attempts to pull together two recently emerging strands within the literature on extreme wealth.  In @korom_enduring_2017, the authors 
 
 # Data and Methods
 
-For the last 40 years, _Forbes_ magazine has published an annual list of the richest individuals in America, known collectively as the _Forbes_ 400.  Through a combination of interviews and public records research, reporters attempt to construct wealth estimates for the extremely wealthy, netting their assets against debt. These data, which include names, estimate wealth, and location, are published each year, and they have been collected and cleaned by [@moretti].  This includes "extensive cleaning of the name variable in order to track individuals longitudinally."  
+For the last 40 years, *Forbes* magazine has published an annual list of the richest individuals in America, known collectively as the *Forbes* 400. Through a combination of interviews and public records research, reporters attempt to construct wealth estimates for the extremely wealthy, netting their assets against debt. These data, which include names, estimate wealth, and location, are published each year, and they have been collected and cleaned by Moretti and Wilson [-@moretti_taxing_2023]. This includes "extensive cleaning of the name variable in order to track individuals longitudinally."
 
-By converting from person-year observations to state-year observations, the authors allow themselves to track the number of Forbes billionaires living in each state each year.  This structure lends itself well to a difference-in-difference (DiD) design that exploits the 2001 changes to the tax code represented by $$Y_{it} = \alpha + \beta_{1}ET_{i,t} + \beta_{2}Post + \delta ET_{i,t}\times Post + \eta_{i} + \theta_{t} + \epsilon_{it},$$ where $Y_{it}$ is the number of billionaires on the Forbes list living in state *i* in year *t*, *ET* is an indicator variable tracking whether a state has an estate tax currently enacted, *Post* is an indicator for whether the year is before or after 2001, $\eta_{i}$ controls for state fixed effects, $\theta_{t}$ controls for time fixed effects and $\epsilon_{it}$ is the error.
-
-
-
-
-They construct their own variable of dynastic fortunes, largely based off of the reported source by _Forbes_, combined with additional data from [@kaplan2013] that tracks whether an individual is the first generation, second generation _etc_. to appear on the _Forbes_ list. Meanwhile, [@fernholz2023] tracks every individual longitudinally on the _Forbes_ list, grouping them together into dynasties.  One shortcoming of this measure, however, is that they treat individuals who appear in the first year of the _Forbes_ list all as seeding their own dynasty, even if they are clearly related to each other (for example, some members of the DuPont or Rockefeller families are listed as belonging to their own distinct line).  
-
-To better capture whether individuals truly belong to a dynasty or not, I have chosen to collapse these differently seeded lines, and treat all members of the same family as belonging to a dynasty, employing extensive searches online to confirm relationships between members (i.e. how many, if any, of the various Smiths on the list are part of the same dynasty?).  After coding each member with a binary dynasty variable, I used a fuzzy matching technique to append this variable to the Moretti and Wilson [-@moretti] data set.  
-
-
-
-![Time Trends for Different Measures of Democratic Participation in the United Kingdom, 1816-2000](figures/image7.png){#fig-example width="50%"}
-
-Using data collected from V-Dem of the two new measures of democratization, joint with the data used by , I investigate the relationship between democracies that have given enough political power to their lower socioeconomic classes and redistributive taxation. I employ two main models. The first model uses a differences-in-differences approach that estimates the causal effect of democracy and wars of mass mobilization on inheritance taxation with an ordinary least squares regression represented by: $$T_{it} = \alpha + \beta_{1}D_{i,t - 1} + \beta_{2}W_{i,t - 1} + \gamma X_{i,t - 1} + \eta_{i} + \theta_{t} + \epsilon_{it},$$ where $T_{it}$ is the top inheritance tax rate for direct descendants for country *i* in year *t*.
-
-# Results
-
-@tbl-main shows the results of the regression. I find some evidence for the importance of considering inequities in access to power when investigating what causes increases in inheritance taxation. While inconsistent, some models find that the effect of the lagged Equal Access to Power index on top inheritance taxation is statistically significant.
-
-[**SK: The quarto code below puts in a figure into a markdown table and calls it a table. Inserting tables are more complicated than inserting figures, so a hack is to include the image of the table as I have done here. Alternatively, you can also ask R to generate tables in a .tex format and ask quarto read it in as a tex file. See Appendix.**]
-
-|                        |
-|:-----------------------|
-| ![](figures/image3.png) |
-
-: War Mobilization, Democracy, and Inheritance Taxation, 1816-2000 {#tbl-main}
-
-
-
-[**SK: Do not delete the two lines of quarto code that starts with `::: {#refs}`. This produces a list of references.**]
-
-::: {#refs}
-:::
-
-
-# Appendix {.appendix}
-
-
+Next, they link the *Forbes* list to state economic data, including estate tax rates, income tax rates, state GDP information, and population.  They also construct their own variable of dynastic fortunes, largely based off of the reported source by *Forbes*, combined with additional data from @kaplan_its_2013 that tracks whether an individual is the first generation, second generation *etc*. to appear on the *Forbes* list. Meanwhile, @fernholz_rising_2023 tracks every individual longitudinally on the *Forbes* list, grouping them together into dynasties. One shortcoming of this measure, however, is that they treat individuals who appear in the first year of the *Forbes* list all as seeding their own dynasty, even if they are clearly related to each other (for example, some members of the DuPont or Rockefeller families are listed as belonging to their own distinct line).  While @moretti_taxing_2023 collapse the generational information from @kaplan_its_2013 into a binary variable, it would be an fruitful area of future study to interrogate whether the results are robust to more finely grained measures of dynasty.  However, the Kaplan data only covers four years, limiting the availability of such a measure for the entire panel without building up a conceptually similar measure from scratch.  
 ```{=tex}
 \begin{table}
-\caption{\textbf{tex version of modelsummary output}}
-\label{tab:main-tex}
-\input{tables/scheve-regression.tex}
+\caption{\textbf{Summary Statistics (Individual-Year Data)}}
+\label{tbl-one}
+\input{tables/summarystats.tex}
 \end{table}
 ```
 
 
+To better capture whether individuals truly belong to a dynasty or not, I have chosen to collapse these differently seeded lines, and treat all members of the same family as belonging to a dynasty, employing extensive searches online to confirm relationships between members (i.e. how many, if any, of the various Smiths on the list are part of the same dynasty?). After coding each member with a binary dynasty variable, I used a fuzzy matching technique along with manual cleaning by hand to link the data sets and append Fernholz and Hagler's dynasty codings to the Moretti and Wilson [-@moretti_taxing_2023] data set.  @tbl-one shows summary statistics for 12,694 individual-year observations spanning from 1983-2017.  1984 has been omitted because it is missing from the Fernholz and Hagler data, and the Moretti and Wilson data excludes 2002 because *Forbes* did not publish location data that year.  @fig-panel shows a summary of treatment — whether or not an estate tax is in place — for each state over the entire observation period.  
+
+By converting from person-year observations to state-year observations, the authors allow themselves to track the number of Forbes billionaires living in each state each year. Appendix Table A1 replicates Table 1 from Moretti and Wilson, and shows the structure of the state-year data, including per-state summaries of Forbes population and change over time.  This structure lends itself well to a difference-in-difference (DiD) design that exploits the 2001 changes to the tax code represented by $$Y_{it} = \alpha + \beta_{1}ET_{i,t} + \beta_{2}Post_{i,t} + \delta(ET_{i,t}\times Post_{i,t}) + \eta_{i} + \theta_{t} + \epsilon_{it},$$ where $Y_{it}$ is the number of billionaires on the Forbes list living in state *i* in year *t*, *ET* is an indicator variable tracking whether a state has an estate tax currently enacted, *Post* is an indicator for whether the year is before or after 2001, $\eta_{i}$ is state fixed effects, $\theta_{t}$ is time fixed effects and $\epsilon_{it}$ is the error.
+
+![Summary View of Estate Tax Treatment by State, 1982-2017](figures/panelview.png){#fig-panel}
+
+Whereas Moretti and Wilson proceed to a triple-difference design that shows that individuals over 65 are more likely to move to avoid taxes then those under 65, I use a similar design to test whether members of dynastic fortunes are more likely to move to avoid taxes than those who are not.  This triple difference is represented by $$Y_{it} = \alpha + \beta_{1}ET_{i,t} + \beta_{2}Post_{i,t} + \beta_{3}D_{i,t} + \beta_{4} (ET_{i,t} \times Post_{i,t}) + \beta_{5} (ET_{i,t} \times D_{i,t}) +$$ $$\beta_{6} (Post_{i,t} \times D_{i,t}) + \delta (ET_{i,t}\times Post_{i,t} \times D_{i,t}) + \eta_{i} + \theta_{t} + \epsilon_{it},$$
+
+where *D* is added to the previous equation (and interacted with each term) and represents the count of dynasty members living in state *i* during time *t*. 
+
+# Results
+
+Following @moretti_taxing_2023, I "use the elimination of the federal credit for state estate taxes in 2001 for assessing the locational sensitivity of the ultra-rich to estate taxes."  In particular, while billionaires generally paid the same in taxes regardless of location before 2001, their tax burdens varied substantially by state post 2001.  @fig-5 shows the share of billionaires living in a state that had an estate tax in 2001 each year.  The horizontal line shows the passage of the EGTRRA with the shaded region showing the phase in period.  The horizontal lines correspond to the pre-2001 and post-2001 mean, showing a drop from about 21 percent on average to roughly 17 percent. @fig-5 replicates Figure 5 from @moretti_taxing_2023.
+
+![Share of Forbes 400 Living in a 2001 Estate Tax State, 1982-2017](figures/figure5.png){#fig-5}
+To test this relationship more rigorously, I replicate Moretti and Wilson's [-@moretti_taxing_2023] difference-in-difference design that compares the change in the number of billionaires (or their wealth) prior to the 2001 credit elimination and after the elimination in estate tax states and non–estate tax states.  Note that while the estimates match the original paper precisely, Moretti and Wilson use Driscoll-Kraay (with ten-year bandwidth) standard errors, whereas I use simple clustered standard errors, thus explaining the difference.  
+
+|                         |
+|:------------------------|
+| ![](tables/reg1.png) |
+
+\[**SK: The quarto code below puts in a figure into a markdown table and calls it a table. Inserting tables are more complicated than inserting figures, so a hack is to include the image of the table as I have done here. Alternatively, you can also ask R to generate tables in a .tex format and ask quarto read it in as a tex file. See Appendix.**\]
+
+
+
+\[**SK: Do not delete the two lines of quarto code that starts with `::: {#refs}`. This produces a list of references.**\]
+
+::: {#refs}
+:::
+
+# Appendix {.appendix}
+
+|                         |
+|:------------------------|
+| ![](figures/table1.png) |
+
+: Replication of @moretti_taxing_2023 Figure 1: "Forbes 400 by State, 2017" {#tbl-main}
+
+![Replication of @moretti_taxing_2023 Figure 6: "Probability of Living in Estate Tax State by Age](figures/figure_6.png){#fig-6}
+
 Adding a `{.appendix}` next to your section header makes it an Appendix.
 
-Table \ref{tab:main-tex} is a table generated in LaTeX. LaTeX is a different language than R or markdown. So, we denote that we are using tex code explicitly by using the `{=tex}` tag. However, often quarto can detect LaTeX code. For example, the notation `\ref{tab:main-tex}` used in the top of this paragraph is tex code that quarto recognizes, and captures the number of the table. 
+Table \ref{tab:main-tex} is a table generated in LaTeX. LaTeX is a different language than R or markdown. So, we denote that we are using tex code explicitly by using the `{=tex}` tag. However, often quarto can detect LaTeX code. For example, the notation `\ref{tab:main-tex}` used in the top of this paragraph is tex code that quarto recognizes, and captures the number of the table.
 
 The file `tables/scheve-regression.tex` can be generated in your R script. When you create the table with `modelsummary`, add `output = "gt"` inside `modelsummary()`, and saving the output of `modelsummary` into `gt::gtsave()`. For example, this uses a simple example:
 
-![](figures/codesnippet.png){width="80%"}
-
-Then, the code chunk starting with `{=tex}` in the quarto code will read in the tex table, and add additional environments around it. For more on these environments, see <https://www.overleaf.com/learn/latex/Environments> and the chapters in the website. ChatGPT should be quite good too at providing snippets of LaTeX code. All the teaching fellows and instructors can help with TeX. 
 
 
-
+Then, the code chunk starting with `{=tex}` in the quarto code will read in the tex table, and add additional environments around it. For more on these environments, see <https://www.overleaf.com/learn/latex/Environments> and the chapters in the website. ChatGPT should be quite good too at providing snippets of LaTeX code. All the teaching fellows and instructors can help with TeX.
