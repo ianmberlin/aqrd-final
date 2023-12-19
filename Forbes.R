@@ -11,7 +11,7 @@ library(patchwork)
 library(zoomerjoin)
 library(broom)
 
-# Load Files
+## Load Files
 state_year<- read_dta("ReplicationPackage/data/stata_data/StateyearAnalysisDataset.dta")
 person_year_orig <- read_dta("ReplicationPackage/data/stata_data/IndivAnalysisDataset.dta") 
 
@@ -23,6 +23,8 @@ dynastic <- read_excel("data/Forbes 400 Aggregate with Dynasty Members.xlsx") |>
   mutate(across(where(is.character), str_trim))
 
 ## Fuzzy Matching ----
+
+# clean data and prepare for matching
 dynasty_long <- dynastic |>
   filter(dynasty_binary != "") |>
   mutate(dynasty_binary = as.character(dynasty_binary)) |> 
@@ -36,9 +38,11 @@ dynasty_long <- dynastic |>
   mutate(NetWorthMill = NetWorth/1000000,
          name_lower = tolower(name))
 
+# convert to lower to minimize false negatives
 person_year <- person_year |>
   mutate(name_lower = tolower(name))
 
+# fuzzy match 
 join_wide <- jaccard_left_join(person_year, dynasty_long,
                           by = c("name_lower" = "name_lower"),
                           block_by = c("year" = "year"),
@@ -52,17 +56,16 @@ join_wide <- jaccard_left_join(person_year, dynasty_long,
          match = if_else(NetWorthMill.x == NetWorthMill.y, 1, 0)) |>
   arrange(match, dist)
 
+# export to csv
 write.csv(join_wide, "data/fuzzy_match_wide_partial.csv")
 
 ## Additional cleaning in Excel to hand match names that did not fuzzy match
 
 # Read in cleaned CSV
-
 cleaned <- read.csv("data/fuzzy_match_wide.csv") |>
   select(c("year.x", "name.x", "dynasty_binary"))
 
 # merge with Moretti data
-
 merged <- left_join(person_year, cleaned,
                     by = c("name" = "name.x", "year" = "year.x")) |>
   rename("dynasty" = "dynasty_binary") |>
@@ -72,10 +75,30 @@ merged <- left_join(person_year, cleaned,
          our_wealthy = as.factor(our_wealthy),
          dynasty_combined = as.factor(if_else(dynasty == 1 | our_wealthy == 1, 1, 0)))
 
-counts <- merged |>
+
+counts_fernholz <- merged |>
+  group_by(State, year, dynasty, .drop = FALSE) |>
+  summarize(stock_fernholz = n(),
+            NetWorth_fernholz = sum(NetWorthMill, na.rm = TRUE))
+
+counts_moretti <- merged |>
+  group_by(State, year, our_wealthy, .drop = FALSE) |>
+  summarize(stock_moretti = n(),
+            NetWorth_moretti = sum(NetWorthMill, na.rm = TRUE))
+
+counts_combined <- merged |>
   group_by(State, year, dynasty_combined, .drop = FALSE) |>
-  summarize(N = n(),
-            NetWorth = sum(NetWorthMill, na.rm = TRUE))
+  summarize(stock_combined = n(),
+            NetWorth_combined = sum(NetWorthMill, na.rm = TRUE))
+
+counts <- counts_fernholz |>
+  left_join(counts_moretti, by = c("State" = "State", 
+                                   "year" = "year", 
+                                   "dynasty" = "our_wealthy")) |>
+  left_join(counts_combined, by = c("State" = "State", 
+                                    "year" = "year", 
+                                    "dynasty" = "dynasty_combined"))
+  
 
 state_year_dynasty <- state_year |>
   filter(!year %in% c("1982", "1984")) |>
@@ -83,13 +106,11 @@ state_year_dynasty <- state_year |>
   select(- c("stock", "wealth", "NetWorthMill")) |>
   mutate(State = as.factor(State),
          year = as.factor(year))|>
-  add_column(dynasty_combined = as.factor(rep(c(0, 1), length.out = 2*(nrow(state_year)-100))),
+  add_column(dynasty = as.factor(rep(c(0, 1), length.out = 2*(nrow(state_year)-100))),
              .after = "abbr") |>
-  left_join(counts, by = c("State" = "State", "year" = "year", "dynasty_combined" = "dynasty_combined"))
-
+  left_join(counts, by = c("State" = "State", "year" = "year", "dynasty" = "dynasty"))
 
 # Panel View
-
 state_year |>
   panelview(stock ~ EI,
             index = c("State", "year"),
@@ -98,6 +119,8 @@ state_year |>
             ylab = "",
             main = "Estate Tax",
             leave.gap = TRUE)
+
+ggsave("template/figures/panelview.png", height = 6, width = 6)
 
 
 ## Replication ----
@@ -119,7 +142,7 @@ person_year_orig |>
   group_by(year) |>
   summarize(share = mean(EI2001)*100) |>
   ggplot(aes(x = year, y = share)) +
-  geom_line() +
+  geom_line(linewidth = 1) +
   geom_segment(aes(x = 1983, y = 21.4, xend = 2001, yend = 21.4), 
                linetype = "dashed", color = "red") +
   geom_segment(aes(x = 2002, y = 17.4, xend = 2017, yend = 17.4), 
@@ -128,10 +151,12 @@ person_year_orig |>
   annotate("rect",xmin = 2001, xmax = 2004, ymin = -Inf, ymax = Inf, alpha = .5) +
   scale_y_continuous(limits =c(0,30),
                      breaks = seq(0, 30, by = 5)) +
+  scale_x_continuous(breaks = seq(1985, 2015, by = 10)) +
   labs(x = "Year",
-       y = "Percentage")
+       y = "Percentage",
+       caption = "Notes: Year 2002 is missing. Dashed horizontal lines are the mean before 2001 and after 2001.")
 
-
+ggsave("template/figures/figure5.png", height = 4, width = 6)
 
 # Figure 6
 
@@ -166,7 +191,7 @@ trend_post <- person_year_orig |>
 # combine graphs
 trend_pre + trend_post
 
-ggsave("figures/figure_6.png", width = 8, height = 4)
+ggsave("template/figures/figure_6.png", width = 8, height = 4)
 
 # Table 2
 state_year <- state_year |>
@@ -199,17 +224,30 @@ state_year_drop <- state_year|>
   filter(!year %in% c("2002", "2003", "2004"))
 
 mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
-models <- list("(1)" = mod1,
-               "(2)" = mod2,
-               "(3)" = mod3,
-               "Per Capita\n(4)" = mod5,
-               "Drop \n2002-2004\n(5)" = mod8
-               )
-modelsummary(models,
-             gof_map = c("nobs", "FE: State", "FE: year"))
-               
-modelsummary(list(mod1, mod2, mod3, mod5, mod6, mod7, mod8), gof_map = c("nobs", "FE: State", "FE: year"))
 
+models <- list("(1)" = mod1, 
+               "(2)" = mod2, 
+               "(3)" = mod3,
+               "Per Capita (4)" = mod5,
+               "Drop 2002-2004 
+               (5)" = mod8
+               )
+
+reg1 <- modelsummary(models,
+             gof_map = c("nobs", "FE: State", "FE: year"),
+             coef_map = c("EI:post_year" = "ET-state × post-2001",
+                          "EI" = "ET-State",
+                          "post_year:PIT" = "PIT × post-2001",
+                          "PIT" = "PIT",
+
+                          "topshr_90to97" = "High earners share"),
+             output = "gt") |>
+  tab_options(
+    table.width = px(420)) |>
+  opt_table_font(stack = "transitional")
+
+gtsave(reg1, "template/tables/reg1.png")
+  
 
 # Triple Differences
 
@@ -223,21 +261,16 @@ state_year_dynasty <- state_year_dynasty |>
          topshr_90to97 = (pop_90to97/pop_90to97_natl)*100,
          stockpc = (stock/pop)*1000)
 
-mod2_1 <- feols(stock ~ EI*post_year*dynasty_combined + EI*dynasty_combined + EI*post_year + dynasty_combined*post_year | State + year, state_year_dynasty)
+mod2_1 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 mod2_2 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + PIT*post_year*dynasty + PIT*dynasty + PIT*post_year | State + year, state_year_dynasty)
 mod2_3 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + EI + dynasty + topshr_90to97| State + year, state_year_dynasty)
 
 summary(mod2_1)
 
-test <- merged |>
-  filter(our_wealthy != dynasty) |>
-  select(name, family, our_wealthy, dynasty) 
-
-unique(test$name)
 
 # Summary Statistics ----
 
-merged |>
+summary <- merged |>
   select(NetWorthMill, Age_num, EI, dynasty, our_wealthy) |> 
   mutate(dynasty = as.double(dynasty)-1,
          our_wealthy = as.double(our_wealthy)-1) |>
@@ -247,7 +280,28 @@ merged |>
     mean = mean(value, na.rm = TRUE),
     sd = sd(value, na.rm = TRUE),
     n = sum(!is.na(value))
+  ) |>
+  ## rename variable descriptions
+  mutate(name = recode_factor(
+    name,
+    Age_num = "Age",
+    EI = "Estate Tax State (0 or 1)",
+    NetWorthMill = "Net Worth (USD millions)",
+    dynasty = "Fernholz and Hagler Dynasty Indicator (0 or 1)",
+    our_wealthy = "Moretti and Wilson Dynasty Indicator (0 or 1)")) |>
+  arrange(name) |>
+  gt() |>
+  cols_align("left", 1) |>
+  cols_label(name = "", mean = "Mean", sd = "Sd", n = "N") |>
+  fmt_number(columns = c(mean, sd), decimals = 2) |>
+  ## add commas to integers
+  fmt_integer(columns = n) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()
   )
+
+gtsave(summary, "template/tables/summarystats.tex")
 
 # Table 1
 mean_wealth <- state_year |> 
@@ -303,7 +357,7 @@ tab1 <- gt(tab1_df) |>
     everything() ~ px(100)
   )
 
-gtsave(tab1, "figures/table1.png")
+gtsave(tab1, "template/tables/table1.tex")
 
 
 state_year |>
