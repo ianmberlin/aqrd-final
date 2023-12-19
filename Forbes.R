@@ -73,7 +73,8 @@ merged <- left_join(person_year, cleaned,
          year = as.factor(year),
          dynasty = as.factor(dynasty),
          our_wealthy = as.factor(our_wealthy),
-         dynasty_combined = as.factor(if_else(dynasty == 1 | our_wealthy == 1, 1, 0)))
+         dynasty_either = as.factor(if_else(dynasty == 1 | our_wealthy == 1, 1, 0)),
+  dynasty_both = as.factor(if_else(dynasty == 1 & our_wealthy == 1, 1, 0)))
 
 
 counts_fernholz <- merged |>
@@ -86,20 +87,28 @@ counts_moretti <- merged |>
   summarize(stock_moretti = n(),
             NetWorth_moretti = sum(NetWorthMill, na.rm = TRUE))
 
-counts_combined <- merged |>
-  group_by(State, year, dynasty_combined, .drop = FALSE) |>
-  summarize(stock_combined = n(),
-            NetWorth_combined = sum(NetWorthMill, na.rm = TRUE))
+counts_either <- merged |>
+  group_by(State, year, dynasty_either, .drop = FALSE) |>
+  summarize(stock_either = n(),
+            NetWorth_either = sum(NetWorthMill, na.rm = TRUE))
+
+counts_both <- merged |>
+  group_by(State, year, dynasty_both, .drop = FALSE) |>
+  summarize(stock_both = n(),
+            NetWorth_both = sum(NetWorthMill, na.rm = TRUE))
 
 counts <- counts_fernholz |>
   left_join(counts_moretti, by = c("State" = "State", 
                                    "year" = "year", 
                                    "dynasty" = "our_wealthy")) |>
-  left_join(counts_combined, by = c("State" = "State", 
+  left_join(counts_either, by = c("State" = "State", 
                                     "year" = "year", 
-                                    "dynasty" = "dynasty_combined"))
-  
+                                    "dynasty" = "dynasty_either")) |>
+  left_join(counts_both, by = c("State" = "State", 
+                                     "year" = "year", 
+                                     "dynasty" = "dynasty_both"))
 
+# create combined dataset for triple-difference analysis
 state_year_dynasty <- state_year |>
   filter(!year %in% c("1982", "1984")) |>
   slice(rep(1:n(), each = 2)) |>
@@ -225,25 +234,26 @@ state_year_drop <- state_year|>
 
 mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
 
-models <- list("(1)" = mod1, 
+models_1 <- list("(1)" = mod1, 
                "(2)" = mod2, 
                "(3)" = mod3,
-               "Per Capita (4)" = mod5,
+               "Per Capita (5)" = mod5,
                "Drop 2002-2004 
-               (5)" = mod8
+               (8)" = mod8
                )
 
-reg1 <- modelsummary(models,
+reg1 <- modelsummary(models_1,
              gof_map = c("nobs", "FE: State", "FE: year"),
              coef_map = c("EI:post_year" = "ET-state × post-2001",
                           "EI" = "ET-State",
                           "post_year:PIT" = "PIT × post-2001",
                           "PIT" = "PIT",
-
                           "topshr_90to97" = "High earners share"),
              output = "gt") |>
   tab_options(
-    table.width = px(420)) |>
+    table.font.size = px(12),
+    table.width = px(400),
+    data_row.padding = px(1.5)) |>
   opt_table_font(stack = "transitional")
 
 gtsave(reg1, "template/tables/reg1.png")
@@ -255,18 +265,57 @@ state_year_dynasty <- state_year_dynasty |>
   mutate(year = as.character(year),
          post_year = if_else(year > 2001, 1, 0),
          PIT = avg*100) |>
-  rename("stock" = "N") |>
   group_by(year) |>
   mutate(pop_90to97_natl = sum(pop_90to97),
          topshr_90to97 = (pop_90to97/pop_90to97_natl)*100,
-         stockpc = (stock/pop)*1000)
+         stockpc = (stock_fernholz/pop)*1000)
 
-mod2_1 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
-mod2_2 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + PIT*post_year*dynasty + PIT*dynasty + PIT*post_year | State + year, state_year_dynasty)
-mod2_3 <- feols(stock ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + EI + dynasty + topshr_90to97| State + year, state_year_dynasty)
+mod2_1 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
-summary(mod2_1)
+mod2_2 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + PIT*post_year*dynasty + PIT*dynasty + PIT*post_year | State + year, state_year_dynasty)
 
+mod2_3 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + EI + dynasty + topshr_90to97| State + year, state_year_dynasty)
+
+mod2_4 <- feols(stockpc ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
+
+summary(mod2_4)
+
+mod_moretti <- feols(stock_moretti ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
+
+mod_either <- feols(stock_either ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
+
+mod_both <- feols(stock_both ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
+
+# drop 2002-2004
+state_year_dynasty_drop <- state_year_dynasty |>
+  filter(!year %in% c("2002", "2003", "2004"))
+
+mod_drop <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty_drop)
+
+models_2 <- list(mod2_1, mod2_2, mod2_3, "Per Capita" = mod2_4, "Moretti Codings" = mod_moretti, "Either" = mod_either, "Both" = mod_both, "Drop 2002-2004" = mod_drop)
+
+reg2 <- modelsummary(models_2,
+             gof_map = c("nobs", "FE: State", "FE: year"),
+             coef_map = c("EI:post_year:dynasty1" = "ET-state × post-2001 x dynasty",
+                          "EI:dynasty1" = "ET-state × dynasty",
+                          "EI:post_year" = "ET-state × post-2001",
+                          "post_year:dynasty1" = "Dynasty x post-2001",
+                          "EI" = "ET-State",
+                          "dynasty1" = "Dynasty",
+                          "post_year:dynasty1:PIT" = "PIT × post-2001 x dynasty",
+                          "dymasty1:PIT" = "PIT × dynasty",
+                          "post_year:PIT" = "PIT × post-2001",
+                          "PIT" = "PIT",
+                          "topshr_90to97" = "High earners share"),
+             stars = TRUE,
+             output = "gt") |>
+  tab_options(
+    table.font.size = px(14),
+    table.width = px(500),
+    data_row.padding = px(1.5)) |>
+  opt_table_font(stack = "transitional")
+
+gtsave(reg2, "template/tables/reg2.png")
 
 # Summary Statistics ----
 
@@ -358,22 +407,4 @@ tab1 <- gt(tab1_df) |>
   )
 
 gtsave(tab1, "template/tables/table1.tex")
-
-
-state_year |>
-  group_by(state) 
-
-?pivot_wider
-  
-summary_table <- forbes |>
-  mutate(gender2 = if_else(gender == "M", 1, 0),
-         marital2 = if_else(marital == "Married", 1, 0),
-         race2 = if_else(race == "white", 1, 0)) |>
-  select("networth", "gender2", "marital2", "race2", "age", "numberofchildren",
-         "Change") |>
-  sumtable(labels = c("Net Worth (billions)", "Gender (M = 1)", 
-                      "Marital Status (Married = 1)", "Race (white = 1)", 
-                      "Age", "Number of Children", "% Change from Previous Year"),
-           digits = 4)
-
 
