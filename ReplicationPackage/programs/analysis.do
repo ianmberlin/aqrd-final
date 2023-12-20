@@ -1706,7 +1706,7 @@ egen EI`postyear' = max(x), by(abbr)
 egen total_wealth = total(wealth), by(year)
 gen wealth_share = (wealth/total_wealth)*100
 sum total_wealth if year==2017
-gen wealth_normalized = (wealth)*(r(mean)/total_wealth)   //rescale each state-year's wealth so national total is constant over time (equal to 2017 national total).
+gen wealth_normalizd = (wealth)*(r(mean)/total_wealth)   //rescale each state-year's wealth so national total is constant over time (equal to 2017 national total).
 
 collapse (sum) stock `wealth', by(EI`postyear' year)
 reshape wide stock `wealth', i(year) j(EI`postyear')

@@ -76,7 +76,7 @@ merged <- left_join(person_year, cleaned,
          dynasty_either = as.factor(if_else(dynasty == 1 | our_wealthy == 1, 1, 0)),
   dynasty_both = as.factor(if_else(dynasty == 1 & our_wealthy == 1, 1, 0)))
 
-
+#group and generate counts
 counts_fernholz <- merged |>
   group_by(State, year, dynasty, .drop = FALSE) |>
   summarize(stock_fernholz = n(),
@@ -97,6 +97,7 @@ counts_both <- merged |>
   summarize(stock_both = n(),
             NetWorth_both = sum(NetWorthMill, na.rm = TRUE))
 
+#join all the counts together to merge with Moretti data
 counts <- counts_fernholz |>
   left_join(counts_moretti, by = c("State" = "State", 
                                    "year" = "year", 
@@ -115,24 +116,12 @@ state_year_dynasty <- state_year |>
   select(- c("stock", "wealth", "NetWorthMill")) |>
   mutate(State = as.factor(State),
          year = as.factor(year))|>
-  add_column(dynasty = as.factor(rep(c(0, 1), length.out = 2*(nrow(state_year)-100))),
+  add_column(dynasty = as.factor(rep(c(0, 1), length.out = 2*(nrow(state_year)-100))), # create dynasty column that alternates 0 and 1 for merging 
              .after = "abbr") |>
   left_join(counts, by = c("State" = "State", "year" = "year", "dynasty" = "dynasty"))
 
-# Panel View
-state_year |>
-  panelview(stock ~ EI,
-            index = c("State", "year"),
-            axis.lab.gap = c(1,0),
-            xlab = "",
-            ylab = "",
-            main = "Estate Tax",
-            leave.gap = TRUE)
 
-ggsave("template/figures/panelview.png", height = 6, width = 6)
-
-
-## Replication ----
+## Figure Replications ----
 
 # Figure 5.
 
@@ -167,8 +156,9 @@ person_year_orig |>
 
 ggsave("template/figures/figure5.png", height = 4, width = 6)
 
-# Figure 6
+# Figure 6.
 
+# Panel A
 trend_pre <- person_year_orig |> 
   filter(Age_num > 40,
          Age_num <= 85,
@@ -183,6 +173,7 @@ trend_pre <- person_year_orig |>
        y = "Fraction of age group living\n in state with estate tax",
        title = "Panel A. 1982–2001")
 
+# Panel B
 trend_post <- person_year_orig |> 
   filter(Age_num > 40,
          Age_num <= 85,
@@ -202,38 +193,35 @@ trend_pre + trend_post
 
 ggsave("template/figures/figure_6.png", width = 8, height = 4)
 
-# Table 2
+## Regressions ----
+
+#Table 2 (DiD Table)
+
+# clean data
 state_year <- state_year |>
   mutate(post_year = if_else(year > 2001, 1, 0)) |>
   mutate(PIT = avg*100) 
 
-mean_2017 <- state_year |>
-  filter(year == 2017) |>
-  summarize(mean = mean(wealth))
+#
 
 state_year <- state_year |>
   group_by(year) |>
   mutate(pop_90to97_natl = sum(pop_90to97)) |>
   mutate(topshr_90to97 = (pop_90to97/pop_90to97_natl)*100) |>
-  mutate(total_wealth = sum(wealth)) |>
-  mutate(wealth_share = (wealth/total_wealth)*100) |>
-  mutate(stockpc = (stock/pop)*1000) |> 
-  mutate(inheritance_estate = if_else(EI == 1 | Ionly == 1, 1, 0)) |>
-  mutate(wealth_deflated = if_else(year>2001, wealth/52.1, wealth))
+  mutate(stockpc = (stock/pop)*1000)
+  
+#create dataset without 2002-2004
+state_year_drop <- state_year |>
+  filter(!year %in% c("2002", "2003", "2004"))
 
+# run models
 mod1 <- feols(stock ~  EI*post_year | State + year, state_year)
 mod2 <- feols(stock ~ EI*post_year  + PIT*post_year + PIT | State + year, state_year)
 mod3 <- feols(stock ~ EI*post_year + topshr_90to97  | State + year, state_year)
 mod5 <- feols(stockpc ~ EI*post_year | State + year, state_year)
-mod6 <- feols(wealth_deflated ~ EI*post_year | State + year, state_year)
-mod7 <- feols(stock ~ inheritance_estate*post_year + inheritance_estate | State + year, state_year)
-
-#create dataset without 2002-2004
-state_year_drop <- state_year|>
-  filter(!year %in% c("2002", "2003", "2004"))
-
 mod8 <- feols(stock ~ EI*post_year + EI  | State + year, state_year_drop)
 
+# creat table
 models_1 <- list("(1)" = mod1, 
                "(2)" = mod2, 
                "(3)" = mod3,
@@ -256,11 +244,13 @@ reg1 <- modelsummary(models_1,
     data_row.padding = px(1.5)) |>
   opt_table_font(stack = "transitional")
 
+# save table
 gtsave(reg1, "template/tables/reg1.png")
   
 
 # Triple Differences
 
+# data cleaning
 state_year_dynasty <- state_year_dynasty |>
   mutate(year = as.character(year),
          post_year = if_else(year > 2001, 1, 0),
@@ -270,6 +260,11 @@ state_year_dynasty <- state_year_dynasty |>
          topshr_90to97 = (pop_90to97/pop_90to97_natl)*100,
          stockpc = (stock_fernholz/pop)*1000)
 
+# drop 2002-2004
+state_year_dynasty_drop <- state_year_dynasty |>
+  filter(!year %in% c("2002", "2003", "2004"))
+
+# run models
 mod2_1 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
 mod2_2 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year + PIT*post_year*dynasty + PIT*dynasty + PIT*post_year | State + year, state_year_dynasty)
@@ -278,20 +273,16 @@ mod2_3 <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_yea
 
 mod2_4 <- feols(stockpc ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
-summary(mod2_4)
-
 mod_moretti <- feols(stock_moretti ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
 mod_either <- feols(stock_either ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
 mod_both <- feols(stock_both ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty)
 
-# drop 2002-2004
-state_year_dynasty_drop <- state_year_dynasty |>
-  filter(!year %in% c("2002", "2003", "2004"))
-
 mod_drop <- feols(stock_fernholz ~ EI*post_year*dynasty + EI*dynasty + EI*post_year + dynasty*post_year | State + year, state_year_dynasty_drop)
 
+
+# create table
 models_2 <- list(mod2_1, mod2_2, mod2_3, "Per Capita" = mod2_4, "Moretti Codings" = mod_moretti, "Either" = mod_either, "Both" = mod_both, "Drop 2002-2004" = mod_drop)
 
 reg2 <- modelsummary(models_2,
@@ -315,6 +306,7 @@ reg2 <- modelsummary(models_2,
     data_row.padding = px(1.5)) |>
   opt_table_font(stack = "transitional")
 
+# save table 
 gtsave(reg2, "template/tables/reg2.png")
 
 # Summary Statistics ----
@@ -343,16 +335,22 @@ summary <- merged |>
   cols_align("left", 1) |>
   cols_label(name = "", mean = "Mean", sd = "Sd", n = "N") |>
   fmt_number(columns = c(mean, sd), decimals = 2) |>
+  tab_options(data_row.padding = px(4)) |>
   ## add commas to integers
   fmt_integer(columns = n) |>
+  opt_table_font(stack = "transitional") |>
   tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_row_groups()
-  )
+    style = list(
+      cell_borders(sides = "bottom",
+                   style = "hidden")),
+    locations = cells_body())
 
-gtsave(summary, "template/tables/summarystats.tex")
+# save table
+gtsave(summary, "template/tables/summarystats.png")
 
-# Table 1
+# Table 1 replication
+
+# calculate mean wealth by state
 mean_wealth <- state_year |> 
   filter(year == 2017) |>
   group_by(State) |>
@@ -360,7 +358,7 @@ mean_wealth <- state_year |>
   summarize(mean = mean(pbwealth))  |>
   select(mean)
   
-
+# calculate changes in billionaire population 
 tab1_df <- state_year |>
   filter(year %in% c("1982", "2000", "2017")) |>
   mutate(pbwealth = NetWorthMill/stock) |>
@@ -375,8 +373,7 @@ tab1_df <- state_year |>
              .after = "2017") |>
   select(State, `2017`, mean, stock_delta82_17, stock_delta82_00, stock_delta00_17)
 
-
-
+#create and format table
 tab1 <- gt(tab1_df) |>
   cols_label(State = "State", `2017` = "Forbes population in 2017", 
                            mean = "Per capita mean wealth in 2017 (mil)",
@@ -393,18 +390,27 @@ tab1 <- gt(tab1_df) |>
     table.width = px(800),
     data_row.padding = px(1)
   ) |>
-  tab_style(
-    style = list(
-      cell_borders(
-        sides = "bottom",
-        style = "hidden"
-      )
-    ),
-    locations = cells_body()
-  ) |>
-  cols_width(
-    everything() ~ px(100)
-  )
+  tab_style(style = list(cell_borders(
+    sides = "bottom",
+    style = "hidden"
+      )),
+    locations = cells_body()) |>
+  cols_width(everything() ~ px(100))
 
+# save table
 gtsave(tab1, "template/tables/table1.tex")
+
+# Panel View ----
+state_year |>
+  filter(!year %in% c(1982,1984)) |>
+  panelview(stock ~ EI,
+            index = c("State", "year"),
+            axis.lab.gap = c(1,0),
+            xlab = "",
+            ylab = "",
+            main = "Estate Tax",
+            leave.gap = TRUE)
+
+# save
+ggsave("template/figures/panelview.png", height = 6, width = 6)
 
