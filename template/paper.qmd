@@ -14,7 +14,7 @@ format:
     include-in-header: header.tex
 bibliography: aqrd-bibliography.bib
 abstract: | 
-  Recent studies have shown that wealth among the 400 richest Americans — the *Forbes* 400 — has grown increasingly concentrated over time.  At the same time, individuals who inherited their wealth tend to be more stable within the *Forbes* 400 over time.  One potential explanation for this divergence could be that individuals who belong to dynastic fortunes are better at colluding to avoid state level estate taxes by positioning where they live. Building off of @moretti_taxing_2023, I replicate their findings that billionaires are generally sensitive to estate taxes and move between states to avoid taxation, but find that there is no difference in the rate of movement depending on whether an individual belongs to a dynasty or not.  
+  Recent studies have shown that wealth among the 400 richest Americans — the *Forbes* 400 — has grown increasingly concentrated over time.  At the same time, individuals who inherited their wealth tend to be more stable within the *Forbes* 400 over time.  One potential explanation for this divergence could be that individuals who belong to dynastic fortunes are better at colluding to avoid state level estate taxes by positioning where they live. Building off of @moretti_taxing_2023, I replicate their findings that billionaires are generally sensitive to estate taxes and move between states to avoid taxation, but find that there is no difference in the rate of movement depending on whether an individual belongs to a dynasty or not. [GitHub repository here](https://github.com/ianmberlin/aqrd-final)
 ---
 
 # Introduction
